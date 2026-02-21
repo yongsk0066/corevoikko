@@ -117,7 +117,7 @@ EXPORTED_FUNCTIONS=$(echo "$EXPORTED_FUNCTIONS" | tr -d '[:space:]')
 
 emcc -g0 "$LIBFILE" $OPTS \
   -o js/wasm/libvoikko.mjs \
-  --post-js js/legacy/libvoikko_api.js \
+  --post-js js/libvoikko_api.js \
   -s MODULARIZE=1 \
   -s EXPORT_ES6=1 \
   -s EXPORT_NAME="'Libvoikko'" \
