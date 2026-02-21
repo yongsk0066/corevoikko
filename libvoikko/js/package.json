@@ -16,6 +16,7 @@
   "sideEffects": false,
   "scripts": {
     "build": "tsdown",
+    "build:wasm": "cd .. && ./js/build.sh plain",
     "test": "vitest run",
     "test:watch": "vitest"
   },
