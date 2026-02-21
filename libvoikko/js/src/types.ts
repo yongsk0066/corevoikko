@@ -122,7 +122,8 @@ export interface VoikkoInitOptions {
   dictionaryUrl?: string;
   /**
    * Local filesystem path for dictionary files (Node.js).
-   * Should point to a directory containing `5/mor-standard/`.
+   * Accepts both flat layout (files directly in path) and
+   * V5 structure ({path}/5/mor-standard/).
    */
   dictionaryPath?: string;
   /**

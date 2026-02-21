@@ -7,7 +7,7 @@ import type {
   VoikkoInitOptions,
   RawVoikkoInstance,
 } from './types.js';
-import { loadModule } from './wasm-loader.js';
+import { loadWasm, loadDict, mountDict } from './wasm-loader.js';
 
 export type {
   Token,
@@ -43,7 +43,9 @@ export class Voikko {
 
   /**
    * Initialize a Voikko instance for the given language.
-   * Loads the WASM module and dictionary files asynchronously.
+   *
+   * Pipeline: loadWasm ∥ loadDict → mountDict → module.init
+   * WASM module is cached after first call.
    *
    * @param language - BCP 47 language tag (default: 'fi')
    * @param options - Dictionary loading options
@@ -52,7 +54,11 @@ export class Voikko {
     language: string = 'fi',
     options: VoikkoInitOptions = {},
   ): Promise<Voikko> {
-    const module = await loadModule(options);
+    const [module, dict] = await Promise.all([
+      loadWasm(options.locateFile),
+      loadDict(options),
+    ]);
+    mountDict(module, dict);
     const raw = module.init(language);
     return new Voikko(raw);
   }

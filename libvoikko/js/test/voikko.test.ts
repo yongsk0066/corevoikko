@@ -1,4 +1,5 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeAll, beforeEach, afterAll, afterEach } from 'vitest';
+import type { Voikko as VoikkoType } from '../src/index.js';
 
 // -- Tier 1: Type/Structure tests (always runnable) --
 
@@ -10,7 +11,6 @@ describe('Voikko module exports', () => {
   });
 
   it('should export type interfaces', async () => {
-    // Verify the module can be imported without errors
     const mod = await import('../src/index.js');
     expect(mod.Voikko).toBeDefined();
   });
@@ -19,17 +19,17 @@ describe('Voikko module exports', () => {
 // -- Tier 2: Integration tests (require WASM + dictionary) --
 
 const DICT_PATH = process.env['VOIKKO_DICT_PATH'];
-const WASM_AVAILABLE = !!DICT_PATH;
+const HAS_DICTIONARY = !!DICT_PATH;
 
-describe.skipIf(!WASM_AVAILABLE)('Voikko integration', () => {
-  let voikko: Awaited<ReturnType<typeof import('../src/index.js').Voikko.init>>;
+describe.skipIf(!HAS_DICTIONARY)('Voikko integration', () => {
+  let voikko: VoikkoType;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const { Voikko } = await import('../src/index.js');
     voikko = await Voikko.init('fi', { dictionaryPath: DICT_PATH! });
   });
 
-  afterEach(() => {
+  afterAll(() => {
     voikko.terminate();
   });
 
@@ -40,9 +40,11 @@ describe.skipIf(!WASM_AVAILABLE)('Voikko integration', () => {
     expect(voikko.spell('määä')).toBe(false);
   });
 
-  it('spellAfterTerminateThrowsException', () => {
-    voikko.terminate();
-    expect(() => voikko.spell('kissa')).toThrow();
+  it('spellAfterTerminateThrowsException', async () => {
+    const { Voikko } = await import('../src/index.js');
+    const tmp = await Voikko.init('fi', { dictionaryPath: DICT_PATH! });
+    tmp.terminate();
+    expect(() => tmp.spell('kissa')).toThrow();
   });
 
   // Suggestions
@@ -176,7 +178,35 @@ describe.skipIf(!WASM_AVAILABLE)('Voikko integration', () => {
     expect(voikko.hyphenate("vaa'an", '&shy;', false)).toBe("vaa'an");
   });
 
-  // Option setters
+  it('attributeValuesForEnumeratedAttribute', () => {
+    const values = voikko.attributeValues('NUMBER');
+    expect(values).toHaveLength(2);
+    expect(values).toContain('singular');
+    expect(values).toContain('plural');
+  });
+
+  it('attributeValuesForNonEnumeratedAttribute', () => {
+    expect(voikko.attributeValues('BASEFORM')).toBeNull();
+  });
+
+  it('attributeValuesForUnknownAttribute', () => {
+    expect(voikko.attributeValues('XYZ')).toBeNull();
+  });
+});
+
+// -- Tier 2: Option setter tests (need fresh instance per test) --
+
+describe.skipIf(!HAS_DICTIONARY)('Voikko option setters', () => {
+  let voikko: VoikkoType;
+
+  beforeEach(async () => {
+    const { Voikko } = await import('../src/index.js');
+    voikko = await Voikko.init('fi', { dictionaryPath: DICT_PATH! });
+  });
+
+  afterEach(() => {
+    voikko.terminate();
+  });
 
   it('setIgnoreDot', () => {
     voikko.setIgnoreDot(false);
@@ -292,20 +322,5 @@ describe.skipIf(!WASM_AVAILABLE)('Voikko integration', () => {
     expect(voikko.suggest('koir_')).toContain('koira');
     voikko.setSuggestionStrategy('TYPO');
     expect(voikko.suggest('koari')).toContain('koira');
-  });
-
-  it('attributeValuesForEnumeratedAttribute', () => {
-    const values = voikko.attributeValues('NUMBER');
-    expect(values).toHaveLength(2);
-    expect(values).toContain('singular');
-    expect(values).toContain('plural');
-  });
-
-  it('attributeValuesForNonEnumeratedAttribute', () => {
-    expect(voikko.attributeValues('BASEFORM')).toBeNull();
-  });
-
-  it('attributeValuesForUnknownAttribute', () => {
-    expect(voikko.attributeValues('XYZ')).toBeNull();
   });
 });
