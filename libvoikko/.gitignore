@@ -39,3 +39,9 @@ compile
 /test/*.log
 /test/*.trs
 /java/*.asc
+/js/node_modules
+/js/dist
+/js/wasm/*.mjs
+/js/wasm/*.wasm
+/js/wasm/*.data
+/js/pnpm-lock.yaml
