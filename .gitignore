@@ -7,5 +7,16 @@ libvoikko/cs/libvoikko.tests/test-results
 libvoikko/cs/libvoikko/bin
 libvoikko/cs/test-results
 voikko-fi/build-v5
+voikko-fi/vvfst-medicine/
+voikko-fi/vvfst/*.att
+voikko-fi/vvfst/*.vfst
+voikko-fi/vvfst/joukahainen-*.lexc
+voikko-fi/vvfst/joukahainen.lexc.stamp
+voikko-fi/vvfst/all.lexc
+voikko-fi/vvfst/autocorrect.lexc
+voikko-fi/vvfst/autocorrect.foma
+voikko-fi/vvfst/main.foma
+voikko-fi/vvfst/index.txt
+voikko-fi/vvfst/taivutuskaavat.lexc
 plan/
 

@@ -74,7 +74,7 @@ def _decode_if_bytes(b, encoding="UTF-8"):
 MAX_WORD_CHARS = 255
 
 """Maximum number of analyses that can be produced for a word"""
-MAX_ANALYSIS_COUNT = 31
+MAX_ANALYSIS_COUNT = 100
 
 class Dictionary:
 	"""Represents a morphological dictionary."""
