@@ -19,6 +19,7 @@
 
 import tempfile
 import os
+import sys
 import codecs
 from ctypes import CDLL
 from ctypes import POINTER
@@ -26,36 +27,36 @@ from ctypes import c_char_p
 from ctypes import c_int
 from ctypes import c_void_p
 
-DICTIONARY_FORMAT_VERSION = "2"
-INFO_FILE = "voikko-fi_FI.pro"
+DICTIONARY_FORMAT_VERSION = "5"
+INFO_FILE = "index.txt"
 
 class MorphologyInfo:
 	def __init__(self):
-		self.language = u"fi_FI"
+		self.language = u"fi"
 		self.variant = u"standard"
 		self.description = u"Default description"
 		self.morphology = None
 		self.speller = None
 		self.suggestion = None
 		self.hyphenator = None
-	
+		self.grammar = None
+
 	def __writeLine(self, fileHandle, key, value):
 		if value is not None:
-			fileHandle.write(u"info: ")
 			fileHandle.write(key)
 			fileHandle.write(u": ")
 			fileHandle.write(value)
 			fileHandle.write(u"\n")
-	
+
 	def writeFileContent(self, fileHandle):
-		self.__writeLine(fileHandle, u"Voikko-Dictionary-Format", DICTIONARY_FORMAT_VERSION)
-		self.__writeLine(fileHandle, u"Language-Code", self.language)
-		self.__writeLine(fileHandle, u"Language-Variant", self.variant)
+		fileHandle.write(u"Voikko-Dictionary-Format: " + DICTIONARY_FORMAT_VERSION + u"\n")
+		self.__writeLine(fileHandle, u"Language", self.language + u"-x-" + self.variant)
 		self.__writeLine(fileHandle, u"Description", self.description)
 		self.__writeLine(fileHandle, u"Morphology-Backend", self.morphology)
 		self.__writeLine(fileHandle, u"Speller-Backend", self.speller)
 		self.__writeLine(fileHandle, u"Suggestion-Backend", self.suggestion)
 		self.__writeLine(fileHandle, u"Hyphenator-Backend", self.hyphenator)
+		self.__writeLine(fileHandle, u"Grammar-Backend", self.grammar)
 
 
 class TestDataDir:
@@ -89,6 +90,8 @@ def getVoikkoCLibrary():
 	library = None
 	if os.name == 'nt':
 		library = CDLL("libvoikko-1.dll")
+	elif sys.platform == 'darwin':
+		library = CDLL("libvoikko.1.dylib")
 	else:
 		library = CDLL("libvoikko.so.1")
 	library.voikkoInit.argtypes = [POINTER(c_char_p), c_char_p, c_char_p]

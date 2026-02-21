@@ -29,6 +29,7 @@ class DictionaryInfoTest(unittest.TestCase):
 		info = MorphologyInfo()
 		info.variant = VARIANT_NAME
 		info.morphology = u"null"
+		info.grammar = u"null"
 		self.dataDir = TestDataDir()
 		self.dataDir.createMorphology(VARIANT_NAME, info)
 	
@@ -42,18 +43,22 @@ class DictionaryInfoTest(unittest.TestCase):
 	def __tryOpenWithOldApi(self, variant):
 		lib = getVoikkoCLibrary()
 		handle = c_int(-1)
-		error = lib.voikko_init_with_path(byref(handle), variant,
-		        0, self.dataDir.getDirectory())
+		variantBytes = variant.encode("UTF-8") if variant is not None else None
+		pathBytes = self.dataDir.getDirectory().encode("UTF-8")
+		error = lib.voikko_init_with_path(byref(handle), variantBytes,
+		        0, pathBytes)
 		isOk = not bool(error)
 		lib.voikko_terminate(handle)
 		return isOk
-	
+
 	def __tryOpenWithNewApi(self, variant):
 		lib = getVoikkoCLibrary()
 		error = c_char_p()
-		handle = lib.voikkoInit(byref(error), variant,
-		         self.dataDir.getDirectory())
-		if error.value == None:
+		variantBytes = variant.encode("UTF-8") if variant is not None else None
+		pathBytes = self.dataDir.getDirectory().encode("UTF-8")
+		handle = lib.voikkoInit(byref(error), variantBytes,
+		         pathBytes)
+		if error.value is None:
 			lib.voikkoTerminate(handle)
 			return True
 		else:
@@ -91,6 +96,7 @@ class DictionaryInfoTest(unittest.TestCase):
 		info2 = MorphologyInfo()
 		info2.language = u"dk"
 		info2.morphology = u"null"
+		info2.grammar = u"null"
 		info2.description = "Testdescription lkrj"
 		self.dataDir.createMorphology(u"test1", info2)
 		
@@ -103,8 +109,8 @@ class DictionaryInfoTest(unittest.TestCase):
 		dicts = libvoikko.Voikko.listDicts(self.dataDir.getDirectory())
 		for dictionary in dicts:
 			if dictionary.language == u"dk":
-				self.assertEquals(info2.description, dictionary.description)
-				self.assertEquals(u"standard", dictionary.variant)
+				self.assertEqual(info2.description, dictionary.description)
+				self.assertEqual(u"standard", dictionary.variant)
 				return
 		self.fail(u"Should have found dk dictionary")
 

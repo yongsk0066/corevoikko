@@ -30,6 +30,7 @@ class NullComponentTest(unittest.TestCase):
 		info.morphology = u"null"
 		info.speller = u"AllOk"
 		info.suggestion = u"null"
+		info.grammar = u"null"
 		self.dataDir = TestDataDir()
 		self.dataDir.createMorphology(VARIANT_NAME, info)
 		self.voikko = libvoikko.Voikko("fi-x-" + VARIANT_NAME, path = self.dataDir.getDirectory())
@@ -47,7 +48,7 @@ class NullComponentTest(unittest.TestCase):
 		self.assertEqual(0, len(suggestionList))
 
 	def testAllOkSpellerWorks(self):
-		self.failUnless(self.voikko.spell(u"koirra"))
+		self.assertTrue(self.voikko.spell(u"koirra"))
 
 
 if __name__ == "__main__":

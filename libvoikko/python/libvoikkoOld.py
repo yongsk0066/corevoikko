@@ -54,6 +54,7 @@ from ctypes import POINTER
 from ctypes import string_at
 from ctypes import Structure
 import os
+import sys
 
 """Maximum number of characters in a valid word"""
 MAX_WORD_CHARS = 255
@@ -182,6 +183,8 @@ class Voikko:
 		self.handle = c_int(-1)
 		if os.name == 'nt':
 			self.lib = CDLL("libvoikko-1.dll")
+		elif sys.platform == 'darwin':
+			self.lib = CDLL("libvoikko.1.dylib")
 		else:
 			self.lib = CDLL("libvoikko.so.1")
 		

@@ -31,6 +31,7 @@ from ctypes import CDLL
 from ctypes import POINTER
 import unittest
 import os
+import sys
 
 lib = None
 handle = None
@@ -44,6 +45,8 @@ class Utf8ApiTest(unittest.TestCase):
 		global handle
 		if os.name == 'nt':
 			lib = CDLL("libvoikko-1.dll")
+		elif sys.platform == 'darwin':
+			lib = CDLL("libvoikko.1.dylib")
 		else:
 			lib = CDLL("libvoikko.so.1")
 		lib.voikkoInit.argtypes = [POINTER(c_char_p), c_char_p, c_int, c_char_p]
@@ -106,12 +109,12 @@ class Utf8ApiTest(unittest.TestCase):
 		lib.voikkoTerminate(handle)
 	
 	def testSpellingWorksWithCapitalScandinavianLetters(self):
-		self.failIf(spellCstr(u"Ääiti"))
-		self.failUnless(spellCstr(u"Äiti"))
+		self.assertFalse(spellCstr(u"Ääiti"))
+		self.assertTrue(spellCstr(u"Äiti"))
 	
 	def testSpellingWorksWithSmallScandinavianLetters(self):
-		self.failIf(spellCstr(u"ääiti"))
-		self.failUnless(spellCstr(u"äiti"))
+		self.assertFalse(spellCstr(u"ääiti"))
+		self.assertTrue(spellCstr(u"äiti"))
 	
 	def testSuggestCstrWorks(self):
 		cSuggestions = lib.voikkoSuggestCstr(handle, u"koirra")
@@ -126,7 +129,7 @@ class Utf8ApiTest(unittest.TestCase):
 			i = i + 1
 		
 		lib.voikkoFreeCstrArray(cSuggestions)
-		self.failUnless(u"koira" in pSuggestions)
+		self.assertTrue(u"koira" in pSuggestions)
 	
 	def testHyphenateCstrWorks(self):
 		cHyphenationPattern = lib.voikkoHyphenateCstr(handle, u"koira".encode("UTF-8"))
