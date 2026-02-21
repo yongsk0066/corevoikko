@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # Copyright 2011 Harri Pitkänen (hatapitk@iki.fi)
@@ -30,10 +30,10 @@ from libvoikko import Voikko
 from voikkostatistics import getStatistics
 
 if '--help' in sys.argv:
-	print "Usage:"
-	print sys.argv[0], "[language]"
-	print "Calculate readability statistics for text read from stdin."
-	print " language: BCP 47 language tag of text language, default is fi"
+	print("Usage:")
+	print(sys.argv[0], "[language]")
+	print("Calculate readability statistics for text read from stdin.")
+	print(" language: BCP 47 language tag of text language, default is fi")
 	sys.exit(0)
 
 language = u"fi"
@@ -44,17 +44,17 @@ voikko = Voikko(language)
 voikko.setNoUglyHyphenation(False)
 voikko.setHyphenateUnknownWords(True)
 
-allText = unicode(sys.stdin.read(), getpreferredencoding())
+allText = sys.stdin.read()
 
 stats = getStatistics(allText, voikko)
 voikko.terminate()
 
-print u"Language used for processing:", language
-print u"Number of sentences:", stats[u"SENTENCES"]
-print u"Number of words:", stats[u"WORDS"]
-print u"Number of syllables:", stats[u"SYLLABLES"]
-print u"Number of characters (without punctuation):", stats[u"LETTERS"]
-print u"Number of characters (with punctuation):", stats[u"LETTERS"] + stats[u"PUNCTUATION"]
-print u"Flesch Reading Ease:", stats[u"FLESCH_READING_EASE"]
-print u"Flesch-Kincaid Grade Level:", stats[u"FLESCH_KINCAID_GRADE_LEVEL"]
-print u"Wiion yksinkertainen luokkataso (1-12):", stats[u"WIIO_SIMPLE"]
+print("Language used for processing:", language)
+print("Number of sentences:", stats[u"SENTENCES"])
+print("Number of words:", stats[u"WORDS"])
+print("Number of syllables:", stats[u"SYLLABLES"])
+print("Number of characters (without punctuation):", stats[u"LETTERS"])
+print("Number of characters (with punctuation):", stats[u"LETTERS"] + stats[u"PUNCTUATION"])
+print("Flesch Reading Ease:", stats[u"FLESCH_READING_EASE"])
+print("Flesch-Kincaid Grade Level:", stats[u"FLESCH_KINCAID_GRADE_LEVEL"])
+print("Wiion yksinkertainen luokkataso (1-12):", stats[u"WIIO_SIMPLE"])

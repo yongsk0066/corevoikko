@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # Copyright 2013 Harri Pitkänen (hatapitk@iki.fi)
@@ -54,7 +54,6 @@ import operator
 from libvoikko import Voikko, Token
 
 LANGUAGE = u"fi-x-morpho"
-ENCODING = u"UTF-8"
 
 
 def filterAnalysisList(analysisList, word):
@@ -83,7 +82,7 @@ unknownWordFreqs = {}
 
 
 for line in sys.stdin:
-	paragraph = unicode(line.strip(), ENCODING)
+	paragraph = line.strip()
 	for token in voikko.tokens(paragraph):
 		if token.tokenType != Token.WORD:
 			continue
@@ -105,10 +104,10 @@ for line in sys.stdin:
 			unknownWordFreqs[word] = unknownWordFreqs[word] + 1
 
 
-print u"=== Known words ==="
-for word in sorted(knownWordFreqs.items(), key=lambda(k,v):(v,k), reverse=True):
-	print word[0].encode(ENCODING), "\t", word[1]
+print("=== Known words ===")
+for word in sorted(knownWordFreqs.items(), key=lambda x: (x[1], x[0]), reverse=True):
+	print(word[0], "\t", word[1])
 
-print u"=== Unknown words ==="
-for word in sorted(unknownWordFreqs.items(), key=lambda(k,v):(v,k), reverse=True):
-	print word[0].encode(ENCODING), "\t", word[1]
+print("=== Unknown words ===")
+for word in sorted(unknownWordFreqs.items(), key=lambda x: (x[1], x[0]), reverse=True):
+	print(word[0], "\t", word[1])

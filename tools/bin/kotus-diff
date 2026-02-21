@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # Copyright 2007-2008 Harri Pitkänen (hatapitk@iki.fi)
@@ -25,6 +25,7 @@ import locale
 import codecs
 import xml.parsers.expat
 import subprocess
+from functools import reduce
 import _pg
 import os
 import datetime
@@ -45,7 +46,7 @@ def start_element(name, attrs):
 	global current_element
 	global current_gradation_is_optional
 	current_element = name
-	if name == 'av' and attrs.has_key('astevaihtelu') and attrs['astevaihtelu'] == 'valinnainen':
+	if name == 'av' and 'astevaihtelu' in attrs and attrs['astevaihtelu'] == 'valinnainen':
 		current_gradation_is_optional = True
 	else:
 		current_gradation_is_optional = False
@@ -64,8 +65,8 @@ def char_data(data):
 	global current_gradation_is_optional
 	if current_element == 's':
 		current_word = data
-		if not kwordlist.has_key(current_word): kwordlist[current_word] = []
-		if not gradclasses.has_key(current_word):
+		if current_word not in kwordlist: kwordlist[current_word] = []
+		if current_word not in gradclasses:
 			gradclasses[current_word] = set('-')
 			current_word_allow_no_gradation = False
 		else:
@@ -81,10 +82,10 @@ def char_data(data):
 		gradclasses[current_word].add(data)
 
 def print_line(word, problem, in_joukahainen = True):
-	if in_joukahainen: print '<tr><td><a href="/query/wlist?word=%s">Jouk.</a></td><td>' % word.encode('UTF-8')
-	else: print '<tr><td>-</td><td>'
-	print '%s</td><td>%s' % (word.encode('UTF-8'), problem.encode('UTF-8'))
-	print '</td></tr>'
+	if in_joukahainen: print('<tr><td><a href="/query/wlist?word=%s">Jouk.</a></td><td>' % word)
+	else: print('<tr><td>-</td><td>')
+	print('%s</td><td>%s' % (word, problem))
+	print('</td></tr>')
 
 # Returns the inflection class and gradation class for a word in Joukahainen
 # Returns tuple (inflclass_main, grad_type) or None, if no inflection was available
@@ -93,9 +94,9 @@ def _get_inflection_gradation(db, wid):
 	                  "WHERE wid = %i AND aid = 1") % wid)
 	if results.ntuples() != 1: return None
 	result = results.getresult()[0]
-	infclass_parts = unicode(result[0], 'UTF-8').split('-')
+	infclass_parts = result[0].split('-')
 	if len(infclass_parts) == 1:
-		infclass_main = unicode(result[0], 'UTF-8')
+		infclass_main = result[0]
 		grad_type = '-'
 	elif len(infclass_parts) == 2:
 		infclass_main = infclass_parts[0]
@@ -114,7 +115,7 @@ def _get_inftype(classid, infclass_main):
 	if classid in [1, 2]: word_types = noun_types
 	elif classid == 3: word_types = verb_types
 	else: return None
-	
+
 	for word_type in word_types:
 		if not infclass_main in word_type.joukahainenClasses: continue
 		else: return word_type
@@ -125,10 +126,10 @@ def kotus_classes(db, wid, classid):
 	infclass_parts = _get_inflection_gradation(db, wid)
 	if infclass_parts == None: return []
 	(infclass_main, grad_type) = infclass_parts
-	
+
 	word_type = _get_inftype(classid, infclass_main)
 	if word_type == None: return []
-	
+
 	return word_type.kotusClasses
 
 # Returns a list of possible Kotus gradation classes for the given word
@@ -136,12 +137,12 @@ def kotus_gradclasses(db, word):
 	infclass_parts = _get_inflection_gradation(db, wid)
 	if infclass_parts == None: return []
 	(infclass_main, grad_type) = infclass_parts
-	
+
 	if infclass_main == u'poikkeava': return ['P']
-	
+
 	# d->t in some classes is not seen as gradation in Kotus classification
 	if infclass_main in [u'voida', u'kanavoida', u'haravoida'] and grad_type == u'av2': return ['-']
-	
+
 	if grad_type == u'-': return ['-']
 	elif grad_type == u'av1': return ['A', 'B', 'C', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'M']
 	elif grad_type == u'av2': return ['A', 'B', 'C', 'E', 'F', 'G', 'H', 'I', 'J', 'K']
@@ -171,11 +172,11 @@ def print_unknown_line(word):
 	global kwordlist
 	global gradclasses
 	line = word
-	if len(kwordlist[word]) == 0: return line.encode('UTF-8') + "<br>"
-	line = line + u" (%s)" % reduce(lambda x, y: u"%s, %s" % (x, y), kwordlist[word])
-	if gradclasses[word] == set(['-']): return line.encode('UTF-8') + '<br>'
-	line = line + u"(%s)" % reduce(lambda x, y: u"%s, %s" % (x, y), gradclasses[word])
-	return line.encode('UTF-8') + "<br>"
+	if len(kwordlist[word]) == 0: return line + "<br>"
+	line = line + " (%s)" % reduce(lambda x, y: "%s, %s" % (x, y), kwordlist[word])
+	if gradclasses[word] == set(['-']): return line + '<br>'
+	line = line + "(%s)" % reduce(lambda x, y: "%s, %s" % (x, y), gradclasses[word])
+	return line + "<br>"
 
 # Start of main program
 
@@ -227,23 +228,22 @@ AND w.wid NOT IN (SELECT f.wid FROM flag_attribute_value f
 ORDER BY w.word""").getresult()
 
 # Page header
-print '<html>'
-print '<head>'
-print '<title>Joukahaisen ja Kotuksen sanalistan eroja</title>'
-print '<meta http-equiv="Content-Type" content="text/html; charset=utf-8">'
-print '<style type="text/css"> table, td, th { border: 1px solid black; border-collapse: collapse;} </style>'
-print '</head>'
-print '<body>'
-print '<h1>Kotus-diff %s</h1>' % datetime.datetime.now().isoformat()
-print '<table>'
-print '<tr><th>Linkit</th><th>Sana</th><th>Eroavuudet</th></tr>'
+print('<html>')
+print('<head>')
+print('<title>Joukahaisen ja Kotuksen sanalistan eroja</title>')
+print('<meta http-equiv="Content-Type" content="text/html; charset=utf-8">')
+print('<style type="text/css"> table, td, th { border: 1px solid black; border-collapse: collapse;} </style>')
+print('</head>')
+print('<body>')
+print('<h1>Kotus-diff %s</h1>' % datetime.datetime.now().isoformat())
+print('<table>')
+print('<tr><th>Linkit</th><th>Sana</th><th>Eroavuudet</th></tr>')
 
 prev_word = None
 prev_isOKtoIgnoreMissing = False
 inf_classes = []
 grad_classes = []
 for (word, wid, classid, infl, isOKtoIgnoreMissing) in jwordlist:
-	word = unicode(word, 'UTF-8')
 	if word in ignlist: continue
 	if word != prev_word:
 		if prev_word == None:
@@ -262,7 +262,7 @@ for (word, wid, classid, infl, isOKtoIgnoreMissing) in jwordlist:
 			   not compare_classes(kwordlist[prev_word], inf_classes):
 				print_line(prev_word, 'Kotuksen taivutus %s, Joukahaisen taivutus %s' \
 				  % (reduce(lambda x, y: x+','+y, kwordlist[prev_word]), reduce(lambda x, y: x+','+y, inf_classes)))
-			
+
 			if len(kwordlist[prev_word]) > 0 and \
 			   not compare_gradclasses(gradclasses[prev_word], set(grad_classes)):
 				print_line(prev_word, 'Kotuksen astevaihtelu %s, Joukahaisen astevaihtelu %s' \
@@ -273,37 +273,37 @@ for (word, wid, classid, infl, isOKtoIgnoreMissing) in jwordlist:
 		prev_isOKtoIgnoreMissing = isOKtoIgnoreMissing
 	inf_classes = inf_classes + kotus_classes(db, wid, classid)
 	grad_classes = grad_classes + kotus_gradclasses(db, wid)
-print '</table>'
+print('</table>')
 
 # Words that should be added
 jwordlist = db.query("SELECT w.word FROM word w ORDER BY w.word").getresult()
 knownwords = []
 for jword in jwordlist:
-	knownwords.append(unicode(jword[0], 'UTF-8'))
+	knownwords.append(jword[0])
 jwordlist = None
 
 speller = subprocess.Popen(SPELLCOMMAND, shell = True, stdin = subprocess.PIPE,
                            stdout = subprocess.PIPE, close_fds = True)
-for (word, classes) in kwordlist.iteritems():
+for (word, classes) in kwordlist.items():
 	if word.find(u' ') != -1: continue
-	speller.stdin.write(word.encode('UTF-8') + '\n')
+	speller.stdin.write((word + '\n').encode('UTF-8'))
 (out, err) = speller.communicate()
-unknownlist = out.split('\n')
+unknownlist = out.decode('UTF-8').split('\n')
 
-print '<h2>Ei Joukahaisessa</h2>'
-print '<p>'
+print('<h2>Ei Joukahaisessa</h2>')
+print('<p>')
 count = 0
 for unknown in unknownlist:
-	word = unicode(unknown, 'UTF-8')[3:]
+	word = unknown[3:]
 	if word in knownwords: continue
 	if word in ignlist: continue
 	if len(word) < 2: continue
 	if word[0] == u'-' and word[1:] in knownwords: continue
-	print print_unknown_line(word)
+	print(print_unknown_line(word))
 	count = count + 1
-print (u'(Yhteensä %i sanaa)' % count).encode('UTF-8')
-print '</p>'
+print('(Yhteensä %i sanaa)' % count)
+print('</p>')
 
 # Page footer
-print '</body>'
-print '</html>'
+print('</body>')
+print('</html>')

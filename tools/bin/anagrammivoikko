@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # Copyright 2006 Harri Pitkänen (hatapitk@iki.fi)
@@ -56,20 +56,20 @@ def count_permutations(clist):
 	# Calculate the number of all permutations
 	n = 1
 	for i in range(1, len(clist) + 1): n = i * n
-	
+
 	# Remove the duplicates
 	chars = list(set(clist))
 	for c in chars:
-		count = len(filter(lambda x: x == c, clist))
-		for i in range(1, count + 1): n = n / i
-	
+		count = sum(1 for x in clist if x == c)
+		for i in range(1, count + 1): n = n // i
+
 	return n
 
 def usage():
-	print u'Usage: ' + sys.argv[0] + u' [-l language] word1 [word2 ...]'
-	print u'       ' + sys.argv[0] + u' [-l language] -f file'
-	print u'Options:'
-	print u'     --nocheck   List all permutations'
+	print('Usage: ' + sys.argv[0] + ' [-l language] word1 [word2 ...]')
+	print('       ' + sys.argv[0] + ' [-l language] -f file')
+	print('Options:')
+	print('     --nocheck   List all permutations')
 
 def words_from_file(filename):
 	try:
@@ -109,7 +109,7 @@ for (opt, value) in opts:
 	elif opt == "--nocheck":
 		nocheck = True
 for word in args:
-	words.append(unicode(word, ENCODING))
+	words.append(word)
 
 # At least one word should be available
 if len(words) == 0:
@@ -120,7 +120,7 @@ if len(words) == 0:
 try:
 	dict = enchant.Dict(langcode)
 except enchant.DictNotFoundError:
-	print u"No dictionary was found for language " + langcode
+	print("No dictionary was found for language " + langcode)
 	sys.exit(1)
 sys.stderr.write("Using language " + dict.tag + " with Enchant " + dict.provider.desc + "\n")
 
@@ -130,7 +130,7 @@ for word in words: nperms = nperms + count_permutations(list(word))
 sys.stderr.write("Number of permutations to check: %i\n" % nperms)
 
 # List all anagrams
-starttime = time.clock()
+starttime = time.perf_counter()
 perms = 0
 for word in words:
 	clist = list(word)
@@ -139,13 +139,12 @@ for word in words:
 		perms = perms + 1
 		wrd = u''.join(clist)
 		if nocheck or dict.check(wrd):
-			print wrd.encode(ENCODING)
+			print(wrd)
 		clist = next_permutation(clist)
-time_used = time.clock() - starttime
+time_used = time.perf_counter() - starttime
 
 # Show statistics
-sys.stderr.write("Number of permutations tested: " + `perms` + "\n")
-sys.stderr.write("Time used (seconds): " + `time_used`[:7] + "\n")
+sys.stderr.write("Number of permutations tested: " + str(perms) + "\n")
+sys.stderr.write("Time used (seconds): " + str(time_used)[:7] + "\n")
 if time_used > 0:
-	sys.stderr.write("Permutations per second: " + `perms/time_used`[:7] + "\n")
-
+	sys.stderr.write("Permutations per second: " + str(perms/time_used)[:7] + "\n")

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # Copyright 2008 - 2009 Harri Pitkänen (hatapitk@iki.fi)
@@ -54,13 +54,13 @@ def hyphenateStdin():
 	properties = ()
 	line = sys.stdin.readline()
 	while line.endswith('\n'):
-		line = unicode(line, LINE_ENC).strip()
+		line = line.strip()
 		if len(line) > 0:
 			hyphens = hyphenator.createPossibleHyphens(line, LOCALE, properties)
 			if hyphens == None:
-				print line.encode(LINE_ENC)
+				print(line)
 			else:
-				print hyphens.PossibleHyphens.encode(LINE_ENC)
+				print(hyphens.PossibleHyphens)
 		line = sys.stdin.readline()
 
 def spellStdin():
@@ -68,19 +68,19 @@ def spellStdin():
 	properties = ()
 	line = sys.stdin.readline()
 	while line.endswith('\n'):
-		line = unicode(line, LINE_ENC).strip()
+		line = line.strip()
 		if len(line) > 0:
 			isValid = speller.isValid(line, LOCALE, properties)
 			suggestions = speller.spell(line, LOCALE, properties)
 			if (isValid and suggestions != None) or \
 			   (not isValid and suggestions == None):
-				print "ERROR: inconsistent results from isValid and spell"
+				print("ERROR: inconsistent results from isValid and spell")
 			if isValid:
-				print (u"C: " + line).encode(LINE_ENC)
+				print("C: " + line)
 			else:
-				print (u"W: " + line).encode(LINE_ENC)
+				print("W: " + line)
 				for sug in suggestions.getAlternatives():
-					print (u"S: " + sug).encode(LINE_ENC)
+					print("S: " + sug)
 		line = sys.stdin.readline()
 
 def grammarTests():
@@ -93,23 +93,23 @@ def grammarTests():
 	result = gc.doProofreading(aDocumentIdentifier, aText, LOCALE,
 	         nStartOfSentencePos, nSuggestedBehindEndOfSentencePosition,
 	         aProperties)
-	
+
 	assert result.aDocumentIdentifier == aDocumentIdentifier
 	assert result.xFlatParagraph == None
 	assert result.aText == aText
 	assert result.aLocale == LOCALE
 	assert result.xProofreader == gc
-	
+
 	# TODO: start/end of sentence positions are not necessarily correct.
 	# Find out where these are actually needed and fix as necessary.
 	assert result.nStartOfSentencePosition == nStartOfSentencePos
 	# 26 is the position of the end of last error
 	assert result.nBehindEndOfSentencePosition == 26
 	assert result.nStartOfNextSentencePosition == 26
-	
+
 	errors = result.aErrors
 	assert len(errors) == 2
-	
+
 	error = errors[0]
 	assert error.nErrorStart == 9
 	assert error.nErrorLength == 11
@@ -119,7 +119,7 @@ def grammarTests():
 	suggestions = error.aSuggestions
 	assert len(suggestions) == 1
 	assert suggestions[0] == u"jotenkuten"
-	
+
 	error = errors[1]
 	assert error.nErrorStart == 21
 	assert error.nErrorLength == 5
@@ -129,36 +129,36 @@ def grammarTests():
 	suggestions = error.aSuggestions
 	assert len(suggestions) == 1
 	assert suggestions[0] == u"märkä"
-	
+
 	gc.ignoreRule(u"1", LOCALE) # GCERR_INVALID_SPELLING
 	result = gc.doProofreading(aDocumentIdentifier, aText, LOCALE,
 	         nStartOfSentencePos, nSuggestedBehindEndOfSentencePosition,
 	         aProperties)
 	assert len(result.aErrors) == 1
-	
+
 	gc.resetIgnoreRules()
 	result = gc.doProofreading(aDocumentIdentifier, aText, LOCALE,
 	         nStartOfSentencePos, nSuggestedBehindEndOfSentencePosition,
 	         aProperties)
 	assert len(result.aErrors) == 2
-	
-	print u"All grammar checker tests were successful."
+
+	print("All grammar checker tests were successful.")
 
 def spellingTests():
 	"Run the spell checker tests"
 	properties = ()
-	
+
 	assert speller.isValid(u"märkä", LOCALE, properties)
 	assert not speller.isValid(u"märrä", LOCALE, properties)
-	
+
 	suggestions = speller.spell(u"borrelioosipparantola", LOCALE, properties)
 	assert suggestions.getWord() == u"borrelioosipparantola"
 	assert suggestions.getLocale().Language == LOCALE.Language
 	assert suggestions.getFailureType() == 4 # SpellFailure::SPELLING_ERROR
 	assert suggestions.getAlternativesCount() == 1
 	assert suggestions.getAlternatives()[0] == u"borrelioosiparantola"
-	
-	print u"All spell checker tests were successful."
+
+	print("All spell checker tests were successful.")
 
 def hyphenTests():
 	"Run the hyphenator tests"
@@ -186,19 +186,19 @@ def hyphenTests():
 			properties = unoPropertySeq(eval("{" + section + "}"))
 			hyphens = hyphenator.createPossibleHyphens(inputword, LOCALE, properties)
 			if hyphens == None and inputword != expresult:
-				print u'Hyphenation test failed in section "%s":' % section
-				print u'  Expected "%s", got "%s"' % (expresult, inputword)
+				print('Hyphenation test failed in section "%s":' % section)
+				print('  Expected "%s", got "%s"' % (expresult, inputword))
 				failcount = failcount + 1
 			if hyphens != None and hyphens.PossibleHyphens != expresult:
-				print u'Hyphenation test failed in section "%s":' % section
-				print u'  Expected "%s", got "%s"' % (expresult, hyphens.PossibleHyphens)
+				print('Hyphenation test failed in section "%s":' % section)
+				print('  Expected "%s", got "%s"' % (expresult, hyphens.PossibleHyphens))
 				failcount = failcount + 1
 		inputfile.close()
 		if failcount == 0:
-			print u"All %i hyphenation tests were successful." % testcount
+			print("All %i hyphenation tests were successful." % testcount)
 			return True
 		else:
-			print u"%i out of %i hyphenation tests failed." % (failcount, testcount)
+			print("%i out of %i hyphenation tests failed." % (failcount, testcount))
 			return False
 	except IOError:
 		sys.stderr.write("Could not read from file " + HYPHENTESTS + "\n")

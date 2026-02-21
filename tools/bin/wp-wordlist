@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # Copyright 2007 Harri Pitkänen (hatapitk@iki.fi)
@@ -87,7 +87,7 @@ def char_data(data):
 			for c in word:
 				if c.isalpha(): hasalpha = True
 				elif c in ['|','[',']','/','{','}']: hasforbidden = True
-			if hasalpha and not hasforbidden: print word.encode('UTF-8')
+			if hasalpha and not hasforbidden: print(word)
 
 
 
@@ -100,5 +100,5 @@ parser.EndElementHandler = end_element
 parser.CharacterDataHandler = char_data
 
 # Parse the Wikipedia dump
-parser.ParseFile(sys.stdin)
+parser.ParseFile(sys.stdin.buffer)
 
