@@ -28,9 +28,10 @@ libvoikko/js/
 ├── dist/                 # tsdown 빌드 출력 (gitignore)
 ├── build.sh              # Emscripten 빌드 스크립트 (EXPORT_ES6=1)
 ├── configure.sh          # emconfigure 래퍼
-├── libvoikko_api.js      # cwrap 바인딩 (--post-js로 WASM에 주입, 수정 금지)
-├── commonjs-footer.js    # 레거시 CJS export (더 이상 사용 안 함)
-└── qunit.html            # 레거시 브라우저 테스트 (레퍼런스용)
+└── legacy/
+    ├── libvoikko_api.js  # cwrap 바인딩 (--post-js로 WASM에 주입, 수정 금지)
+    ├── commonjs-footer.js # 레거시 CJS export (더 이상 사용 안 함)
+    └── qunit.html        # 레거시 브라우저 테스트 (레퍼런스용)
 ```
 
 ## 빌드 명령어
@@ -99,7 +100,7 @@ options ──┬── loadWasm()  ──────┐
 
 ## 수정 시 주의사항
 
-- `libvoikko_api.js` — 수정 금지. Emscripten 클로저 스코프에 의존.
+- `legacy/libvoikko_api.js` — 수정 금지. Emscripten 클로저 스코프에 의존.
 - `build.sh` — emcc 플래그 변경 시 `EXPORTED_FUNCTIONS`, `EXPORTED_RUNTIME_METHODS` 확인.
 - `src/types.ts`의 `RawVoikkoInstance` — `libvoikko_api.js`가 반환하는 객체와 1:1 대응해야 함.
 - `wasm/` 디렉토리 — emcc 출력물. gitignore 대상.
