@@ -93,32 +93,32 @@ class DeprecatedApiTest(unittest.TestCase):
 		voikko.lib.voikko_set_int_option(voikko.handle, 5, 56)
 	
 	def testEncodingCanBeSet(self):
-		self.assertEqual(1, voikko.lib.voikko_set_string_option(voikko.handle, 2, "UTF-8"))
-		self.assertEqual(0, voikko.lib.voikko_set_string_option(voikko.handle, 2, "iso-8859-1"))
-		self.assertEqual(0, voikko.lib.voikko_set_string_option(voikko.handle, 1, "UTF-8"))
+		self.assertEqual(1, voikko.lib.voikko_set_string_option(voikko.handle, 2, b"UTF-8"))
+		self.assertEqual(0, voikko.lib.voikko_set_string_option(voikko.handle, 2, b"iso-8859-1"))
+		self.assertEqual(0, voikko.lib.voikko_set_string_option(voikko.handle, 1, b"UTF-8"))
 	
 	def test_spell_cstr_works(self):
 		self.assertEqual(1, voikko.lib.voikko_spell_cstr(voikko.handle, u"kissa".encode("UTF-8")))
 		self.assertEqual(0, voikko.lib.voikko_spell_cstr(voikko.handle, u"koirra".encode("UTF-8")))
 	
 	def test_suggest_cstr_works(self):
-		cSuggestions = voikko.lib.voikko_suggest_cstr(voikko.handle, u"koirra")
+		cSuggestions = voikko.lib.voikko_suggest_cstr(voikko.handle, u"koirra".encode("UTF-8"))
 		pSuggestions = []
-		
+
 		if not bool(cSuggestions):
 			return pSuggestions
-		
+
 		i = 0
 		while bool(cSuggestions[i]):
-			pSuggestions.append(unicode(cSuggestions[i], "UTF-8"))
+			pSuggestions.append(cSuggestions[i].decode("UTF-8"))
 			i = i + 1
-		
+
 		voikko.lib.voikko_free_suggest_cstr(cSuggestions)
 		self.assertTrue(u"koira" in pSuggestions)
 	
 	def test_hyphenate_cstr_works(self):
 		cHyphenationPattern = voikko.lib.voikko_hyphenate_cstr(voikko.handle, u"koira".encode("UTF-8"))
-		hyphenationPattern = string_at(cHyphenationPattern)
+		hyphenationPattern = string_at(cHyphenationPattern).decode("ASCII")
 		voikko.lib.voikko_free_hyphenate(cHyphenationPattern)
 		self.assertEqual(u"   - ", hyphenationPattern)
 	
@@ -130,7 +130,7 @@ class DeprecatedApiTest(unittest.TestCase):
 		self.assertEqual(5, tokenLen.value)
 		self.assertEqual(Token.WORD, tokenType)
 	
-	def test_next_sentece_start_cstr_works(self):
+	def test_next_sentence_start_cstr_works(self):
 		sentenceLen = c_size_t()
 		text = u"Kissa ei ole koira. Koira ei ole kissa.".encode("UTF-8")
 		sentenceType = voikko.lib.voikko_next_sentence_start_cstr(voikko.handle,
@@ -152,29 +152,29 @@ class DeprecatedApiTest(unittest.TestCase):
 		self.assertEqual(1, error.errorCode)
 		self.assertEqual(6, error.startPos)
 		self.assertEqual(11, error.errorLen)
-		self.assertEqual(u"jotenkuten", error.suggestions[0])
-		errorFi = voikko.lib.voikko_error_message_cstr(error.errorCode, "fi")
-		self.assertEqual(u"Virheellinen kirjoitusasu", errorFi)
-		errorEn = voikko.lib.voikko_error_message_cstr(error.errorCode, "en")
-		self.assertEqual(u"Incorrect spelling of word(s)", errorEn)
+		self.assertEqual(u"jotenkuten".encode("UTF-8"), error.suggestions[0])
+		errorFi = voikko.lib.voikko_error_message_cstr(error.errorCode, b"fi")
+		self.assertEqual(u"Virheellinen kirjoitusasu".encode("UTF-8"), errorFi)
+		errorEn = voikko.lib.voikko_error_message_cstr(error.errorCode, b"en")
+		self.assertEqual(u"Incorrect spelling of word(s)".encode("UTF-8"), errorEn)
 		voikko.lib.voikko_free_suggest_cstr(error.suggestions)
 	
 	def test_voikko_analyze_word_cstr_works(self):
 		analysis = voikko.lib.voikko_analyze_word_cstr(voikko.handle, u"kansaneläkelaitos".encode("UTF-8"))
-		structure = voikko.lib.voikko_mor_analysis_value_ucs4(analysis[0], "STRUCTURE")
+		structure = voikko.lib.voikko_mor_analysis_value_ucs4(analysis[0], b"STRUCTURE")
 		self.assertEqual(u"=pppppp=ppppp=pppppp", structure)
 		voikko.lib.voikko_free_mor_analysis(analysis)
 	
 	
 	def assertInitAndReturnHandle(self):
 		handle = c_int(-1)
-		error = voikko.lib.voikko_init_with_path(byref(handle), u"fi_FI", 0, None)
+		error = voikko.lib.voikko_init_with_path(byref(handle), b"fi_FI", 0, None)
 		self.assertEqual(None, error)
 		return handle.value
-	
+
 	def assertInitFails(self):
 		handle = c_int(-1)
-		error = voikko.lib.voikko_init_with_path(byref(handle), u"fi_FI", 0, None)
+		error = voikko.lib.voikko_init_with_path(byref(handle), b"fi_FI", 0, None)
 		self.assertNotEqual(None, error)
 	
 	def assertCanSpellWithHandle(self, handleValue):

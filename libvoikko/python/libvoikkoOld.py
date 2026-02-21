@@ -56,6 +56,20 @@ from ctypes import Structure
 import os
 import sys
 
+def _encode_if_str(s):
+	"""Encode str to bytes for c_char_p parameters"""
+	if isinstance(s, str):
+		return s.encode("UTF-8")
+	return s
+
+def _decode_if_bytes(b, encoding="UTF-8"):
+	"""Decode bytes to str (replaces Python 2 unicode())"""
+	if isinstance(b, bytes):
+		return b.decode(encoding)
+	if b is None:
+		return None
+	return b
+
 """Maximum number of characters in a valid word"""
 MAX_WORD_CHARS = 255
 
@@ -101,8 +115,8 @@ class Token:
 		self.tokenType = tokenType
 	
 	def __repr__(self):
-		return (u"<" + self.tokenText + u"," + \
-		       Token._TYPE_NAMES[self.tokenType] + u">").encode("UTF-8")
+		return u"<" + self.tokenText + u"," + \
+		       Token._TYPE_NAMES[self.tokenType] + u">"
 
 class SuggestionStrategy:
 	"""Strategies for generating suggestions for incorrectly spelled words."""
@@ -131,7 +145,7 @@ class GrammarError:
 			i = 0
 			while bool(cGrammarError.suggestions[i]):
 				self.suggestions.append(
-				     unicode(cGrammarError.suggestions[i], "UTF-8"))
+				     _decode_if_bytes(cGrammarError.suggestions[i], "UTF-8"))
 				i = i + 1
 	
 	def __repr__(self):
@@ -263,10 +277,10 @@ class Voikko:
 		             as 0 etc. -1 disables the spell checking cache entirely.
 		"""
 		if self.handle.value < 0:
-			error = self.lib.voikko_init_with_path(byref(self.handle), variant,
-			                                       cacheSize, path)
-			if error != None:
-				raise VoikkoException(u"Initialization of Voikko failed: " + unicode(error, "UTF-8"))
+			error = self.lib.voikko_init_with_path(byref(self.handle),
+			        _encode_if_str(variant), cacheSize, _encode_if_str(path))
+			if error is not None:
+				raise VoikkoException(u"Initialization of Voikko failed: " + _decode_if_bytes(error, "UTF-8"))
 	
 	def terminate(self):
 		"""Uninitialize this Voikko instance. The instance must be initialized again
@@ -282,13 +296,13 @@ class Voikko:
 		before looking from the standard locations. This method can be called
 		even if the Voikko instance has not yet been initialized.
 		"""
-		cDicts = self.lib.voikko_list_dicts(path)
+		cDicts = self.lib.voikko_list_dicts(_encode_if_str(path))
 		dicts = []
 		i = 0
 		while bool(cDicts[i]):
 			cDict = cDicts[i]
-			variant = unicode(self.lib.voikko_dict_variant(cDict), "ASCII")
-			description = unicode(self.lib.voikko_dict_description(cDict), "UTF-8")
+			variant = _decode_if_bytes(self.lib.voikko_dict_variant(cDict), "ASCII")
+			description = _decode_if_bytes(self.lib.voikko_dict_description(cDict), "UTF-8")
 			dicts.append(Dictionary(variant, description))
 			i = i + 1
 		self.lib.voikko_free_dicts(cDicts)
@@ -349,7 +363,7 @@ class Voikko:
 		separated by newline characters.
 		"""
 		_checkInited(self)
-		textUnicode = unicode(text)
+		textUnicode = str(text)
 		errorList = []
 		offset = 0
 		for paragraph in textUnicode.split(u"\n"):
@@ -361,8 +375,8 @@ class Voikko:
 		"""Return a human readable explanation for grammar error code in
 		given language.
 		"""
-		explanation = self.lib.voikko_error_message_cstr(errorCode, language)
-		return unicode(explanation, "UTF-8")
+		explanation = self.lib.voikko_error_message_cstr(errorCode, _encode_if_str(language))
+		return _decode_if_bytes(explanation, "UTF-8")
 	
 	def analyze(self, word):
 		"""Analyze the morphology of given word and return the list of
@@ -385,7 +399,7 @@ class Voikko:
 			while bool(cKeys[j]):
 				key = cKeys[j]
 				value = self.lib.voikko_mor_analysis_value_ucs4(cAnalysis, key)
-				pAnalysis[unicode(key, 'ASCII')] = value
+				pAnalysis[_decode_if_bytes(key, 'ASCII')] = value
 				j = j + 1
 			pAnalysisList.append(pAnalysis)
 			i = i + 1
@@ -396,7 +410,7 @@ class Voikko:
 	def tokens(self, text):
 		"""Split the given natural language text into a list of Token objects."""
 		_checkInited(self)
-		uniText = unicode(text)
+		uniText = str(text)
 		result = []
 		textLen = len(uniText)
 		tokenLen = c_size_t()
@@ -424,7 +438,7 @@ class Voikko:
 		cHyphenationPattern = self.lib.voikko_hyphenate_ucs4(self.handle, word)
 		hyphenationPattern = string_at(cHyphenationPattern)
 		self.lib.voikko_free_hyphenate(cHyphenationPattern)
-		return unicode(hyphenationPattern, 'ASCII')
+		return _decode_if_bytes(hyphenationPattern, 'ASCII')
 	
 	def hyphenate(self, word):
 		"""Return the given word in fully hyphenated form."""

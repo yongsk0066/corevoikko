@@ -76,7 +76,7 @@ class Utf8ApiTest(unittest.TestCase):
 		lib.voikkoNextSentenceStartCstr.argtypes = [c_void_p, c_char_p, c_size_t, POINTER(c_size_t)]
 		lib.voikkoNextSentenceStartCstr.restype = c_int
 		
-		lib.voikkoNextGrammarErrorCstr.argtypes = [c_int, c_char_p, c_size_t, c_size_t, c_int]
+		lib.voikkoNextGrammarErrorCstr.argtypes = [c_void_p, c_char_p, c_size_t, c_size_t, c_int]
 		lib.voikkoNextGrammarErrorCstr.restype = c_void_p
 		
 		lib.voikkoGetGrammarErrorCode.argtypes = [c_void_p]
@@ -101,9 +101,9 @@ class Utf8ApiTest(unittest.TestCase):
 		lib.voikko_free_mor_analysis_value_cstr.restype = None
 		
 		error = c_char_p()
-		handle = lib.voikkoInit(byref(error), "fi_FI", 0, None)
-		if error.value != None:
-			raise Exception(u"Initialization of Voikko failed: " + unicode(error.value, "UTF-8"))
+		handle = lib.voikkoInit(byref(error), b"fi_FI", 0, None)
+		if error.value is not None:
+			raise Exception(u"Initialization of Voikko failed: " + error.value.decode("UTF-8"))
 	
 	def tearDown(self):
 		lib.voikkoTerminate(handle)
@@ -117,23 +117,23 @@ class Utf8ApiTest(unittest.TestCase):
 		self.assertTrue(spellCstr(u"äiti"))
 	
 	def testSuggestCstrWorks(self):
-		cSuggestions = lib.voikkoSuggestCstr(handle, u"koirra")
+		cSuggestions = lib.voikkoSuggestCstr(handle, u"koirra".encode("UTF-8"))
 		pSuggestions = []
-		
+
 		if not bool(cSuggestions):
 			return pSuggestions
-		
+
 		i = 0
 		while bool(cSuggestions[i]):
-			pSuggestions.append(unicode(cSuggestions[i], "UTF-8"))
+			pSuggestions.append(cSuggestions[i].decode("UTF-8"))
 			i = i + 1
-		
+
 		lib.voikkoFreeCstrArray(cSuggestions)
 		self.assertTrue(u"koira" in pSuggestions)
 	
 	def testHyphenateCstrWorks(self):
 		cHyphenationPattern = lib.voikkoHyphenateCstr(handle, u"koira".encode("UTF-8"))
-		hyphenationPattern = string_at(cHyphenationPattern)
+		hyphenationPattern = string_at(cHyphenationPattern).decode("ASCII")
 		lib.voikkoFreeCstr(cHyphenationPattern)
 		self.assertEqual(u"   - ", hyphenationPattern)
 	
@@ -161,13 +161,13 @@ class Utf8ApiTest(unittest.TestCase):
 	
 	def testVoikkoAnalyzeWordCstrWorks(self):
 		analysis = lib.voikkoAnalyzeWordCstr(handle, u"kansaneläkelaitos".encode("UTF-8"))
-		structure = lib.voikko_mor_analysis_value_ucs4(analysis[0], "STRUCTURE")
+		structure = lib.voikko_mor_analysis_value_ucs4(analysis[0], b"STRUCTURE")
 		self.assertEqual(u"=pppppp=ppppp=pppppp", structure)
 		lib.voikko_free_mor_analysis(analysis)
 	
 	def test_voikko_mor_analysis_value_cstr_works(self):
 		analysis = lib.voikkoAnalyzeWordCstr(handle, u"kansaneläkelaitos".encode("UTF-8"))
-		structureBuffer = lib.voikko_mor_analysis_value_cstr(analysis[0], "STRUCTURE")
+		structureBuffer = lib.voikko_mor_analysis_value_cstr(analysis[0], b"STRUCTURE")
 		self.assertEqual(u"=pppppp=ppppp=pppppp".encode("UTF-8"), string_at(structureBuffer))
 		lib.voikko_free_mor_analysis_value_cstr(structureBuffer)
 		lib.voikko_free_mor_analysis(analysis)
