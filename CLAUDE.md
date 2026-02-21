@@ -99,6 +99,18 @@ LEXC 소스 파일들(`*.lexc`)과 foma 스크립트(`*.foma.in`)로 구성. `ge
 
 `configure.ac`에서 `-Wall -Werror -pedantic`이 기본 설정되어 있어 경고가 에러로 처리된다.
 
+## JS/WASM 패키지 (`libvoikko/js/`)
+
+Emscripten WASM 빌드의 ESM TypeScript 래퍼. 자세한 내용은 `libvoikko/js/CLAUDE.md` 참조.
+
+```bash
+cd libvoikko/js
+pnpm install && pnpm build    # TS 래퍼 빌드
+pnpm test                     # 테스트 (Tier 1: 구조, Tier 2: WASM 통합)
+```
+
+스택: pnpm + tsdown + vitest + ESM only
+
 ## 도구 (`tools/bin/`)
 
 - `voikkotest` — 종합 테스트 스위트
