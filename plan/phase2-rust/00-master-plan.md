@@ -449,9 +449,14 @@ MVP 합계:               ~16-23일
 | ~~**checker tokenize 중복**~~ | ✅ check_with_analyzer 메서드로 외부 analyzer 전달 | Phase 5에서 해결 |
 | ~~**dead_code allow 정리**~~ | ✅ module-level로 이동 | Phase 5에서 해결 |
 | ~~**autocorrect 테스트 보강**~~ | ✅ 12 tests (VFST 빌더 포함) | Phase 5에서 해결 |
-| **SpellerCache RefCell** | handle.rs에서 spell_check에 캐시 미전달 (성능 최적화) | 벤치마크 후 |
-| **Rust 차등 테스트 러너** | golden file은 생성됨. Rust 측 비교 러너 작성 필요 | 추가 작업 |
-| **WASM 빌드 검증** | wasm32 target으로 실제 빌드 + wasm-bindgen 바인딩 생성 확인 | WASM 배포 시 |
+| ~~**SpellerCache RefCell**~~ | ✅ RefCell 래핑, spell()에서 캐시 사용 | TODO 해결 시 |
+| ~~**Rust 차등 테스트 러너**~~ | ✅ tests/differential.rs 작성 — spell/analyze/hyphenate/suggest 비교 | TODO 해결 시 |
+| ~~**WASM 빌드 검증**~~ | ✅ 197KB .wasm + .d.ts 생성 확인 | TODO 해결 시 |
+| ~~**soft hyphen 검증**~~ | ✅ hyphenator로 유효 위치 검증 | TODO 해결 시 |
+| ~~**Unicode normalize**~~ | ✅ C++ voikko_normalise 완전 구현 (67 combining mark) | TODO 해결 시 |
+| ~~**STRUCTURE off-by-one**~~ | ✅ [Bc] 태그 i+=4→i+=3 수정 | 차등 테스트에서 발견 |
+| ~~**suggest 3x 슬롯**~~ | ✅ max_suggestions*3 후보 수집 후 truncate | 차등 테스트에서 발견 |
+| **suggest rich priority** | SuggestionGenerator trait에 analyzer 전달 필요 (6/31 불일치) | [06-suggest-rich-priority.md](./06-suggest-rich-priority.md) |
 | **TS 래퍼 연결** | libvoikko/js/ ESM 래퍼가 Rust WASM 백엔드 사용하도록 전환 | TS 통합 시 |
 
 ---
