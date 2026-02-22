@@ -1,0 +1,18 @@
+[package]
+name = "voikko-wasm"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "WASM bindings for Voikko Finnish NLP"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+voikko-core.workspace = true
+voikko-fi.workspace = true
+wasm-bindgen.workspace = true
+serde.workspace = true
+serde-wasm-bindgen.workspace = true
+thiserror.workspace = true

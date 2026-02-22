@@ -1,0 +1,21 @@
+[package]
+name = "voikko-fi"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "Finnish language module for Voikko NLP"
+
+[features]
+default = ["spell", "analyze"]
+spell = ["analyze"]
+suggest = ["spell"]
+analyze = []
+hyphenate = ["analyze"]
+grammar = ["analyze"]
+tokenize = []
+
+[dependencies]
+voikko-core.workspace = true
+voikko-fst.workspace = true
+thiserror.workspace = true

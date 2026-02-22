@@ -1,0 +1,13 @@
+[package]
+name = "voikko-fst"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "VFST finite state transducer engine for Voikko"
+
+[dependencies]
+voikko-core.workspace = true
+bytemuck.workspace = true
+hashbrown.workspace = true
+thiserror.workspace = true
