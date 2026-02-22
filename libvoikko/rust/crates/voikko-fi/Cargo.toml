@@ -19,3 +19,6 @@ tokenize = []
 voikko-core.workspace = true
 voikko-fst.workspace = true
 thiserror.workspace = true
+
+[dev-dependencies]
+bytemuck.workspace = true

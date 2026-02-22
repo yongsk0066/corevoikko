@@ -8,12 +8,14 @@
 //   - `generators`: individual edit-operation generators (SuggestionGenerator trait)
 //   - `status`: tracking object for abort conditions, cost budget, deduplication
 //   - `strategy`: orchestrator that composes generators into typing / OCR pipelines
+//   - `vfst`: VFST-based generator using error model + acceptor transducers
 //
 // Origin: spellchecker/suggestion/
 
 pub mod generators;
 pub mod status;
 pub mod strategy;
+pub mod vfst;
 
 // Re-export key types for convenient access.
 pub use generators::SuggestionGenerator;
@@ -22,3 +24,4 @@ pub use strategy::{
     default_ocr_strategy, default_typing_strategy, ocr_strategy, typing_strategy,
     SuggestionStrategy,
 };
+pub use vfst::VfstSuggestion;

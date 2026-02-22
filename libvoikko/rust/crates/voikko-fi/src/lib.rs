@@ -7,3 +7,5 @@ pub mod hyphenator;
 pub mod tokenizer;
 #[cfg(feature = "suggest")]
 pub mod suggestion;
+#[cfg(feature = "grammar")]
+pub mod grammar;
