@@ -191,7 +191,7 @@ impl<A: Analyzer> FinnishHyphenator<A> {
     ///   `'X'` = hyphenation forbidden at this position
     ///
     /// Origin: AnalyzerToFinnishHyphenatorAdapter::splitCompounds
-    fn split_compounds(&self, word: &[char]) -> Option<Vec<Vec<u8>>> {
+    fn split_compounds(&self, word: &[char]) -> Option<(Vec<Vec<u8>>, bool)> {
         let len = word.len();
 
         // Convert to lowercase string for the analyzer
@@ -250,7 +250,7 @@ impl<A: Analyzer> FinnishHyphenator<A> {
 
         remove_extra_hyphenations(&mut all_results, len);
 
-        Some(all_results)
+        Some((all_results, dot_removed))
     }
 
     // -----------------------------------------------------------------------
@@ -323,33 +323,11 @@ impl<A: Analyzer> FinnishHyphenator<A> {
             return " ".repeat(wlen);
         }
 
-        let dot_removed_check = self.options.ignore_dot && wlen > 1 && word[wlen - 1] == '.';
-
-        let Some(mut hyphenations) = self.split_compounds(word) else {
+        let Some((mut hyphenations, dot_removed)) = self.split_compounds(word) else {
             return " ".repeat(wlen);
         };
 
-        // Determine effective length for compound hyphenation
-        // We need to check if dot was actually removed. We can infer this by
-        // checking if analyses were empty with dot and non-empty without.
-        // But split_compounds already handles this. The buffers have length == wlen.
-        // For compound_hyphenation, we need to use the effective length.
-        let effective_len = if dot_removed_check {
-            // Check if the last byte of the first buffer is ' ' (dot was removed)
-            // by re-doing the logic. Actually, we pass wlen to compound_hyphenation
-            // and let it work on the full length. The C++ code passes
-            // `wlen - (dotRemoved ? 1 : 0)`. We need to track dot_removed properly.
-            // Let's just check the analysis state.
-            let word_lower: Vec<char> = word.iter().map(|&c| simple_lower(c)).collect();
-            let analyses = self.analyzer.analyze(&word_lower, wlen);
-            if analyses.is_empty() {
-                wlen - 1
-            } else {
-                wlen
-            }
-        } else {
-            wlen
-        };
+        let effective_len = if dot_removed { wlen - 1 } else { wlen };
 
         for hyph in &mut hyphenations {
             self.compound_hyphenation(word, hyph, effective_len);
@@ -721,19 +699,21 @@ fn is_good_hyphen_position(
         return false;
     }
 
-    // Check backwards for vowels (in the syllable before the proposed break)
+    // Check backwards for vowels (in the syllable before the proposed break).
+    // C++ loop: checks `i == 0` break BEFORE the vowel check, so word[0] is
+    // never checked for vowels. We replicate this order exactly.
     let mut has_vowel = false;
     if new_hyphen_pos >= 1 {
         let mut i = new_hyphen_pos - 1;
         loop {
-            if is_vowel(word[i]) {
-                has_vowel = true;
-            }
             if hyphenation_points[i] == b'-' || hyphenation_points[i] == b'=' {
                 break;
             }
             if i == 0 {
                 break;
+            }
+            if is_vowel(word[i]) {
+                has_vowel = true;
             }
             i -= 1;
         }
