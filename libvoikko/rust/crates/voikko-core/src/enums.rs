@@ -33,7 +33,7 @@ pub enum SentenceType {
 
 /// Internal spell-checker result type.
 /// Origin: voikko_defines.h:49-53 (VOIKKO_SPELL_*)
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum SpellResult {
     /// Word is correctly spelled (VOIKKO_SPELL_OK = 1).
     Ok,
