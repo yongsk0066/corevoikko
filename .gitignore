@@ -2,9 +2,9 @@
 *.pyc
 libvoikko/java/target
 libvoikko/test-driver
-libvoikko/cs/libvoikko.tests/bin
-libvoikko/cs/libvoikko.tests/test-results
-libvoikko/cs/libvoikko/bin
+libvoikko/legacy/cs-cpp-tests/bin
+libvoikko/legacy/cs-cpp-tests/test-results
+libvoikko/legacy/cs-cpp/bin
 libvoikko/cs/test-results
 voikko-fi/build-v5
 voikko-fi/vvfst-medicine/

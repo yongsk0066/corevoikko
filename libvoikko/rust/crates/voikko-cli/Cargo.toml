@@ -1,0 +1,43 @@
+[package]
+name = "voikko-cli"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+description = "Command-line tools for Finnish NLP using Voikko"
+
+[dependencies]
+voikko-core.workspace = true
+voikko-fi = { workspace = true, features = ["handle"] }
+
+[[bin]]
+name = "voikko-spell"
+path = "src/bin/voikko_spell.rs"
+
+[[bin]]
+name = "voikko-suggest"
+path = "src/bin/voikko_suggest.rs"
+
+[[bin]]
+name = "voikko-analyze"
+path = "src/bin/voikko_analyze.rs"
+
+[[bin]]
+name = "voikko-hyphenate"
+path = "src/bin/voikko_hyphenate.rs"
+
+[[bin]]
+name = "voikko-tokenize"
+path = "src/bin/voikko_tokenize.rs"
+
+[[bin]]
+name = "voikko-gc-pretty"
+path = "src/bin/voikko_gc_pretty.rs"
+
+[[bin]]
+name = "voikko-baseform"
+path = "src/bin/voikko_baseform.rs"
+
+[[bin]]
+name = "voikko-readability"
+path = "src/bin/voikko_readability.rs"
