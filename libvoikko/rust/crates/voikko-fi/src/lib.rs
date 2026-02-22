@@ -1,2 +1,9 @@
+#[cfg(feature = "analyze")]
 pub mod morphology;
+#[cfg(feature = "spell")]
 pub mod speller;
+#[cfg(feature = "hyphenate")]
+pub mod hyphenator;
+pub mod tokenizer;
+#[cfg(feature = "suggest")]
+pub mod suggestion;
