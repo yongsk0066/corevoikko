@@ -887,7 +887,7 @@ impl SuggestionGenerator for SplitWord {
                 }
                 let mut part2: Vec<char> = word[w2start..w2start + w2len].to_vec();
                 let (ok2, prio_part) = SplitWord::spell_ok(speller, status, &mut part2);
-                let combined_prio = (prio_total + prio_part) * (1 + strip_lead2 as i32 * 5);
+                let combined_prio = (prio_total.saturating_add(prio_part)).saturating_mul(1 + strip_lead2 as i32 * 5);
 
                 if ok2 {
                     // Build "part1 part2" suggestion

@@ -5,12 +5,14 @@ use voikko_core::analysis::{ATTR_MALAGA_VAPAA_JALKIOSA, ATTR_STRUCTURE};
 use voikko_core::character::{is_consonant, is_vowel, simple_lower};
 use voikko_core::enums::SpellResult;
 
+#[cfg(feature = "hyphenate")]
+use crate::hyphenator::{FinnishHyphenator, Hyphenator, HyphenatorOptions};
 use crate::morphology::Analyzer;
 use crate::speller::utils::match_word_and_analysis;
 use crate::speller::Speller;
 
 /// Options controlling Finnish spelling tweaks.
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Copy, Default)]
 pub struct FinnishSpellerOptions {
     /// Accept extra hyphens in compound words.
     /// Origin: VoikkoHandle::accept_extra_hyphens
@@ -20,16 +22,11 @@ pub struct FinnishSpellerOptions {
 /// Wraps a base `Speller` with Finnish-specific adjustments.
 ///
 /// Handles:
-/// 1. Soft hyphen (U+00AD) validation
+/// 1. Soft hyphen (U+00AD) validation (positions checked against hyphenator)
 /// 2. Optional hyphen in compound words
 /// 3. Vowel-consonant overlap patterns ("pop-opisto")
 /// 4. Free suffix parts ("ja-sana")
 /// 5. Ambiguous compound boundaries ("syy-silta" / "syys-ilta")
-///
-/// Note: Soft hyphen validation requires a hyphenator. Since the hyphenator
-/// is not yet implemented (Phase 3-A), soft hyphen handling returns a basic
-/// result by stripping soft hyphens and checking the stripped word. Full
-/// hyphen position validation will be added when the hyphenator is available.
 ///
 /// Origin: FinnishSpellerTweaksWrapper.cpp:42-223
 pub struct FinnishSpellerTweaksWrapper<'a> {
@@ -54,6 +51,38 @@ impl<'a> FinnishSpellerTweaksWrapper<'a> {
         }
     }
 
+    /// Check that every soft hyphen position corresponds to a valid
+    /// hyphenation point. Returns `true` if all positions are valid.
+    ///
+    /// When the `hyphenate` feature is disabled, this always returns `true`
+    /// (positions are not validated).
+    ///
+    /// Origin: FinnishSpellerTweaksWrapper.cpp:197-208
+    #[cfg(feature = "hyphenate")]
+    fn validate_soft_hyphen_positions(&self, word: &[char], shy_positions: &[usize]) -> bool {
+        let hyphenator = FinnishHyphenator::new(
+            self.analyzer,
+            HyphenatorOptions {
+                ugly_hyphenation: true,
+                hyphenate_unknown: true,
+                min_hyphenated_word_length: 3,
+                ignore_dot: true,
+            },
+        );
+        let hyph_pattern = hyphenator.all_possible_hyphen_positions(word);
+        let hyph_bytes = hyph_pattern.as_bytes();
+
+        shy_positions
+            .iter()
+            .all(|&pos| pos < hyph_bytes.len() && hyph_bytes[pos] == b'-')
+    }
+
+    /// Fallback when the `hyphenate` feature is disabled: always accept.
+    #[cfg(not(feature = "hyphenate"))]
+    fn validate_soft_hyphen_positions(&self, _word: &[char], _shy_positions: &[usize]) -> bool {
+        true
+    }
+
     /// Spell-check a word after soft hyphens have been stripped.
     ///
     /// This handles optional hyphens, VC overlap, free suffix, and ambiguous
@@ -65,7 +94,10 @@ impl<'a> FinnishSpellerTweaksWrapper<'a> {
 
         // Look for a hyphen to process optional/compound hyphen logic
         let hyphen_pos = if result != SpellResult::Ok && wlen > 3 {
-            word[1..wlen - 1].iter().position(|&c| c == '-').map(|p| p + 1)
+            word[1..wlen - 1]
+                .iter()
+                .position(|&c| c == '-')
+                .map(|p| p + 1)
         } else {
             None
         };
@@ -120,8 +152,7 @@ impl<'a> FinnishSpellerTweaksWrapper<'a> {
             if word[i] == '-' {
                 let leading_result = self.spell(&word[..i], i);
                 if leading_result != SpellResult::Failed {
-                    let trailing_word: Vec<char> =
-                        word[i + 1..wlen].to_vec();
+                    let trailing_word: Vec<char> = word[i + 1..wlen].to_vec();
                     let trailing_analyses =
                         self.analyzer.analyze(&trailing_word, trailing_word.len());
                     let is_trailing_acceptable = trailing_analyses.iter().any(|a| {
@@ -174,9 +205,7 @@ impl<'a> FinnishSpellerTweaksWrapper<'a> {
             if i == leading_len {
                 let spres = match_word_and_analysis(&buffer, structure);
                 if j < structure_chars.len() && structure_chars[j] == '=' {
-                    if result_with_border == SpellResult::Failed
-                        || result_with_border > spres
-                    {
+                    if result_with_border == SpellResult::Failed || result_with_border > spres {
                         result_with_border = spres;
                     }
                 } else if result_without_border == SpellResult::Failed
@@ -202,9 +231,10 @@ impl<'a> FinnishSpellerTweaksWrapper<'a> {
 impl Speller for FinnishSpellerTweaksWrapper<'_> {
     /// Spell-check a word with Finnish-specific adjustments.
     ///
-    /// Handles soft hyphens (U+00AD) by stripping them and validating
-    /// the stripped word. Full soft-hyphen position validation requires
-    /// the hyphenator (Phase 3-A).
+    /// Handles soft hyphens (U+00AD) by stripping them, validating the
+    /// stripped word, and then checking that every soft hyphen position
+    /// corresponds to a valid hyphenation point (using the union of all
+    /// possible analyses).
     ///
     /// Origin: FinnishSpellerTweaksWrapper.cpp:176-216
     fn spell(&self, word: &[char], wlen: usize) -> SpellResult {
@@ -233,14 +263,14 @@ impl Speller for FinnishSpellerTweaksWrapper<'_> {
             let result_wo_shy = self.spell_without_soft_hyphen(&buffer, buffer.len());
 
             if result_wo_shy != SpellResult::Failed {
-                // TODO: When the hyphenator is implemented (Phase 3-A),
-                // validate that all soft hyphen positions are at valid
-                // hyphenation points. For now, we accept the word if the
-                // stripped version is valid.
+                // Validate that all soft hyphen positions are at valid
+                // hyphenation points. The hyphenator uses the same settings
+                // as the C++ constructor (FinnishSpellerTweaksWrapper.cpp:42-51).
                 //
                 // Origin: FinnishSpellerTweaksWrapper.cpp:197-208
-                // (hyphenator->allPossibleHyphenPositions check)
-                let _ = shy_positions; // Will be used by hyphenator validation
+                if !self.validate_soft_hyphen_positions(&buffer, &shy_positions) {
+                    return SpellResult::Failed;
+                }
             }
 
             result_wo_shy
@@ -253,9 +283,9 @@ impl Speller for FinnishSpellerTweaksWrapper<'_> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use voikko_core::analysis::Analysis;
     use crate::morphology::Analyzer;
     use crate::speller::adapter::AnalyzerToSpellerAdapter;
+    use voikko_core::analysis::Analysis;
 
     /// A mock analyzer for testing Finnish speller tweaks.
     struct MockFinnishAnalyzer;
@@ -449,5 +479,72 @@ mod tests {
             wrapper.spell(&word, word.len()),
             SpellResult::CapitalizeFirst
         );
+    }
+
+    #[test]
+    #[cfg(feature = "hyphenate")]
+    fn soft_hyphen_at_invalid_position_fails() {
+        let analyzer = MockFinnishAnalyzer;
+        let adapter = AnalyzerToSpellerAdapter::new(&analyzer);
+        let wrapper = make_wrapper(&adapter, &analyzer, false);
+
+        // "ko\u{00AD}ira" -> strips to "koira" which is valid, but
+        // the soft hyphen is at position 2 (between 'o' and 'i'), which
+        // is NOT a valid hyphenation point for "koira". The only valid
+        // hyphenation point is at position 3 (koi-ra).
+        let word = chars("ko\u{00AD}ira");
+        assert_eq!(wrapper.spell(&word, word.len()), SpellResult::Failed);
+    }
+
+    #[test]
+    #[cfg(feature = "hyphenate")]
+    fn soft_hyphen_at_valid_position_ok() {
+        let analyzer = MockFinnishAnalyzer;
+        let adapter = AnalyzerToSpellerAdapter::new(&analyzer);
+        let wrapper = make_wrapper(&adapter, &analyzer, false);
+
+        // "koi\u{00AD}ra" -> strips to "koira", soft hyphen at position 3
+        // which corresponds to the valid hyphenation point "koi-ra".
+        let word = chars("koi\u{00AD}ra");
+        assert_eq!(wrapper.spell(&word, word.len()), SpellResult::Ok);
+    }
+
+    #[test]
+    #[cfg(feature = "hyphenate")]
+    fn soft_hyphen_multiple_positions_all_valid() {
+        let analyzer = MockFinnishAnalyzer;
+        let adapter = AnalyzerToSpellerAdapter::new(&analyzer);
+        let wrapper = make_wrapper(&adapter, &analyzer, false);
+
+        // "hel\u{00AD}sin\u{00AD}ki" -> strips to "helsinki"
+        // Hyphenation points for "helsinki" (STRUCTURE "=ippppppp"):
+        //   h(0) e(1) l(2) s(3) i(4) n(5) k(6) i(7)
+        //   -CV: skip leading consonants -> i=1 (e is vowel)
+        //     i=2: l consonant, s(3) consonant -> no
+        //     i=3: s consonant, i(4) vowel -> hyph[3]='-'
+        //     i=5: n consonant, k(6) consonant -> no
+        //     i=6: k consonant, i(7) vowel -> hyph[6]='-'
+        // Valid hyphenation at positions 3 and 6.
+        // Soft hyphens at positions 3 and 6 -> both valid.
+        let word = chars("hel\u{00AD}sin\u{00AD}ki");
+        assert_eq!(
+            wrapper.spell(&word, word.len()),
+            SpellResult::CapitalizeFirst
+        );
+    }
+
+    #[test]
+    #[cfg(feature = "hyphenate")]
+    fn soft_hyphen_one_valid_one_invalid_fails() {
+        let analyzer = MockFinnishAnalyzer;
+        let adapter = AnalyzerToSpellerAdapter::new(&analyzer);
+        let wrapper = make_wrapper(&adapter, &analyzer, false);
+
+        // "hel\u{00AD}si\u{00AD}nki" -> strips to "helsinki"
+        // Soft hyphens at positions 3 and 5.
+        // Position 3 is valid (hel-sinki), but position 5 is NOT valid
+        // (the only valid points are 3 and 6, not 5).
+        let word = chars("hel\u{00AD}si\u{00AD}nki");
+        assert_eq!(wrapper.spell(&word, word.len()), SpellResult::Failed);
     }
 }

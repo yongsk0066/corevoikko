@@ -159,75 +159,167 @@ fn cached_spell(
     }
 }
 
-/// Simple Unicode normalization stub.
+/// 2-to-1 combining diacritical mark composition table.
 ///
-/// A full implementation would handle ligature decomposition and
-/// character substitutions (see charset.cpp:voikko_normalise).
-/// For now, this is a passthrough that copies the input as-is.
+/// Each entry is `(base, combining_mark, precomposed)`.
+/// Origin: charset.cpp CONV_2TO1 (67 entries)
+const CONV_2TO1: [(char, char, char); 67] = [
+    // Basic Latin + Combining Diacritical Marks --> Latin-1 Supplement
+    ('A', '\u{0300}', '\u{00C0}'), // LATIN CAPITAL LETTER A WITH GRAVE
+    ('A', '\u{0301}', '\u{00C1}'), // LATIN CAPITAL LETTER A WITH ACUTE
+    ('A', '\u{0302}', '\u{00C2}'), // LATIN CAPITAL LETTER A WITH CIRCUMFLEX
+    ('A', '\u{0303}', '\u{00C3}'), // LATIN CAPITAL LETTER A WITH TILDE
+    ('A', '\u{0308}', '\u{00C4}'), // LATIN CAPITAL LETTER A WITH DIAERESIS
+    ('A', '\u{030A}', '\u{00C5}'), // LATIN CAPITAL LETTER A WITH RING ABOVE
+    ('C', '\u{0327}', '\u{00C7}'), // LATIN CAPITAL LETTER C WITH CEDILLA
+    ('E', '\u{0300}', '\u{00C8}'), // LATIN CAPITAL LETTER E WITH GRAVE
+    ('E', '\u{0301}', '\u{00C9}'), // LATIN CAPITAL LETTER E WITH ACUTE
+    ('E', '\u{0302}', '\u{00CA}'), // LATIN CAPITAL LETTER E WITH CIRCUMFLEX
+    ('E', '\u{0308}', '\u{00CB}'), // LATIN CAPITAL LETTER E WITH DIAERESIS
+    ('I', '\u{0300}', '\u{00CC}'), // LATIN CAPITAL LETTER I WITH GRAVE
+    ('I', '\u{0301}', '\u{00CD}'), // LATIN CAPITAL LETTER I WITH ACUTE
+    ('I', '\u{0302}', '\u{00CE}'), // LATIN CAPITAL LETTER I WITH CIRCUMFLEX
+    ('I', '\u{0308}', '\u{00CF}'), // LATIN CAPITAL LETTER I WITH DIAERESIS
+    ('N', '\u{0303}', '\u{00D1}'), // LATIN CAPITAL LETTER N WITH TILDE
+    ('O', '\u{0300}', '\u{00D2}'), // LATIN CAPITAL LETTER O WITH GRAVE
+    ('O', '\u{0301}', '\u{00D3}'), // LATIN CAPITAL LETTER O WITH ACUTE
+    ('O', '\u{0302}', '\u{00D4}'), // LATIN CAPITAL LETTER O WITH CIRCUMFLEX
+    ('O', '\u{0303}', '\u{00D5}'), // LATIN CAPITAL LETTER O WITH TILDE
+    ('O', '\u{0308}', '\u{00D6}'), // LATIN CAPITAL LETTER O WITH DIAERESIS
+    ('U', '\u{0300}', '\u{00D9}'), // LATIN CAPITAL LETTER U WITH GRAVE
+    ('U', '\u{0301}', '\u{00DA}'), // LATIN CAPITAL LETTER U WITH ACUTE
+    ('U', '\u{0302}', '\u{00DB}'), // LATIN CAPITAL LETTER U WITH CIRCUMFLEX
+    ('U', '\u{0308}', '\u{00DC}'), // LATIN CAPITAL LETTER U WITH DIAERESIS
+    ('Y', '\u{0301}', '\u{00DD}'), // LATIN CAPITAL LETTER Y WITH ACUTE
+    ('a', '\u{0300}', '\u{00E0}'), // LATIN SMALL LETTER A WITH GRAVE
+    ('a', '\u{0301}', '\u{00E1}'), // LATIN SMALL LETTER A WITH ACUTE
+    ('a', '\u{0302}', '\u{00E2}'), // LATIN SMALL LETTER A WITH CIRCUMFLEX
+    ('a', '\u{0303}', '\u{00E3}'), // LATIN SMALL LETTER A WITH TILDE
+    ('a', '\u{0308}', '\u{00E4}'), // LATIN SMALL LETTER A WITH DIAERESIS
+    ('a', '\u{030A}', '\u{00E5}'), // LATIN SMALL LETTER A WITH RING ABOVE
+    ('c', '\u{0327}', '\u{00E7}'), // LATIN SMALL LETTER C WITH CEDILLA
+    ('e', '\u{0300}', '\u{00E8}'), // LATIN SMALL LETTER E WITH GRAVE
+    ('e', '\u{0301}', '\u{00E9}'), // LATIN SMALL LETTER E WITH ACUTE
+    ('e', '\u{0302}', '\u{00EA}'), // LATIN SMALL LETTER E WITH CIRCUMFLEX
+    ('e', '\u{0308}', '\u{00EB}'), // LATIN SMALL LETTER E WITH DIAERESIS
+    ('i', '\u{0300}', '\u{00EC}'), // LATIN SMALL LETTER I WITH GRAVE
+    ('i', '\u{0301}', '\u{00ED}'), // LATIN SMALL LETTER I WITH ACUTE
+    ('i', '\u{0302}', '\u{00EE}'), // LATIN SMALL LETTER I WITH CIRCUMFLEX
+    ('i', '\u{0308}', '\u{00EF}'), // LATIN SMALL LETTER I WITH DIAERESIS
+    ('n', '\u{0303}', '\u{00F1}'), // LATIN SMALL LETTER N WITH TILDE
+    ('o', '\u{0300}', '\u{00F2}'), // LATIN SMALL LETTER O WITH GRAVE
+    ('o', '\u{0301}', '\u{00F3}'), // LATIN SMALL LETTER O WITH ACUTE
+    ('o', '\u{0302}', '\u{00F4}'), // LATIN SMALL LETTER O WITH CIRCUMFLEX
+    ('o', '\u{0303}', '\u{00F5}'), // LATIN SMALL LETTER O WITH TILDE
+    ('o', '\u{0308}', '\u{00F6}'), // LATIN SMALL LETTER O WITH DIAERESIS
+    ('u', '\u{0300}', '\u{00F9}'), // LATIN SMALL LETTER U WITH GRAVE
+    ('u', '\u{0301}', '\u{00FA}'), // LATIN SMALL LETTER U WITH ACUTE
+    ('u', '\u{0302}', '\u{00FB}'), // LATIN SMALL LETTER U WITH CIRCUMFLEX
+    ('u', '\u{0308}', '\u{00FC}'), // LATIN SMALL LETTER U WITH DIAERESIS
+    ('y', '\u{0301}', '\u{00FD}'), // LATIN SMALL LETTER Y WITH ACUTE
+    ('y', '\u{0308}', '\u{00FF}'), // LATIN SMALL LETTER Y WITH DIAERESIS
+    // Basic Latin + Combining Diacritical Marks --> Latin Extended-A
+    ('S', '\u{030C}', '\u{0160}'), // LATIN CAPITAL LETTER S WITH CARON
+    ('s', '\u{030C}', '\u{0161}'), // LATIN SMALL LETTER S WITH CARON
+    ('Z', '\u{030C}', '\u{017D}'), // LATIN CAPITAL LETTER Z WITH CARON
+    ('z', '\u{030C}', '\u{017E}'), // LATIN SMALL LETTER Z WITH CARON
+    // Basic Russian alphabet + Combining Diacritical Marks --> Basic Russian alphabet
+    ('\u{0418}', '\u{0306}', '\u{0419}'), // CYRILLIC CAPITAL LETTER SHORT I
+    ('\u{0438}', '\u{0306}', '\u{0439}'), // CYRILLIC SMALL LETTER SHORT I
+    // Basic Russian alphabet + Combining Diacritical Marks --> Cyrillic extensions
+    ('\u{0415}', '\u{0300}', '\u{0400}'), // CYRILLIC CAPITAL LETTER IE WITH GRAVE
+    ('\u{0435}', '\u{0300}', '\u{0450}'), // CYRILLIC SMALL LETTER IE WITH GRAVE
+    ('\u{0415}', '\u{0308}', '\u{0401}'), // CYRILLIC CAPITAL LETTER IO
+    ('\u{0435}', '\u{0308}', '\u{0451}'), // CYRILLIC SMALL LETTER IO
+    ('\u{0413}', '\u{0301}', '\u{0403}'), // CYRILLIC CAPITAL LETTER GJE
+    ('\u{0433}', '\u{0301}', '\u{0453}'), // CYRILLIC SMALL LETTER GJE
+    // Basic Russian alphabet + Combining Diacritical Marks --> Extended Cyrillic
+    ('\u{041E}', '\u{0308}', '\u{04E6}'), // CYRILLIC CAPITAL LETTER O WITH DIAERESIS
+    ('\u{043E}', '\u{0308}', '\u{04E7}'), // CYRILLIC SMALL LETTER O WITH DIAERESIS
+];
+
+/// Unicode normalization matching C++ voikko_normalise.
 ///
-/// TODO: Implement full normalization matching C++ voikko_normalise.
+/// Applies character conversions in priority order:
+/// 1. 2-to-1: base + combining mark -> precomposed character
+/// 2. 1-to-1: simple substitutions (hyphens, quotation marks)
+/// 3. 1-to-2: single char -> two chars (degree symbols, ligatures)
+/// 4. 1-to-3: single char -> three chars (triple ligatures)
+/// 5. passthrough
+///
+/// Origin: charset.cpp:voikko_normalise
 fn normalize(word: &[char]) -> Vec<char> {
-    // Basic normalization: replace some common equivalents
-    let mut result = Vec::with_capacity(word.len() + word.len() / 2);
+    // Worst case: every char is a 1-to-3 ligature
+    let mut result = Vec::with_capacity(word.len() * 3);
     let len = word.len();
     let mut i = 0;
     while i < len {
+        // --- Priority 1: 2-to-1 combining diacritical mark composition ---
+        if i < len - 1 {
+            let mut found_2to1 = false;
+            for &(base, combining, precomposed) in &CONV_2TO1 {
+                if word[i] == base && word[i + 1] == combining {
+                    result.push(precomposed);
+                    i += 2;
+                    found_2to1 = true;
+                    break;
+                }
+            }
+            if found_2to1 {
+                continue;
+            }
+        }
+
+        // --- Priority 2: 1-to-1 simple substitutions ---
+        // --- Priority 3: 1-to-2 expansions ---
+        // --- Priority 4: 1-to-3 expansions ---
         match word[i] {
-            // HYPHEN (U+2010) -> HYPHEN-MINUS
-            '\u{2010}' => {
-                result.push('-');
-                i += 1;
+            // 1-to-1: General Punctuation --> Basic Latin
+            '\u{2019}' => result.push('\''), // RIGHT SINGLE QUOTATION MARK -> APOSTROPHE
+            '\u{2010}' => result.push('-'),  // HYPHEN -> HYPHEN-MINUS
+            '\u{2011}' => result.push('-'),  // NON-BREAKING HYPHEN -> HYPHEN-MINUS
+
+            // 1-to-2: Letterlike Symbols
+            '\u{2103}' => {
+                // DEGREE CELSIUS -> degree sign + C
+                result.push('\u{00B0}');
+                result.push('C');
             }
-            // NON-BREAKING HYPHEN (U+2011) -> HYPHEN-MINUS
-            '\u{2011}' => {
-                result.push('-');
-                i += 1;
+            '\u{2109}' => {
+                // DEGREE FAHRENHEIT -> degree sign + F
+                result.push('\u{00B0}');
+                result.push('F');
             }
-            // Ligature decompositions
+            // 1-to-2: Alphabetic Presentation Forms (2-char ligatures)
             '\u{FB00}' => {
                 result.push('f');
                 result.push('f');
-                i += 1;
             }
             '\u{FB01}' => {
                 result.push('f');
                 result.push('i');
-                i += 1;
             }
             '\u{FB02}' => {
                 result.push('f');
                 result.push('l');
-                i += 1;
             }
+
+            // 1-to-3: Alphabetic Presentation Forms (3-char ligatures)
             '\u{FB03}' => {
                 result.push('f');
                 result.push('f');
                 result.push('i');
-                i += 1;
             }
             '\u{FB04}' => {
                 result.push('f');
                 result.push('f');
                 result.push('l');
-                i += 1;
             }
-            // DEGREE CELSIUS (U+2103) -> degree sign + C
-            '\u{2103}' => {
-                result.push('\u{00B0}');
-                result.push('C');
-                i += 1;
-            }
-            // DEGREE FAHRENHEIT (U+2109) -> degree sign + F
-            '\u{2109}' => {
-                result.push('\u{00B0}');
-                result.push('F');
-                i += 1;
-            }
-            c => {
-                result.push(c);
-                i += 1;
-            }
+
+            // Passthrough
+            c => result.push(c),
         }
+        i += 1;
     }
     result
 }
@@ -511,6 +603,218 @@ mod tests {
         let word = chars("\u{FB00}"); // LATIN SMALL LIGATURE FF
         let result = normalize(&word);
         assert_eq!(result, chars("ff"));
+    }
+
+    #[test]
+    fn normalize_ligature_fi() {
+        let word = chars("\u{FB01}"); // LATIN SMALL LIGATURE FI
+        let result = normalize(&word);
+        assert_eq!(result, chars("fi"));
+    }
+
+    #[test]
+    fn normalize_ligature_fl() {
+        let word = chars("\u{FB02}"); // LATIN SMALL LIGATURE FL
+        let result = normalize(&word);
+        assert_eq!(result, chars("fl"));
+    }
+
+    #[test]
+    fn normalize_ligature_ffi() {
+        let word = chars("\u{FB03}"); // LATIN SMALL LIGATURE FFI
+        let result = normalize(&word);
+        assert_eq!(result, chars("ffi"));
+    }
+
+    #[test]
+    fn normalize_ligature_ffl() {
+        let word = chars("\u{FB04}"); // LATIN SMALL LIGATURE FFL
+        let result = normalize(&word);
+        assert_eq!(result, chars("ffl"));
+    }
+
+    #[test]
+    fn normalize_non_breaking_hyphen() {
+        let word = chars("syy\u{2011}silta"); // NON-BREAKING HYPHEN (U+2011)
+        let result = normalize(&word);
+        assert_eq!(result, chars("syy-silta"));
+    }
+
+    #[test]
+    fn normalize_right_single_quotation_mark() {
+        let word = chars("it\u{2019}s"); // RIGHT SINGLE QUOTATION MARK (U+2019)
+        let result = normalize(&word);
+        assert_eq!(result, chars("it's"));
+    }
+
+    #[test]
+    fn normalize_degree_celsius() {
+        let word = chars("20\u{2103}"); // DEGREE CELSIUS (U+2103)
+        let result = normalize(&word);
+        assert_eq!(result, chars("20\u{00B0}C"));
+    }
+
+    #[test]
+    fn normalize_degree_fahrenheit() {
+        let word = chars("68\u{2109}"); // DEGREE FAHRENHEIT (U+2109)
+        let result = normalize(&word);
+        assert_eq!(result, chars("68\u{00B0}F"));
+    }
+
+    // --- 2-to-1 combining diacritical mark tests ---
+
+    #[test]
+    fn normalize_a_combining_diaeresis_lower() {
+        // a + U+0308 COMBINING DIAERESIS -> U+00E4 (a with diaeresis)
+        let word = chars("a\u{0308}");
+        let result = normalize(&word);
+        assert_eq!(result, chars("\u{00E4}"));
+    }
+
+    #[test]
+    fn normalize_a_combining_diaeresis_upper() {
+        // A + U+0308 COMBINING DIAERESIS -> U+00C4 (A with diaeresis)
+        let word = chars("A\u{0308}");
+        let result = normalize(&word);
+        assert_eq!(result, chars("\u{00C4}"));
+    }
+
+    #[test]
+    fn normalize_o_combining_diaeresis_lower() {
+        // o + U+0308 COMBINING DIAERESIS -> U+00F6 (o with diaeresis)
+        let word = chars("o\u{0308}");
+        let result = normalize(&word);
+        assert_eq!(result, chars("\u{00F6}"));
+    }
+
+    #[test]
+    fn normalize_o_combining_diaeresis_upper() {
+        // O + U+0308 COMBINING DIAERESIS -> U+00D6 (O with diaeresis)
+        let word = chars("O\u{0308}");
+        let result = normalize(&word);
+        assert_eq!(result, chars("\u{00D6}"));
+    }
+
+    #[test]
+    fn normalize_e_combining_acute() {
+        // e + U+0301 COMBINING ACUTE -> U+00E9 (e with acute)
+        let word = chars("e\u{0301}");
+        let result = normalize(&word);
+        assert_eq!(result, chars("\u{00E9}"));
+    }
+
+    #[test]
+    fn normalize_n_combining_tilde() {
+        // n + U+0303 COMBINING TILDE -> U+00F1 (n with tilde)
+        let word = chars("n\u{0303}");
+        let result = normalize(&word);
+        assert_eq!(result, chars("\u{00F1}"));
+    }
+
+    #[test]
+    fn normalize_a_combining_ring_above() {
+        // a + U+030A COMBINING RING ABOVE -> U+00E5 (a with ring above)
+        let word = chars("a\u{030A}");
+        let result = normalize(&word);
+        assert_eq!(result, chars("\u{00E5}"));
+    }
+
+    #[test]
+    fn normalize_c_combining_cedilla() {
+        // c + U+0327 COMBINING CEDILLA -> U+00E7 (c with cedilla)
+        let word = chars("c\u{0327}");
+        let result = normalize(&word);
+        assert_eq!(result, chars("\u{00E7}"));
+    }
+
+    #[test]
+    fn normalize_s_combining_caron() {
+        // s + U+030C COMBINING CARON -> U+0161 (s with caron)
+        let word = chars("s\u{030C}");
+        let result = normalize(&word);
+        assert_eq!(result, chars("\u{0161}"));
+    }
+
+    #[test]
+    fn normalize_z_combining_caron_upper() {
+        // Z + U+030C COMBINING CARON -> U+017D (Z with caron)
+        let word = chars("Z\u{030C}");
+        let result = normalize(&word);
+        assert_eq!(result, chars("\u{017D}"));
+    }
+
+    #[test]
+    fn normalize_cyrillic_short_i() {
+        // CYRILLIC CAPITAL LETTER I (U+0418) + COMBINING BREVE (U+0306)
+        // -> CYRILLIC CAPITAL LETTER SHORT I (U+0419)
+        let word = chars("\u{0418}\u{0306}");
+        let result = normalize(&word);
+        assert_eq!(result, chars("\u{0419}"));
+    }
+
+    #[test]
+    fn normalize_cyrillic_io_lower() {
+        // CYRILLIC SMALL LETTER IE (U+0435) + COMBINING DIAERESIS (U+0308)
+        // -> CYRILLIC SMALL LETTER IO (U+0451)
+        let word = chars("\u{0435}\u{0308}");
+        let result = normalize(&word);
+        assert_eq!(result, chars("\u{0451}"));
+    }
+
+    #[test]
+    fn normalize_word_with_combining_marks() {
+        // "pa\u{0308}a\u{0308}" (p + a+diaeresis + a+diaeresis) -> "p\u{00E4}\u{00E4}"
+        let word = chars("pa\u{0308}a\u{0308}");
+        let result = normalize(&word);
+        assert_eq!(result, chars("p\u{00E4}\u{00E4}"));
+    }
+
+    #[test]
+    fn normalize_mixed_combining_and_ligature() {
+        // Mix: combining mark composition + ligature in same word
+        // "a\u{0308}\u{FB01}n" -> "\u{00E4}fin"
+        let word = chars("a\u{0308}\u{FB01}n");
+        let result = normalize(&word);
+        assert_eq!(result, chars("\u{00E4}fin"));
+    }
+
+    #[test]
+    fn normalize_2to1_has_priority_over_1to1() {
+        // If a char matches 2-to-1 (with next char), that takes priority.
+        // U+0415 (Cyrillic IE) + U+0300 -> U+0400 (Cyrillic IE WITH GRAVE)
+        // not passed through individually
+        let word = chars("\u{0415}\u{0300}");
+        let result = normalize(&word);
+        assert_eq!(result.len(), 1);
+        assert_eq!(result[0], '\u{0400}');
+    }
+
+    #[test]
+    fn normalize_combining_mark_at_end_passthrough() {
+        // A combining mark at the very end with no recognized pair: pass through
+        let word = chars("x\u{0306}"); // x + COMBINING BREVE (not in table)
+        let result = normalize(&word);
+        assert_eq!(result, chars("x\u{0306}"));
+    }
+
+    #[test]
+    fn normalize_empty_word() {
+        let word: Vec<char> = vec![];
+        let result = normalize(&word);
+        assert!(result.is_empty());
+    }
+
+    #[test]
+    fn normalize_single_char() {
+        let word = chars("k");
+        let result = normalize(&word);
+        assert_eq!(result, chars("k"));
+    }
+
+    #[test]
+    fn normalize_conv_2to1_table_count() {
+        // Verify table has exactly 67 entries as in C++
+        assert_eq!(CONV_2TO1.len(), 67);
     }
 
     // --- Pipeline tests ---

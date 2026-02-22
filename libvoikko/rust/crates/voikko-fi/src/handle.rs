@@ -17,6 +17,8 @@
 //
 // Origin: setup/VoikkoHandle.hpp (C++ VoikkoHandle)
 
+use std::cell::RefCell;
+
 use voikko_core::analysis::Analysis;
 use voikko_core::enums::{SentenceType, TokenType};
 use voikko_core::grammar_error::GrammarError;
@@ -92,11 +94,9 @@ pub struct VoikkoHandle {
     /// Maximum number of suggestions to return.
     max_suggestions: usize,
 
-    /// Speller cache (optional). Currently unused because `spell_check`
-    /// requires `&mut` access, which conflicts with `&self` on the handle.
-    /// TODO: Wrap in RefCell if caching is needed for performance.
-    #[allow(dead_code)]
-    speller_cache: Option<SpellerCache>,
+    /// Speller cache for avoiding redundant lookups.
+    /// Wrapped in `RefCell` for interior mutability (`&self` methods need `&mut` cache access).
+    speller_cache: RefCell<SpellerCache>,
 }
 
 impl VoikkoHandle {
@@ -141,7 +141,7 @@ impl VoikkoHandle {
             grammar_options: GrammarOptions::default(),
             use_ocr_suggestions: false,
             max_suggestions: 5,
-            speller_cache: Some(SpellerCache::new(0)),
+            speller_cache: RefCell::new(SpellerCache::new(0)),
         })
     }
 
@@ -161,13 +161,14 @@ impl VoikkoHandle {
         let tweaks = FinnishSpellerTweaksWrapper::new(
             &adapter,
             &self.analyzer,
-            self.finnish_spell_options.clone(),
+            self.finnish_spell_options,
         );
-        // spell_check expects Option<&mut SpellerCache> but we have Option<SpellerCache>
-        // stored in the handle. Since spell_check takes &self, we cannot mutably borrow
-        // the cache. Pass None for now (the cache is an optimization, not correctness).
-        // TODO: Use RefCell for the cache if performance requires it.
-        spell_check(&word_chars, &tweaks, None, &self.spell_options) == 1
+        spell_check(
+            &word_chars,
+            &tweaks,
+            Some(&mut *self.speller_cache.borrow_mut()),
+            &self.spell_options,
+        ) == 1
     }
 
     /// Generate spelling suggestions for a misspelled word.
@@ -181,7 +182,7 @@ impl VoikkoHandle {
         let tweaks = FinnishSpellerTweaksWrapper::new(
             &adapter,
             &self.analyzer,
-            self.finnish_spell_options.clone(),
+            self.finnish_spell_options,
         );
 
         let mut status = SuggestionStatus::new(&word_chars, self.max_suggestions);
@@ -225,7 +226,7 @@ impl VoikkoHandle {
     /// Origin: voikkoHyphenateCstr
     pub fn hyphenate(&self, word: &str) -> String {
         let word_chars: Vec<char> = word.chars().collect();
-        let hyp = FinnishHyphenator::new(&self.analyzer, self.hyphenator_options.clone());
+        let hyp = FinnishHyphenator::new(&self.analyzer, self.hyphenator_options);
         hyp.hyphenate(&word_chars)
     }
 

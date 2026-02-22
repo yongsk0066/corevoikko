@@ -139,7 +139,7 @@ impl WasmVoikko {
     /// Returns a JavaScript array of analysis objects. Each object contains
     /// string key-value pairs for morphological attributes (CLASS, BASEFORM,
     /// STRUCTURE, etc.).
-    pub fn analyze(&self, word: &str) -> JsValue {
+    pub fn analyze(&self, word: &str) -> Result<JsValue, JsError> {
         let analyses = self.handle.analyze(word);
         let js_analyses: Vec<JsAnalysis> = analyses
             .into_iter()
@@ -147,7 +147,8 @@ impl WasmVoikko {
                 attributes: a.attributes().clone(),
             })
             .collect();
-        serde_wasm_bindgen::to_value(&js_analyses).unwrap_or(JsValue::NULL)
+        serde_wasm_bindgen::to_value(&js_analyses)
+            .map_err(|e| JsError::new(&e.to_string()))
     }
 
     /// Hyphenate a word.
@@ -166,7 +167,7 @@ impl WasmVoikko {
     /// Returns a JavaScript array of grammar error objects with fields:
     /// `errorCode`, `startPos`, `errorLen`, `suggestions`.
     #[wasm_bindgen(js_name = "grammarErrors")]
-    pub fn grammar_errors(&self, text: &str) -> JsValue {
+    pub fn grammar_errors(&self, text: &str) -> Result<JsValue, JsError> {
         let errors = self.handle.grammar_errors(text);
         let js_errors: Vec<JsGrammarError> = errors
             .into_iter()
@@ -177,7 +178,8 @@ impl WasmVoikko {
                 suggestions: e.suggestions,
             })
             .collect();
-        serde_wasm_bindgen::to_value(&js_errors).unwrap_or(JsValue::NULL)
+        serde_wasm_bindgen::to_value(&js_errors)
+            .map_err(|e| JsError::new(&e.to_string()))
     }
 
     /// Tokenize text into a list of tokens.
@@ -185,7 +187,7 @@ impl WasmVoikko {
     /// Returns a JavaScript array of token objects with fields:
     /// `tokenType` ("Word", "Punctuation", "Whitespace", "Unknown"),
     /// `text`, `tokenLen`, `pos`.
-    pub fn tokens(&self, text: &str) -> JsValue {
+    pub fn tokens(&self, text: &str) -> Result<JsValue, JsError> {
         let tokens = self.handle.tokens(text);
         let js_tokens: Vec<JsToken> = tokens
             .into_iter()
@@ -196,14 +198,15 @@ impl WasmVoikko {
                 pos: t.pos,
             })
             .collect();
-        serde_wasm_bindgen::to_value(&js_tokens).unwrap_or(JsValue::NULL)
+        serde_wasm_bindgen::to_value(&js_tokens)
+            .map_err(|e| JsError::new(&e.to_string()))
     }
 
     /// Detect sentence boundaries in text.
     ///
     /// Returns a JavaScript array of sentence objects with fields:
     /// `sentenceType` ("Probable", "Possible", "None"), `sentenceLen`.
-    pub fn sentences(&self, text: &str) -> JsValue {
+    pub fn sentences(&self, text: &str) -> Result<JsValue, JsError> {
         let sentences = self.handle.sentences(text);
         let js_sentences: Vec<JsSentence> = sentences
             .into_iter()
@@ -212,7 +215,8 @@ impl WasmVoikko {
                 sentence_len: s.sentence_len,
             })
             .collect();
-        serde_wasm_bindgen::to_value(&js_sentences).unwrap_or(JsValue::NULL)
+        serde_wasm_bindgen::to_value(&js_sentences)
+            .map_err(|e| JsError::new(&e.to_string()))
     }
 
     /// Release resources held by this instance.

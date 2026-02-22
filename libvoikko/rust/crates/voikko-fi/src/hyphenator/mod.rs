@@ -48,7 +48,7 @@ const SPECIAL_CHARS_BEFORE_HYPHEN: &[char] = &['/', '.', ':', '&', '%', '\''];
 
 /// Configuration options for the Finnish hyphenator.
 /// Origin: AnalyzerToFinnishHyphenatorAdapter.hpp:58-61
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct HyphenatorOptions {
     /// When true, include aesthetically ugly but correct hyphenation points.
     /// When false, suppress ugly positions (e.g., single-char syllables at edges,
