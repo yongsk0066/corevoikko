@@ -6,6 +6,7 @@ resolver = "3"
 edition = "2024"
 rust-version = "1.86"
 license = "MPL-1.1 OR GPL-2.0-or-later OR LGPL-2.1-or-later"
+repository = "https://github.com/yongsk0066/corevoikko"
 
 [workspace.dependencies]
 bytemuck = { version = "1", features = ["derive"] }

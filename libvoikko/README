@@ -1,197 +1,90 @@
 General information
 ===================
 
-This is libvoikko, library of free natural language processing tools
-The library is written in C++. The library supports multiple backends:
-
-- VFST: Finite state transducer format used for Finnish morphology
-  and as an experimental language independent backend.
-- HFST: Supports ZHFST speller archives for various languages.
-- Experimental Lttoolbox backend.
+Libvoikko is a library for free natural language processing.
+The core library is written in Rust. The VFST backend provides
+morphology-based analysis for Finnish.
 
 Libvoikko provides spell checking, hyphenation, grammar checking and
-morphological analysis for Finnish language. Only spell checking is
-supported for other languages through HFST backend.
-Libvoikko aims to provide support for
-languages that are not well served by Hunspell or other existing free
-linguistic tools. This can be done because we do not care about
-compatibility with legacy dictionary formats and we support only actively
-maintained languages. Pushing new features to Hunspell where
-they would need to be maintained essentially indefinitely should not
-be done until we have gained enough experience to know which solutions
-work in the real world.
+morphological analysis for Finnish language.
 
 
 License
 =======
 
-The core library and backends that are enabled by default are available
-under MPL 1.1 / GPL 2+ / LGPL 2.1+ tri-license.
-
-Lttoolbox backend is available only under GPL version 2 or later.
+The core library is available under MPL 1.1 / GPL 2+ / LGPL 2.1+ tri-license.
 
  Backend        License
 ----------------------------------------------------------------
  VFST           MPL 1.1 / GPL 2+ / LGPL 2.1+
- HFST           MPL 1.1 / GPL 2+ / LGPL 2.1+ (Apache v2 dependency)
- Lttoolbox      GPL 2+ (GPL 2+ backend and GPL 2+ dependency)
 
 
 Features
 ========
 
- - Spell checking using compound word and derivation rule system that is
-   largely compatible with widely used proprietary Finnish spell checkers
-   such as the one used in MS Word.
- - Spelling suggestions that are generated to catch most probable typing
-   errors.
- - Special spelling suggestion mode that can be used to correct errors
-   produced by optical character recognition software.
- - Hyphenator with compound hyphenation based on morphological analysis.
- - Various options to tune spell checking and hyphenation for different
-   purposes and applications.
- - Grammar checking and context sensitive spell checking using paragraph
+ - Spell checking using compound word and derivation rule system.
+ - Spelling suggestions tuned for common typing errors and OCR correction.
+ - Hyphenation with compound-aware splitting based on morphological analysis.
+ - Grammar checking and context-sensitive spell checking using paragraph
    based API.
  - String tokenizer and sentence splitter.
  - Morphological analyzer.
- - All functionality is made available through C, Python, Java and .Net APIs.
+ - Available through JS/TS (WASM), Python, Java, C#, Common Lisp, and C APIs.
 
-Documentation for using the library can be found from header file voikko.h.
-
-
-Build requirements
-==================
-
-C++ compiler (GCC or clang) and Python (version 3.0 or later)
-must be available in order to build this library. Pkg-config is needed
-for build configuration.
-
-Java API is designed to be built as a Maven project. No autotools or Ant
-based build system is available yet.
-
-When building from Git checkout you will need autoconf, automake and pkg-config
-to generate the configure script.
-
-Build configuration
-===================
-
-See ./configure --help for a list of available configuration options.
-The default configuration enables those backends that are recommended for
-typical use: VFST for Finnish and HFST for other languages.
-
-Disabling the default backends is safe if you do not need to use the dictionary
-formats supported by them.
-
-You can also enable certain experimental backends. Such configurations will
-not necessarily work with all dictionaries and the dictionary
-formats may change without notice. Thus these options should generally be used
-in developer builds only. If you need to use them in a released build we
-strongly recommend that you disable external dictionary loading with
---disable-extdicts and supply compatible dictionaries along with the library.
+Documentation for the C API can be found in the header file rust/crates/voikko-ffi/include/voikko.h.
 
 
-Runtime requirements
-====================
+Build (Rust)
+============
 
-For dictionary format 3 (HFST backend):
+  cd rust
+  cargo test --all-features      # 637 tests
+  cargo clippy --all-features -- -D warnings
 
- Any valid ZHFST speller with file suffix .zhfst can be used. The name
- of the file is not significant.
- 
+WASM build:
+
+  cd rust
+  cargo build --target wasm32-unknown-unknown --release -p voikko-wasm
+  wasm-bindgen target/wasm32-unknown-unknown/release/voikko_wasm.wasm \
+    --out-dir ../js/wasm --target web --typescript
+
+FFI shared library:
+
+  cd rust
+  cargo build --release -p voikko-ffi
+  # → target/release/libvoikko_ffi.{dylib,so,dll}
+
+
+Dictionary files
+================
+
 For dictionary format 5 (Finnish VFST backend):
 
  Valid VFST dictionaries can be built from voikko-fi version 2.0 or later.
+ The dictionary path should contain: {path}/5/mor-standard/{files}
 
-Python bindings work with Python version 2.7 or later. No conversion is needed
-in order to use the module with Python 3.
-
-
-Search order for dictionary files
-=================================
-
-A set of available dictionary variants is built by examining the contents of the
-following directories. If a variant exists in more than one location, the first
-occurrence is used and the rest are ignored.
-
-1) Path given as the last argument to voikkoInit.
-2) Path specified by the environment variable VOIKKO_DICTIONARY_PATH, if the
-   variable is set in the environment of the process initializing the library.
-3) Only on platforms with Unix home directories (Linux, BSD and Mac OS X):
-   a) from directory $HOME/.voikko
-      i) Only on Mac OS X: from directory $HOME/Library/Spelling/voikko
-   b) from directory /etc/voikko
-4) Only on Windows:
-   a) Directory specified by the registry key
-      HKEY_CURRENT_USER\SOFTWARE\Voikko\DictionaryPath.
-   b) User specific local application data directory, usually
-      C:\Documents and Settings\$username\Local Settings\Application Data\voikko
-   c) Directory specified by the registry key
-      HKEY_LOCAL_MACHINE\SOFTWARE\Voikko\DictionaryPath.
-5) Path specified at compile time using  --with-dictionary-path
-
-In 2), 4) and 5) it is possible to specify multiple locations by separating them with
-the OS specific paths separator (; on Windows, : on other operating systems).
-The locations will be processed in the listed order.
-
-Locations 2) to 5) are not used if the library is configured with --disable-external-dicts
-Using this option is recommended if dictionaries are distributed with the library
-and support for experimental dictionary formats is enabled.
-
-To all of the paths above additional path component "/2" is appended at the end.
-This corresponds to the dictionary version and allows multiple versions of the same
-dictionary to be installed simultaneously. The version number may be other than "2".
-
-Dictionaries and language variants are searched from files or subdirectories using
-the rules that are specific to each format version.
-
-One of the dictionaries is chosen to be the default dictionary by trying the
-following rules:
-
-1) If one of the subdirectories in the main directory paths described above has
-   name "mor-default", the default dictionary will be the variant that is found
-   from that directory. Note that this does not affect the actual decision about
-   the dictionary instance used to provide the variant. If, for example, there is
-   a directory $HOME/.voikko/2/mor-a containing variant "a" and a directory
-   /etc/voikko/2/mor-default containing variant "a", the variant "a" will become the
-   default but it will still be provided by $HOME/.voikko/2/mor-a.
-
-2) If no default is specified, variant "standard" is used as the default.
-
-3) If variant "standard" is not available, the variant with the name that comes
-   first in alphabetical order is selected as the default.
-
-
-Selection of the variant to use
-===============================
-
-The dictionary variant to be used is determined using the following rules, starting
-from rule 1:
-
-1) If the parameter 'langcode' given to functions voikko_init or voikko_init_with_path
-   is NULL, no dictionary will be loaded. The behaviour of the library after such
-   initialization is currently undefined.
-2) If the parameter 'langcode' given to functions voikko_init or voikko_init_with_path
-   is something else than "", "default" or "fi_FI", variant with that name is loaded.
-   If the variant is not available, an error is returned.
-3) If environment variable VOIKKO_DICTIONARY is defined, its value is used as the
-   name of the dictionary variant to load. If the variant is not available, an error
-   is returned.
-4) Finally, the default variant is loaded. If no dictionary variants are available,
-   an error is returned.
+ Required files:
+   - mor.vfst      (morphological transducer, ~3.8MB)
+   - autocorr.vfst (autocorrect transducer, ~11KB)
+   - index.txt     (dictionary metadata)
 
 
 Authors
 =======
 
 2006 - 2025 Harri Pitkänen (hatapitk@iki.fi)
- * Maintainer, core library developer.
+ * Original maintainer, core library developer.
 2006 Nemanja Trifunovic
  * Author of UTF8 utility module.
 2011-2012 Teemu Likonen <tlikonen@iki.fi>
  * Author of the Common Lisp interface.
+2025 - 2026 Yongseok Jang
+ * Rust rewrite, WASM build, npm package, language bindings.
 
 
 Website
 =======
 
-https://voikko.puimula.org
+https://github.com/yongsk0066/corevoikko
+
+Original project: https://voikko.puimula.org
