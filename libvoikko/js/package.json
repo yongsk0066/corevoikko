@@ -1,7 +1,7 @@
 {
-  "name": "libvoikko",
+  "name": "@yongsk0066/voikko",
   "version": "0.1.0",
-  "description": "Finnish language NLP library (spell checking, hyphenation, grammar, morphology) powered by libvoikko WASM",
+  "description": "Finnish NLP library — spell checking, morphological analysis, hyphenation, grammar checking, tokenization. Powered by Rust WASM.",
   "type": "module",
   "exports": {
     ".": {
@@ -14,18 +14,30 @@
     "wasm"
   ],
   "sideEffects": false,
+  "keywords": [
+    "finnish",
+    "nlp",
+    "spell-check",
+    "morphology",
+    "hyphenation",
+    "grammar",
+    "tokenizer",
+    "voikko",
+    "wasm"
+  ],
   "scripts": {
     "build": "tsdown",
-    "build:wasm": "cd .. && ./js/build.sh plain",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "prepublishOnly": "pnpm build"
   },
   "license": "(MPL-1.1 OR GPL-2.0-or-later OR LGPL-2.1-or-later)",
   "repository": {
     "type": "git",
-    "url": "https://github.com/voikko/corevoikko",
+    "url": "https://github.com/yongsk0066/corevoikko",
     "directory": "libvoikko/js"
   },
+  "homepage": "https://github.com/yongsk0066/corevoikko/tree/master/libvoikko/js",
   "devDependencies": {
     "tsdown": "^0.20.3",
     "typescript": "^5.9.3",
