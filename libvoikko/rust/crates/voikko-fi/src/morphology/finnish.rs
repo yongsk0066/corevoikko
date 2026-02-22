@@ -14,6 +14,8 @@ use voikko_core::analysis::{
     ATTR_REQUIRE_FOLLOWING_VERB, ATTR_SIJAMUOTO, ATTR_STRUCTURE, ATTR_TENSE,
     ATTR_POSSESSIVE, ATTR_WORDBASES, ATTR_WORDIDS,
 };
+use std::cell::RefCell;
+
 use voikko_core::case::CaseType;
 use voikko_core::enums::MAX_WORD_CHARS;
 use voikko_fst::Transducer;
@@ -29,13 +31,13 @@ use super::tag_parser::{
 /// Finnish morphological analyzer using the VFST (Voikko Finite State Transducer) backend.
 ///
 /// Owns an unweighted transducer loaded from `mor.vfst` and its traversal configuration.
-/// The analyzer lowercases input, traverses the FST to collect raw outputs, then
-/// delegates to tag_parser functions to build structured Analysis objects.
+/// The config is wrapped in `RefCell` for interior mutability so that the `Analyzer`
+/// trait (which requires `&self`) can be implemented without requiring `&mut self`.
 ///
 /// Origin: FinnishVfstAnalyzer.hpp, FinnishVfstAnalyzer.cpp
 pub struct FinnishVfstAnalyzer {
     transducer: UnweightedTransducer,
-    config: UnweightedConfig,
+    config: RefCell<UnweightedConfig>,
 }
 
 impl FinnishVfstAnalyzer {
@@ -46,7 +48,7 @@ impl FinnishVfstAnalyzer {
     /// Origin: FinnishVfstAnalyzer::FinnishVfstAnalyzer() -- FinnishVfstAnalyzer.cpp:51-137
     pub fn from_bytes(data: &[u8]) -> Result<Self, voikko_fst::VfstError> {
         let transducer = UnweightedTransducer::from_bytes(data)?;
-        let config = transducer.new_config(BUFFER_SIZE);
+        let config = RefCell::new(transducer.new_config(BUFFER_SIZE));
         Ok(Self {
             transducer,
             config,
@@ -60,7 +62,7 @@ impl FinnishVfstAnalyzer {
     ///
     /// Origin: FinnishVfstAnalyzer::analyze(wchar_t*, size_t, bool) -- FinnishVfstAnalyzer.cpp:1050-1112
     pub fn analyze_full(
-        &mut self,
+        &self,
         word: &[char],
         word_len: usize,
         full_morphology: bool,
@@ -74,8 +76,9 @@ impl FinnishVfstAnalyzer {
         voikko_core::case::set_case(&mut word_lower, CaseType::AllLower);
 
         let mut analyses = Vec::new();
+        let mut config = self.config.borrow_mut();
 
-        if !self.transducer.prepare(&mut self.config, &word_lower) {
+        if !self.transducer.prepare(&mut config, &word_lower) {
             // Unknown character in input; still try traversal (unweighted allows it)
         }
 
@@ -83,7 +86,7 @@ impl FinnishVfstAnalyzer {
         let mut analysis_count = 0;
 
         while analysis_count < MAX_ANALYSIS_COUNT
-            && self.transducer.next(&mut self.config, &mut output_buf)
+            && self.transducer.next(&mut config, &mut output_buf)
         {
             analysis_count += 1;
             let fst_output: Vec<char> = output_buf.chars().collect();
@@ -146,15 +149,11 @@ impl FinnishVfstAnalyzer {
 impl Analyzer for FinnishVfstAnalyzer {
     /// Analyze a word with full morphology (BASEFORM, WORDBASES, etc.).
     ///
+    /// Uses `RefCell` interior mutability so that `&self` suffices.
+    ///
     /// Origin: FinnishVfstAnalyzer::analyze -- FinnishVfstAnalyzer.cpp:1050-1112
-    fn analyze(&self, _word: &[char], _word_len: usize) -> Vec<Analysis> {
-        // The Analyzer trait takes &self, but we need &mut self for the config.
-        // This is a design limitation -- in practice, FinnishVfstAnalyzer should
-        // be used via analyze_full() which takes &mut self.
-        //
-        // For the trait implementation, we return an empty vec. Callers that need
-        // morphological analysis should use analyze_full() directly.
-        Vec::new()
+    fn analyze(&self, word: &[char], word_len: usize) -> Vec<Analysis> {
+        self.analyze_full(word, word_len, true)
     }
 }
 

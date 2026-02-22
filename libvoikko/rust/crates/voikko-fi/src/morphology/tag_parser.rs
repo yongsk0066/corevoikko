@@ -515,9 +515,11 @@ pub(crate) fn is_valid_analysis(fst_output: &[char]) -> bool {
                     hyphen_required = false;
                 }
                 if !(hyphen_unconditionally_allowed && hyphen_present) {
-                    let lc_last = simple_lower(last_char);
+                    // C++ mutates lastChar to lower here; we do the same so that
+                    // beforeLastChar receives the lowered value on assignment below.
+                    last_char = simple_lower(last_char);
                     let lc_next = simple_lower(fst_output[i]);
-                    let need_hyphen = (lc_last == lc_next && is_vowel(lc_last))
+                    let need_hyphen = (last_char == lc_next && is_vowel(last_char))
                         || last_char.is_ascii_digit();
                     if need_hyphen != hyphen_present {
                         return false;
@@ -540,12 +542,20 @@ pub(crate) fn is_valid_analysis(fst_output: &[char]) -> bool {
 }
 
 /// Check if `slice[offset..]` starts with the given pattern.
+/// Uses iterator comparison to avoid heap allocation.
 pub(crate) fn starts_with(slice: &[char], offset: usize, pattern: &str) -> bool {
-    let pattern_chars: Vec<char> = pattern.chars().collect();
-    if offset + pattern_chars.len() > slice.len() {
+    if offset >= slice.len() {
         return false;
     }
-    slice[offset..offset + pattern_chars.len()] == pattern_chars[..]
+    let remaining = &slice[offset..];
+    let mut pattern_len = 0;
+    for (sc, pc) in remaining.iter().zip(pattern.chars()) {
+        if *sc != pc {
+            return false;
+        }
+        pattern_len += 1;
+    }
+    pattern_len == pattern.chars().count()
 }
 
 // ---------------------------------------------------------------------------
@@ -951,8 +961,8 @@ pub(crate) fn parse_basic_attributes(fst_output: &[char]) -> BasicAttributes {
                             }
                         }
                         'I' => {
-                            // Info flags
-                            add_info_flag(&mut attrs, &code, fst_output);
+                            // Info flags — pass tag position for position-aware scanning
+                            add_info_flag(&mut attrs, &code, fst_output, j);
                         }
                         'B' => {
                             if j >= 5 && fst_output[j + 2] == 'c' {
@@ -993,19 +1003,19 @@ pub(crate) fn parse_basic_attributes(fst_output: &[char]) -> BasicAttributes {
 
 /// Process info flags from `[Ix]` tags.
 /// Origin: FinnishVfstAnalyzer.cpp:434-458 (addInfoFlag)
-fn add_info_flag(attrs: &mut BasicAttributes, code: &str, fst_output: &[char]) {
+fn add_info_flag(attrs: &mut BasicAttributes, code: &str, fst_output: &[char], tag_pos: usize) {
     if code == "vj" {
         if !fst_output.is_empty() && fst_output[0] != '-' {
             attrs.malaga_vapaa_jalkiosa = true;
         }
     } else if code == "ca" {
-        // Check: no [Bc] or [Ll] after this position, and class is nimisana or unset.
-        // We do a simplified check here -- the full check requires position context
-        // which the C++ code has but we approximate by scanning the full string.
-        let bc_pattern: &[char] = &['[', 'B', 'c', ']'];
-        let ll_pattern: &[char] = &['[', 'L', 'l', ']'];
-        let has_bc = fst_output.windows(4).any(|w| w == bc_pattern);
-        let has_ll = fst_output.windows(4).any(|w| w == ll_pattern);
+        // Check: no [Bc] or [Ll] AFTER this tag position, and class is nimisana or unset.
+        // The C++ code scans from `outputPosition` (current position) forward, not the
+        // entire string. We replicate this by scanning only from `tag_pos` forward.
+        // Origin: FinnishVfstAnalyzer.cpp:442
+        let suffix = &fst_output[tag_pos..];
+        let has_bc = suffix.windows(4).any(|w| w == ['[', 'B', 'c', ']']);
+        let has_ll = suffix.windows(4).any(|w| w == ['[', 'L', 'l', ']']);
         if !has_bc
             && !has_ll
             && matches!(attrs.class, None | Some("nimisana"))
