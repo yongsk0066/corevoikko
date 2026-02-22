@@ -437,6 +437,14 @@ MVP 합계:               ~16-23일
 
 - 2026-02-22: Phase 5 품질 검증 (85/100) — Critical 2건 수정 (unwrap→zip, grammar analyzer 연결), Warning 3건 수정
 
+- 2026-02-22: Suggest rich priority 구현 완료
+  - SuggestionGenerator trait에 `analyzer: Option<&dyn Analyzer>` 파라미터 추가
+  - 12개 generator + SplitWord::spell_ok에 compute_priority 적용
+  - SuggestionStrategy::generate() 경로 연결
+  - 차등 테스트: suggest 6/31 (81%) → 31/31 (100%)
+  - spell/analyze/hyphenate 100% 유지, clippy 0건
+  - 전체 workspace: 625 tests (all-features), 3 ignored
+
 ### 미해결 TODO / 향후 작업
 
 | 항목 | 원인 | 해결 시점 |
@@ -456,7 +464,7 @@ MVP 합계:               ~16-23일
 | ~~**Unicode normalize**~~ | ✅ C++ voikko_normalise 완전 구현 (67 combining mark) | TODO 해결 시 |
 | ~~**STRUCTURE off-by-one**~~ | ✅ [Bc] 태그 i+=4→i+=3 수정 | 차등 테스트에서 발견 |
 | ~~**suggest 3x 슬롯**~~ | ✅ max_suggestions*3 후보 수집 후 truncate | 차등 테스트에서 발견 |
-| **suggest rich priority** | SuggestionGenerator trait에 analyzer 전달 필요 (6/31 불일치) | [06-suggest-rich-priority.md](./06-suggest-rich-priority.md) |
+| ~~**suggest rich priority**~~ | ✅ SuggestionGenerator trait에 analyzer 파라미터 추가, 12개 generator 수정 → 차등 테스트 31/31 (100%) | 구현 완료 |
 | **TS 래퍼 연결** | libvoikko/js/ ESM 래퍼가 Rust WASM 백엔드 사용하도록 전환 | TS 통합 시 |
 
 ---

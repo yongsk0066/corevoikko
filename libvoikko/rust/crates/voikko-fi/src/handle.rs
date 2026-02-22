@@ -194,7 +194,7 @@ impl VoikkoHandle {
             &self.typing_strategy
         };
 
-        strategy.generate(&tweaks, &mut status);
+        strategy.generate(&tweaks, Some(&self.analyzer), &mut status);
         status.sort_suggestions();
 
         status

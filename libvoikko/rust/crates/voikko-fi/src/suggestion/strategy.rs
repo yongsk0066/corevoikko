@@ -2,6 +2,7 @@
 // Origin: spellchecker/suggestion/SuggestionStrategy.cpp,
 //         SuggestionStrategyTyping.cpp, SuggestionStrategyOcr.cpp
 
+use crate::morphology::Analyzer;
 use crate::speller::Speller;
 use super::generators::*;
 use super::status::SuggestionStatus;
@@ -126,14 +127,14 @@ impl SuggestionStrategy {
     /// suggestions were found by primaries.
     ///
     /// Origin: SuggestionStrategy.cpp:49-65
-    pub fn generate(&self, speller: &dyn Speller, status: &mut SuggestionStatus<'_>) {
+    pub fn generate(&self, speller: &dyn Speller, analyzer: Option<&dyn Analyzer>, status: &mut SuggestionStatus<'_>) {
         status.set_max_cost(self.max_cost);
 
         for generator in &self.primary_generators {
             if status.should_abort() {
                 break;
             }
-            generator.generate(speller, status);
+            generator.generate(speller, analyzer, status);
         }
         if status.suggestion_count() > 0 {
             // Primary generator found something; skip secondaries.
@@ -144,7 +145,7 @@ impl SuggestionStrategy {
             if status.should_abort() {
                 break;
             }
-            generator.generate(speller, status);
+            generator.generate(speller, analyzer, status);
         }
     }
 }
@@ -273,7 +274,7 @@ mod tests {
         let word = chars("koira");
         let mut status = SuggestionStatus::new(&word, 5);
         let strategy = default_typing_strategy();
-        strategy.generate(&speller, &mut status);
+        strategy.generate(&speller, None, &mut status);
         assert_eq!(status.suggestion_count(), 1);
         assert_eq!(status.suggestions()[0].word, "koira");
     }
@@ -285,7 +286,7 @@ mod tests {
         let word = chars("koiraa");
         let mut status = SuggestionStatus::new(&word, 5);
         let strategy = default_typing_strategy();
-        strategy.generate(&speller, &mut status);
+        strategy.generate(&speller, None, &mut status);
         assert!(status.suggestion_count() >= 1);
         assert!(status.suggestions().iter().any(|s| s.word == "koira"));
     }
@@ -297,7 +298,7 @@ mod tests {
         let word = chars("kiora");
         let mut status = SuggestionStatus::new(&word, 5);
         let strategy = default_typing_strategy();
-        strategy.generate(&speller, &mut status);
+        strategy.generate(&speller, None, &mut status);
         assert!(status.suggestion_count() >= 1);
         assert!(status.suggestions().iter().any(|s| s.word == "koira"));
     }
@@ -308,7 +309,7 @@ mod tests {
         let word = chars("koirakissa");
         let mut status = SuggestionStatus::new(&word, 5);
         let strategy = default_typing_strategy();
-        strategy.generate(&speller, &mut status);
+        strategy.generate(&speller, None, &mut status);
         assert!(status.suggestion_count() >= 1);
         assert!(status
             .suggestions()
@@ -323,7 +324,7 @@ mod tests {
         let word = chars("k0ira");
         let mut status = SuggestionStatus::new(&word, 5);
         let strategy = default_ocr_strategy();
-        strategy.generate(&speller, &mut status);
+        strategy.generate(&speller, None, &mut status);
         assert!(status.suggestion_count() >= 1);
         assert!(status.suggestions().iter().any(|s| s.word == "koira"));
     }
@@ -334,7 +335,7 @@ mod tests {
         let word = chars("x");
         let mut status = SuggestionStatus::new(&word, 2);
         let strategy = default_typing_strategy();
-        strategy.generate(&speller, &mut status);
+        strategy.generate(&speller, None, &mut status);
         assert!(status.suggestion_count() <= 2);
     }
 
@@ -345,7 +346,7 @@ mod tests {
         let word = chars("xyzzyxyzzy"); // long unknown word
         let mut status = SuggestionStatus::new(&word, 5);
         let strategy = typing_strategy(1); // very small budget
-        strategy.generate(&speller, &mut status);
+        strategy.generate(&speller, None, &mut status);
         // Should not run forever -- just verify it terminates
     }
 
