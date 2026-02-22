@@ -22,25 +22,18 @@ jobs:
         with:
           workspaces: libvoikko/rust
 
-      - name: Build dictionary
-        run: |
-          sudo apt-get update && sudo apt-get install -y foma
-          cd voikko-fi && make vvfst
-
-      - name: Run tests
+      - name: Run tests (without dictionary)
         working-directory: libvoikko/rust
-        env:
-          VOIKKO_DICT_PATH: ${{ github.workspace }}/voikko-fi/vvfst
         run: cargo test --all-features
+        # 637 tests run; 10 dictionary-dependent tests are #[ignore]'d
 
       - name: Clippy
         working-directory: libvoikko/rust
         run: cargo clippy --all-features -- -D warnings
 
   js:
-    name: JS/WASM (vitest)
+    name: JS/WASM (build + type check)
     runs-on: ubuntu-latest
-    needs: rust
     steps:
       - uses: actions/checkout@v4
 
@@ -63,11 +56,6 @@ jobs:
           wasm-bindgen target/wasm32-unknown-unknown/release/voikko_wasm.wasm \
             --out-dir ../js/wasm --target web --typescript
 
-      - name: Build dictionary
-        run: |
-          sudo apt-get update && sudo apt-get install -y foma
-          cd voikko-fi && make vvfst
-
       - uses: pnpm/action-setup@v4
         with:
           version: 9
@@ -82,8 +70,7 @@ jobs:
         working-directory: libvoikko/js
         run: pnpm install && pnpm build
 
-      - name: Test
+      - name: Test (Tier 1 — no dictionary needed)
         working-directory: libvoikko/js
-        env:
-          VOIKKO_DICT_PATH: ${{ github.workspace }}/voikko-fi/vvfst
         run: pnpm test
+        # Tier 1 (2 tests) always run; Tier 2 (35 tests) auto-skip without dictionary
