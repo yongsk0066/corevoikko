@@ -129,22 +129,22 @@ impl SuggestionStrategy {
     pub fn generate(&self, speller: &dyn Speller, status: &mut SuggestionStatus<'_>) {
         status.set_max_cost(self.max_cost);
 
-        for gen in &self.primary_generators {
+        for generator in &self.primary_generators {
             if status.should_abort() {
                 break;
             }
-            gen.generate(speller, status);
+            generator.generate(speller, status);
         }
         if status.suggestion_count() > 0 {
             // Primary generator found something; skip secondaries.
             return;
         }
 
-        for gen in &self.generators {
+        for generator in &self.generators {
             if status.should_abort() {
                 break;
             }
-            gen.generate(speller, status);
+            generator.generate(speller, status);
         }
     }
 }

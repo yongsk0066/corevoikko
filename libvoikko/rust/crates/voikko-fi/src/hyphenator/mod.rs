@@ -470,7 +470,7 @@ fn allow_rule_hyphenation(word: &[char], nchars: usize, ugly_hyphenation: bool) 
 
         // Words ending with a digit are not safe to hyphenate
         if let Some(&last) = word.get(nchars - 1) {
-            if ('0'..='9').contains(&last) {
+            if last.is_ascii_digit() {
                 return false;
             }
         }
