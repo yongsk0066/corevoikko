@@ -111,6 +111,25 @@ pnpm test                     # 테스트 (Tier 1: 구조, Tier 2: WASM 통합)
 
 스택: pnpm + tsdown + vitest + ESM only
 
+## Rust WASM 포팅 (`libvoikko/rust/`)
+
+C++ libvoikko를 Rust로 재작성하는 프로젝트. Phase 0~4 구현 완료, Phase 5 (WASM 통합) 미착수.
+계획 문서: `plan/phase2-rust/00-master-plan.md`
+
+```bash
+cd libvoikko/rust
+cargo test --all-features      # 549 tests (voikko-core 66 + voikko-fst 71 + voikko-fi 412)
+cargo clippy --all-features -- -D warnings
+```
+
+Cargo workspace 4 crates:
+- **voikko-core** — 공유 타입 (enums, Analysis, Token, GrammarError, character, case)
+- **voikko-fst** — VFST FST 엔진 (header, transitions, symbols, flags, unweighted/weighted traversal)
+- **voikko-fi** — 핀란드어 모듈 (morphology, speller, hyphenator, tokenizer, suggestion, grammar)
+- **voikko-wasm** — wasm-bindgen 래퍼 (Phase 5에서 구현 예정)
+
+사전 검증: `cargo run -p voikko-fst --example fst_test`, `cargo run -p voikko-fi --all-features --example analyze_test`
+
 ## 도구 (`tools/bin/`)
 
 - `voikkotest` — 종합 테스트 스위트
