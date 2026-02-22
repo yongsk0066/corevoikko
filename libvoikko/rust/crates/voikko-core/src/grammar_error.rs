@@ -98,6 +98,22 @@ impl Default for GrammarError {
     }
 }
 
+/// Map a grammar error code to a short description in the given language.
+///
+/// Supported languages: `"fi"` (Finnish, default), `"en"` (English).
+/// Any other language code falls back to English.
+///
+/// Finnish descriptions match the C++ `voikko_error_message_cstr` output.
+/// English descriptions match C++ `error.cpp` English branch.
+/// Origin: grammar/error.cpp
+pub fn error_code_description_lang(code: i32, language: &str) -> &'static str {
+    if language.starts_with("fi") {
+        error_code_description(code)
+    } else {
+        error_code_description_en(code)
+    }
+}
+
 /// Map a grammar error code to its Finnish short description.
 ///
 /// These descriptions match the C++ `voikko_error_message_cstr` output.
@@ -147,6 +163,56 @@ pub fn error_code_description(code: i32) -> &'static str {
         }
         GCERR_EXTRA_MAIN_VERB => {
             "Virkkeest\u{00e4} saattaa puuttua pilkku, tai siin\u{00e4} voi olla ylim\u{00e4}\u{00e4}r\u{00e4}inen verbi."
+        }
+        _ => "",
+    }
+}
+
+/// Map a grammar error code to its English short description.
+///
+/// These descriptions match the C++ `voikko_error_message_cstr` English branch.
+/// Origin: grammar/error.cpp
+pub fn error_code_description_en(code: i32) -> &'static str {
+    match code {
+        GCERR_INVALID_SPELLING => "Incorrect spelling of word(s)",
+        GCERR_EXTRA_WHITESPACE => "Remove extra space.",
+        GCERR_SPACE_BEFORE_PUNCTUATION => "Extra space before punctuation",
+        GCERR_EXTRA_COMMA => "Remove extra comma.",
+        GCERR_INVALID_SENTENCE_STARTER => "Invalid character at the start of a sentence",
+        GCERR_WRITE_FIRST_LOWERCASE => {
+            "Consider writing the word in lowercase."
+        }
+        GCERR_WRITE_FIRST_UPPERCASE => {
+            "The word must be written with a capital letter."
+        }
+        GCERR_REPEATING_WORD => "The word appears twice.",
+        GCERR_TERMINATING_PUNCTUATION_MISSING => {
+            "Punctuation is missing at the end of a sentence."
+        }
+        GCERR_INVALID_PUNCTUATION_AT_END_OF_QUOTATION => {
+            "Invalid punctuation at the end of a quotation"
+        }
+        GCERR_FOREIGN_QUOTATION_MARK => {
+            "Quotation mark not suitable for Finnish text"
+        }
+        GCERR_MISPLACED_CLOSING_PARENTHESIS => "Misplaced closing parenthesis",
+        GCERR_NEGATIVE_VERB_MISMATCH => {
+            "Negative verb and main verb do not agree."
+        }
+        GCERR_A_INFINITIVE_REQUIRED => {
+            "The latter verb should be in the a/\u{00e4} infinitive form."
+        }
+        GCERR_MA_INFINITIVE_REQUIRED => {
+            "The latter verb should be in the maan/m\u{00e4}\u{00e4}n infinitive form."
+        }
+        GCERR_MISPLACED_SIDESANA => {
+            "A conjunction (ja, tai, mutta, ...) cannot be the last word of a sentence."
+        }
+        GCERR_MISSING_MAIN_VERB => {
+            "Check whether a main verb is missing from the sentence."
+        }
+        GCERR_EXTRA_MAIN_VERB => {
+            "A comma may be missing, or there may be an extra verb."
         }
         _ => "",
     }
@@ -207,5 +273,23 @@ mod tests {
         assert_eq!(GCERR_EXTRA_WHITESPACE, 2);
         assert_eq!(GCERR_REPEATING_WORD, 8);
         assert_eq!(GCERR_EXTRA_MAIN_VERB, 18);
+    }
+
+    #[test]
+    fn english_descriptions_all_nonempty() {
+        for code in 1..=18 {
+            let desc = error_code_description_en(code);
+            assert!(!desc.is_empty(), "empty English description for code {code}");
+        }
+    }
+
+    #[test]
+    fn lang_dispatch_fi_vs_en() {
+        let fi = error_code_description_lang(GCERR_INVALID_SPELLING, "fi");
+        let en = error_code_description_lang(GCERR_INVALID_SPELLING, "en");
+        assert_eq!(fi, "Virheellinen kirjoitusasu");
+        assert_eq!(en, "Incorrect spelling of word(s)");
+        // Unknown language falls back to English
+        assert_eq!(error_code_description_lang(GCERR_INVALID_SPELLING, "sv"), en);
     }
 }

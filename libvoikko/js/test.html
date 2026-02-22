@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Voikko WASM Test</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+    h1 { margin-bottom: 16px; }
+    .section { margin-bottom: 24px; border: 1px solid #ddd; border-radius: 8px; padding: 16px; }
+    .section h2 { margin-bottom: 12px; font-size: 1.1em; }
+    label { display: block; font-weight: 600; margin-bottom: 4px; }
+    input[type="text"], textarea { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
+    textarea { height: 80px; resize: vertical; }
+    button { padding: 8px 16px; background: #2563eb; color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 8px; }
+    button:hover { background: #1d4ed8; }
+    button:disabled { background: #9ca3af; cursor: not-allowed; }
+    .result { margin-top: 8px; padding: 8px; background: #f3f4f6; border-radius: 4px; font-family: monospace; font-size: 13px; white-space: pre-wrap; min-height: 24px; }
+    .ok { color: #16a34a; font-weight: bold; }
+    .err { color: #dc2626; font-weight: bold; }
+    #status { padding: 12px; margin-bottom: 16px; border-radius: 8px; }
+    #status.loading { background: #fef3c7; }
+    #status.ready { background: #dcfce7; }
+    #status.error { background: #fee2e2; }
+    .row { display: flex; gap: 8px; align-items: end; }
+    .row > :first-child { flex: 1; }
+  </style>
+</head>
+<body>
+  <h1>Voikko WASM Test</h1>
+
+  <div id="status" class="loading">Loading WASM + dictionary...</div>
+
+  <!-- Spell -->
+  <div class="section">
+    <h2>Spell Check</h2>
+    <div class="row">
+      <div><label for="spellInput">Word</label><input type="text" id="spellInput" value="koira" /></div>
+      <button onclick="runSpell()" id="btnSpell" disabled>Check</button>
+    </div>
+    <div class="result" id="spellResult"></div>
+  </div>
+
+  <!-- Suggest -->
+  <div class="section">
+    <h2>Suggestions</h2>
+    <div class="row">
+      <div><label for="suggestInput">Word</label><input type="text" id="suggestInput" value="koirra" /></div>
+      <button onclick="runSuggest()" id="btnSuggest" disabled>Suggest</button>
+    </div>
+    <div class="result" id="suggestResult"></div>
+  </div>
+
+  <!-- Analyze -->
+  <div class="section">
+    <h2>Morphological Analysis</h2>
+    <div class="row">
+      <div><label for="analyzeInput">Word</label><input type="text" id="analyzeInput" value="kissalla" /></div>
+      <button onclick="runAnalyze()" id="btnAnalyze" disabled>Analyze</button>
+    </div>
+    <div class="result" id="analyzeResult"></div>
+  </div>
+
+  <!-- Hyphenate -->
+  <div class="section">
+    <h2>Hyphenation</h2>
+    <div class="row">
+      <div><label for="hyphenInput">Word</label><input type="text" id="hyphenInput" value="kuorma-auto" /></div>
+      <button onclick="runHyphenate()" id="btnHyphen" disabled>Hyphenate</button>
+    </div>
+    <div class="result" id="hyphenResult"></div>
+  </div>
+
+  <!-- Grammar -->
+  <div class="section">
+    <h2>Grammar Check</h2>
+    <label for="grammarInput">Text</label>
+    <textarea id="grammarInput">Minä  olen koirra.</textarea>
+    <button onclick="runGrammar()" id="btnGrammar" disabled>Check Grammar</button>
+    <div class="result" id="grammarResult"></div>
+  </div>
+
+  <!-- Tokens -->
+  <div class="section">
+    <h2>Tokenizer</h2>
+    <div class="row">
+      <div><label for="tokenInput">Text</label><input type="text" id="tokenInput" value="Koira juoksi." /></div>
+      <button onclick="runTokens()" id="btnTokens" disabled>Tokenize</button>
+    </div>
+    <div class="result" id="tokenResult"></div>
+  </div>
+
+  <script type="module">
+    // Import from the built dist (run `pnpm build` first)
+    // For local testing, serve this directory with a static file server.
+    // Dictionary files must be available at the dictionaryUrl path.
+    import { Voikko } from './dist/index.mjs';
+
+    let voikko = null;
+
+    // Determine dictionary URL from query param or default
+    const params = new URLSearchParams(location.search);
+    const dictUrl = params.get('dict') || './dict';
+
+    const statusEl = document.getElementById('status');
+
+    try {
+      statusEl.textContent = `Loading WASM + dictionary from ${dictUrl} ...`;
+      voikko = await Voikko.init('fi', { dictionaryUrl: dictUrl });
+      statusEl.textContent = `Ready (dictionary: ${dictUrl})`;
+      statusEl.className = 'ready';
+
+      // Enable all buttons
+      document.querySelectorAll('button[disabled]').forEach(b => b.disabled = false);
+    } catch (e) {
+      statusEl.textContent = `Error: ${e.message}`;
+      statusEl.className = 'error';
+      console.error(e);
+    }
+
+    // Expose functions to onclick handlers
+    window.runSpell = () => {
+      const word = document.getElementById('spellInput').value;
+      const ok = voikko.spell(word);
+      const el = document.getElementById('spellResult');
+      el.innerHTML = ok
+        ? `<span class="ok">✓</span> "${word}" is correctly spelled`
+        : `<span class="err">✗</span> "${word}" is misspelled`;
+    };
+
+    window.runSuggest = () => {
+      const word = document.getElementById('suggestInput').value;
+      const suggestions = voikko.suggest(word);
+      document.getElementById('suggestResult').textContent =
+        suggestions.length ? suggestions.join(', ') : '(no suggestions)';
+    };
+
+    window.runAnalyze = () => {
+      const word = document.getElementById('analyzeInput').value;
+      const analyses = voikko.analyze(word);
+      document.getElementById('analyzeResult').textContent =
+        analyses.length
+          ? JSON.stringify(analyses, null, 2)
+          : '(no analysis found)';
+    };
+
+    window.runHyphenate = () => {
+      const word = document.getElementById('hyphenInput').value;
+      const pattern = voikko.getHyphenationPattern(word);
+      const hyphenated = voikko.hyphenate(word);
+      document.getElementById('hyphenResult').textContent =
+        `Pattern: ${pattern}\nResult:  ${hyphenated}`;
+    };
+
+    window.runGrammar = () => {
+      const text = document.getElementById('grammarInput').value;
+      const errors = voikko.grammarErrors(text);
+      document.getElementById('grammarResult').textContent =
+        errors.length
+          ? errors.map(e =>
+              `[${e.startPos}:${e.errorLen}] ${e.shortDescription}` +
+              (e.suggestions.length ? ` → ${e.suggestions.join(', ')}` : '')
+            ).join('\n')
+          : '(no grammar errors)';
+    };
+
+    window.runTokens = () => {
+      const text = document.getElementById('tokenInput').value;
+      const tokens = voikko.tokens(text);
+      document.getElementById('tokenResult').textContent =
+        tokens.map(t => `${t.type.padEnd(12)} "${t.text}"`).join('\n');
+    };
+  </script>
+</body>
+</html>

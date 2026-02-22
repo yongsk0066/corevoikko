@@ -153,11 +153,88 @@ fn bench_suggest_misspelled(c: &mut Criterion) {
     });
 }
 
+/// Hyphenate all 246 words from the differential test wordlist.
+fn bench_hyphenate_words(c: &mut Criterion) {
+    let Some(dict_path) = find_mor_vfst() else {
+        eprintln!("[bench_hyphenate_words] mor.vfst not found — skipping (set VOIKKO_DICT_PATH)");
+        c.bench_function("hyphenate_words (skipped)", |b| b.iter(|| {}));
+        return;
+    };
+
+    let mor_data = std::fs::read(&dict_path).expect("failed to read mor.vfst");
+    let handle =
+        voikko_fi::handle::VoikkoHandle::from_bytes(&mor_data, None, "fi").expect("VoikkoHandle");
+    let words = load_wordlist();
+
+    c.bench_function("hyphenate_246_words", |b| {
+        b.iter(|| {
+            for word in &words {
+                std::hint::black_box(handle.hyphenate(word));
+            }
+        });
+    });
+}
+
+/// Check grammar on a set of Finnish paragraphs.
+fn bench_grammar_check(c: &mut Criterion) {
+    let Some(dict_path) = find_mor_vfst() else {
+        eprintln!("[bench_grammar_check] mor.vfst not found — skipping (set VOIKKO_DICT_PATH)");
+        c.bench_function("grammar_check (skipped)", |b| b.iter(|| {}));
+        return;
+    };
+
+    let mor_data = std::fs::read(&dict_path).expect("failed to read mor.vfst");
+    let handle =
+        voikko_fi::handle::VoikkoHandle::from_bytes(&mor_data, None, "fi").expect("VoikkoHandle");
+
+    let paragraphs = [
+        "Hyvää huomenta, miten menee tänään?",
+        "Koira juoksi nopeasti metsässä ja näki jäniksen.",
+        "Suomen kielen opiskelu on mielenkiintoista mutta haastavaa.",
+        "Helsinki on Suomen pääkaupunki ja suurin kaupunki.",
+        "Tämä  on virheellinen lause jossa on  ylimääräisiä välilyöntejä.",
+    ];
+
+    c.bench_function("grammar_5_paragraphs", |b| {
+        b.iter(|| {
+            for text in &paragraphs {
+                std::hint::black_box(handle.grammar_errors(text));
+            }
+        });
+    });
+}
+
+/// Tokenize a medium-length Finnish text.
+fn bench_tokenize(c: &mut Criterion) {
+    let Some(dict_path) = find_mor_vfst() else {
+        eprintln!("[bench_tokenize] mor.vfst not found — skipping (set VOIKKO_DICT_PATH)");
+        c.bench_function("tokenize (skipped)", |b| b.iter(|| {}));
+        return;
+    };
+
+    let mor_data = std::fs::read(&dict_path).expect("failed to read mor.vfst");
+    let handle =
+        voikko_fi::handle::VoikkoHandle::from_bytes(&mor_data, None, "fi").expect("VoikkoHandle");
+
+    let text = "Koira juoksi nopeasti metsässä ja näki jäniksen. \
+                Jänis pakeni koloonsa, mutta koira jäi odottamaan. \
+                Lopulta molemmat väsyivät ja menivät nukkumaan.";
+
+    c.bench_function("tokenize_3_sentences", |b| {
+        b.iter(|| {
+            std::hint::black_box(handle.tokens(text));
+        });
+    });
+}
+
 criterion_group!(
     benches,
     bench_spell_words,
     bench_analyze_words,
     bench_fst_traverse,
-    bench_suggest_misspelled
+    bench_suggest_misspelled,
+    bench_hyphenate_words,
+    bench_grammar_check,
+    bench_tokenize,
 );
 criterion_main!(benches);
