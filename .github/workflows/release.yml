@@ -1,0 +1,112 @@
+name: Release & Publish
+
+on:
+  push:
+    tags:
+      - 'v*'  # v0.1.0, v1.0.0 등
+
+jobs:
+  test:
+    name: Test before release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+          targets: wasm32-unknown-unknown
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: libvoikko/rust
+
+      - name: Rust tests + clippy
+        working-directory: libvoikko/rust
+        run: |
+          cargo test --all-features
+          cargo clippy --all-features -- -D warnings
+
+      - name: Build WASM
+        working-directory: libvoikko/rust
+        run: |
+          cargo build --target wasm32-unknown-unknown --release -p voikko-wasm
+          cargo install wasm-bindgen-cli
+          wasm-bindgen target/wasm32-unknown-unknown/release/voikko_wasm.wasm \
+            --out-dir ../js/wasm --target web --typescript
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+
+      - name: JS build + test
+        working-directory: libvoikko/js
+        run: |
+          pnpm install
+          pnpm build
+          pnpm test
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: js-package
+          path: |
+            libvoikko/js/dist/
+            libvoikko/js/wasm/
+            libvoikko/js/package.json
+
+  publish-npm:
+    name: Publish to npm
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: js-package
+          path: libvoikko/js/
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+
+      - name: Publish
+        working-directory: libvoikko/js
+        run: npm publish --access public --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  github-release:
+    name: GitHub Release
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: js-package
+          path: libvoikko/js/
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            libvoikko/js/dist/*
+            libvoikko/js/wasm/voikko_wasm_bg.wasm
