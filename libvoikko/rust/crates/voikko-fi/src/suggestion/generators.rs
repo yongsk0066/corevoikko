@@ -69,11 +69,17 @@ pub fn suggest_for_buffer_with_analyzer(
         SpellResult::Failed => {}
         SpellResult::Ok => {
             let prio = compute_priority(analyzer, word, buf_len, result);
+            if analyzer.is_some() {
+                status.charge();
+            }
             let s: String = word.iter().collect();
             status.add_suggestion(s, prio);
         }
         SpellResult::CapitalizeFirst => {
             let prio = compute_priority(analyzer, word, buf_len, result);
+            if analyzer.is_some() {
+                status.charge();
+            }
             let mut corrected: Vec<char> = word.to_vec();
             corrected[0] = simple_upper(corrected[0]);
             let s: String = corrected.iter().collect();
@@ -816,7 +822,11 @@ impl SplitWord {
             word[0] = simple_upper(word[0]);
         }
         let ok = result == SpellResult::Ok || result == SpellResult::CapitalizeFirst;
-        (ok, compute_priority(analyzer, word, len, result))
+        let prio = compute_priority(analyzer, word, len, result);
+        if analyzer.is_some() {
+            status.charge();
+        }
+        (ok, prio)
     }
 }
 

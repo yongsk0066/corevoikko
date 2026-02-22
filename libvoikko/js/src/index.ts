@@ -54,8 +54,8 @@ const GRAMMAR_ERROR_DESCRIPTIONS: Record<number, string> = {
   11: 'Suomenkieliseen tekstiin sopimaton lainausmerkki',
   12: 'Väärin sijoitettu sulkumerkki',
   13: 'Kieltoverbi ja pääverbi eivät sovi yhteen.',
-  14: 'Jälkimmäisen verbin tulisi olla a/ä-päätteisessä infinitiisissä.',
-  15: 'Jälkimmäisen verbin tulisi olla maan/mään-päätteisessä infinitiisissä.',
+  14: 'Jälkimmäisen verbin tulisi olla a/ä-päätteisessä infinitiivissä.',
+  15: 'Jälkimmäisen verbin tulisi olla maan/mään-päätteisessä infinitiivissä.',
   16: 'Sidesana (ja, tai, mutta, ...) ei voi olla virkkeen viimeinen sana.',
   17: 'Tarkista, puuttuuko virkkeestä pääverbi tai -verbejä.',
   18: 'Virkkeestä saattaa puuttua pilkku, tai siinä voi olla ylimääräinen verbi.',
@@ -159,40 +159,41 @@ export class Voikko {
   /**
    * Check text for grammar errors.
    * Accepts multiple paragraphs separated by newline characters.
+   *
+   * Paragraphs are delimited by `\n` (or `\r\n`). Each paragraph is checked
+   * independently and error positions are adjusted to the original text offsets.
    */
   grammarErrors(text: string, _language: string = 'fi'): GrammarError[] {
-    // Split text into paragraphs at \n\n or \r\n boundaries (matching C++ behavior).
-    // Each paragraph is checked independently, with startPos offset adjusted.
-    const paragraphs = text.split(/\r?\n/);
     const result: GrammarError[] = [];
-    let offset = 0;
+    let pos = 0;
 
-    for (let i = 0; i < paragraphs.length; i++) {
-      const para = paragraphs[i];
+    while (pos <= text.length) {
+      // Find the next \n boundary in the original text
+      let nlPos = text.indexOf('\n', pos);
+      if (nlPos === -1) nlPos = text.length;
+
+      // Strip trailing \r for \r\n line endings
+      let paraEnd = nlPos;
+      if (paraEnd > pos && text[paraEnd - 1] === '\r') paraEnd--;
+
+      const para = text.substring(pos, paraEnd);
       if (para.length > 0) {
-        const raw: { errorCode: number; startPos: number; errorLen: number; suggestions: string[] }[] =
+        const raw: { errorCode: number; startPos: number; errorLen: number; suggestions: string[]; shortDescription?: string }[] =
           this.#handle.grammarErrors(para);
         for (const e of raw) {
           result.push({
             errorCode: e.errorCode,
-            startPos: e.startPos + offset,
+            startPos: e.startPos + pos,
             errorLen: e.errorLen,
             suggestions: e.suggestions,
-            shortDescription: GRAMMAR_ERROR_DESCRIPTIONS[e.errorCode] ?? '',
+            shortDescription: e.shortDescription || GRAMMAR_ERROR_DESCRIPTIONS[e.errorCode] || '',
           });
         }
       }
-      // Account for the paragraph text + the newline separator
-      offset += para.length;
-      if (i < paragraphs.length - 1) {
-        // Add back the newline character(s) that were consumed by split
-        const nextCharPos = offset;
-        if (nextCharPos < text.length && text[nextCharPos] === '\r') {
-          offset += 2; // \r\n
-        } else {
-          offset += 1; // \n
-        }
-      }
+
+      // Advance past the \n (or stop if we reached end of text)
+      if (nlPos >= text.length) break;
+      pos = nlPos + 1;
     }
 
     return result;
@@ -247,17 +248,26 @@ export class Voikko {
     const chars = [...word];
     const patChars = [...pattern];
     let result = '';
+
+    // Pattern meanings (one character per input character):
+    // ' ' (space) = no hyphenation point
+    // '-' = soft hyphenation point: insert separator BEFORE this character
+    // '=' = compound boundary: REPLACE this character with separator
+    //       Exception: if the character is already '-', keep it (no double hyphen)
+    //       When allowContextChanges=false, '=' positions are skipped entirely
+
     for (let i = 0; i < chars.length; i++) {
       if (i < patChars.length) {
         if (patChars[i] === '-') {
+          // Soft hyphen: insert separator before this character, then emit the char
           result += separator;
         } else if (patChars[i] === '=' && allowContextChanges) {
           if (chars[i] === '-') {
-            // Existing hyphen at compound boundary — preserve it
+            // Existing hyphen at compound boundary — preserve it (no double hyphen)
             result += chars[i];
             continue;
           }
-          // Replace non-hyphen char (e.g., apostrophe) with separator
+          // Replace the character (e.g., apostrophe in "vaa'an") with separator
           result += separator;
           continue;
         }

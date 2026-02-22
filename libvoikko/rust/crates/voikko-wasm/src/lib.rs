@@ -34,6 +34,7 @@ struct JsGrammarError {
     start_pos: usize,
     error_len: usize,
     suggestions: Vec<String>,
+    short_description: String,
 }
 
 /// Serializable representation of a token.
@@ -167,6 +168,7 @@ impl WasmVoikko {
                 start_pos: e.start_pos,
                 error_len: e.error_len,
                 suggestions: e.suggestions,
+                short_description: e.short_description,
             })
             .collect();
         serde_wasm_bindgen::to_value(&js_errors)

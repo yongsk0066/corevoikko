@@ -60,8 +60,12 @@ impl<'a> FinnishGrammarChecker<'a> {
     }
 
     /// Update the grammar checker options.
+    ///
+    /// Also clears the cache, since changing options (e.g.,
+    /// `accept_titles_in_gc`) may produce different results for the same text.
     pub(crate) fn set_options(&mut self, options: GrammarOptions) {
         self.engine.set_options(options);
+        self.cache.borrow_mut().clear();
     }
 
     /// Access the cache (for error retrieval).

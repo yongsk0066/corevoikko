@@ -1,7 +1,10 @@
 import type { VoikkoInitOptions } from './types.js';
 
-/** Dictionary files required for Finnish V5 format */
-const DICT_FILES = ['index.txt', 'mor.vfst', 'autocorr.vfst'] as const;
+/** Dictionary files required for initialization (missing = fatal error) */
+const REQUIRED_DICT_FILES = ['index.txt', 'mor.vfst'] as const;
+
+/** Dictionary files that are optional (missing = silently skipped) */
+const OPTIONAL_DICT_FILES = ['autocorr.vfst'] as const;
 
 // ── WASM initialization (cached) ─────────────────────────────────
 
@@ -58,20 +61,36 @@ export async function loadDict(
 /** Fetch dictionary files from a URL (browser). */
 async function fetchDict(baseUrl: string): Promise<Map<string, Uint8Array>> {
   const base = baseUrl.endsWith('/') ? baseUrl : baseUrl + '/';
+  const map = new Map<string, Uint8Array>();
 
-  const entries = await Promise.all(
-    DICT_FILES.map(async (name) => {
+  // Required files — throw on failure
+  await Promise.all(
+    REQUIRED_DICT_FILES.map(async (name) => {
       const response = await fetch(`${base}5/mor-standard/${name}`);
       if (!response.ok) {
         throw new Error(
           `Failed to fetch dictionary file ${name}: ${response.status} ${response.statusText}`,
         );
       }
-      return [name, new Uint8Array(await response.arrayBuffer())] as const;
+      map.set(name, new Uint8Array(await response.arrayBuffer()));
     }),
   );
 
-  return new Map(entries);
+  // Optional files — skip on failure (e.g. 404)
+  await Promise.all(
+    OPTIONAL_DICT_FILES.map(async (name) => {
+      try {
+        const response = await fetch(`${base}5/mor-standard/${name}`);
+        if (response.ok) {
+          map.set(name, new Uint8Array(await response.arrayBuffer()));
+        }
+      } catch {
+        // Network error — skip optional file silently
+      }
+    }),
+  );
+
+  return map;
 }
 
 /**
@@ -82,7 +101,7 @@ async function readDict(dirPath: string): Promise<Map<string, Uint8Array>> {
   const { readFile, access } = await import('node:fs/promises');
   const { join } = await import('node:path');
 
-  const flatFile = join(dirPath, DICT_FILES[0]);
+  const flatFile = join(dirPath, REQUIRED_DICT_FILES[0]);
   let dictDir: string;
   try {
     await access(flatFile);
@@ -91,12 +110,27 @@ async function readDict(dirPath: string): Promise<Map<string, Uint8Array>> {
     dictDir = join(dirPath, '5', 'mor-standard');
   }
 
-  const entries = await Promise.all(
-    DICT_FILES.map(async (name) => {
+  const map = new Map<string, Uint8Array>();
+
+  // Required files — throw on failure
+  await Promise.all(
+    REQUIRED_DICT_FILES.map(async (name) => {
       const data = await readFile(join(dictDir, name));
-      return [name, new Uint8Array(data)] as const;
+      map.set(name, new Uint8Array(data));
     }),
   );
 
-  return new Map(entries);
+  // Optional files — skip if not found on disk
+  await Promise.all(
+    OPTIONAL_DICT_FILES.map(async (name) => {
+      try {
+        const data = await readFile(join(dictDir, name));
+        map.set(name, new Uint8Array(data));
+      } catch {
+        // File not found — skip optional file silently
+      }
+    }),
+  );
+
+  return map;
 }

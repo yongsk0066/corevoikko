@@ -49,12 +49,18 @@ pub struct GrammarError {
     /// Suggested corrections for the error.
     /// Origin: voikko_structs.h:56
     pub suggestions: Vec<String>,
+
+    /// Short human-readable description of the error (Finnish).
+    /// Populated from `error_code_description()` after creation.
+    /// Origin: grammar/error.cpp (voikko_error_message_cstr)
+    pub short_description: String,
 }
 
 impl GrammarError {
     /// Create a new grammar error with no suggestions.
     pub fn new(error_code: i32, start_pos: usize, error_len: usize) -> Self {
         Self {
+            short_description: error_code_description(error_code).to_string(),
             error_code,
             start_pos,
             error_len,
@@ -70,6 +76,7 @@ impl GrammarError {
         suggestions: Vec<String>,
     ) -> Self {
         Self {
+            short_description: error_code_description(error_code).to_string(),
             error_code,
             start_pos,
             error_len,
@@ -86,7 +93,62 @@ impl Default for GrammarError {
             start_pos: 0,
             error_len: 0,
             suggestions: Vec::new(),
+            short_description: String::new(),
         }
+    }
+}
+
+/// Map a grammar error code to its Finnish short description.
+///
+/// These descriptions match the C++ `voikko_error_message_cstr` output.
+/// Origin: grammar/error.cpp
+pub fn error_code_description(code: i32) -> &'static str {
+    match code {
+        GCERR_INVALID_SPELLING => "Virheellinen kirjoitusasu",
+        GCERR_EXTRA_WHITESPACE => "Poista ylim\u{00e4}\u{00e4}r\u{00e4}inen v\u{00e4}li.",
+        GCERR_SPACE_BEFORE_PUNCTUATION => {
+            "Ylim\u{00e4}\u{00e4}r\u{00e4}inen v\u{00e4}li v\u{00e4}limerkin edess\u{00e4}"
+        }
+        GCERR_EXTRA_COMMA => "Poista ylim\u{00e4}\u{00e4}r\u{00e4}inen pilkku.",
+        GCERR_INVALID_SENTENCE_STARTER => "Virheellinen virkkeen aloittava merkki",
+        GCERR_WRITE_FIRST_LOWERCASE => {
+            "Harkitse sanan kirjoittamista pienell\u{00e4} alkukirjaimella."
+        }
+        GCERR_WRITE_FIRST_UPPERCASE => {
+            "Sana on kirjoitettava isolla alkukirjaimella."
+        }
+        GCERR_REPEATING_WORD => "Sana on kirjoitettu kahteen kertaan.",
+        GCERR_TERMINATING_PUNCTUATION_MISSING => {
+            "V\u{00e4}limerkki puuttuu virkkeen lopusta."
+        }
+        GCERR_INVALID_PUNCTUATION_AT_END_OF_QUOTATION => {
+            "Virheelliset v\u{00e4}limerkit lainauksen lopussa"
+        }
+        GCERR_FOREIGN_QUOTATION_MARK => {
+            "Suomenkieliseen tekstiin sopimaton lainausmerkki"
+        }
+        GCERR_MISPLACED_CLOSING_PARENTHESIS => {
+            "V\u{00e4}\u{00e4}rin sijoitettu sulkumerkki"
+        }
+        GCERR_NEGATIVE_VERB_MISMATCH => {
+            "Kieltoverbi ja p\u{00e4}\u{00e4}verbi eiv\u{00e4}t sovi yhteen."
+        }
+        GCERR_A_INFINITIVE_REQUIRED => {
+            "J\u{00e4}lkimm\u{00e4}isen verbin tulisi olla a/\u{00e4}-p\u{00e4}\u{00e4}tteisess\u{00e4} infinitiiviss\u{00e4}."
+        }
+        GCERR_MA_INFINITIVE_REQUIRED => {
+            "J\u{00e4}lkimm\u{00e4}isen verbin tulisi olla maan/m\u{00e4}\u{00e4}n-p\u{00e4}\u{00e4}tteisess\u{00e4} infinitiiviss\u{00e4}."
+        }
+        GCERR_MISPLACED_SIDESANA => {
+            "Sidesana (ja, tai, mutta, ...) ei voi olla virkkeen viimeinen sana."
+        }
+        GCERR_MISSING_MAIN_VERB => {
+            "Tarkista, puuttuuko virkkeest\u{00e4} p\u{00e4}\u{00e4}verbi tai -verbej\u{00e4}."
+        }
+        GCERR_EXTRA_MAIN_VERB => {
+            "Virkkeest\u{00e4} saattaa puuttua pilkku, tai siin\u{00e4} voi olla ylim\u{00e4}\u{00e4}r\u{00e4}inen verbi."
+        }
+        _ => "",
     }
 }
 

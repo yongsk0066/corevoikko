@@ -128,5 +128,36 @@ fn bench_fst_traverse(c: &mut Criterion) {
     });
 }
 
-criterion_group!(benches, bench_spell_words, bench_analyze_words, bench_fst_traverse);
+/// Suggest corrections for a small set of misspelled Finnish words.
+fn bench_suggest_misspelled(c: &mut Criterion) {
+    let Some(dict_path) = find_mor_vfst() else {
+        eprintln!(
+            "[bench_suggest_misspelled] mor.vfst not found — skipping (set VOIKKO_DICT_PATH)"
+        );
+        c.bench_function("suggest_misspelled (skipped)", |b| b.iter(|| {}));
+        return;
+    };
+
+    let mor_data = std::fs::read(&dict_path).expect("failed to read mor.vfst");
+    let handle =
+        voikko_fi::handle::VoikkoHandle::from_bytes(&mor_data, None, "fi").expect("VoikkoHandle");
+
+    let misspelled = ["koirra", "kissaa", "Helinki", "tsjälkeen", "autoo"];
+
+    c.bench_function("suggest_5_misspelled", |b| {
+        b.iter(|| {
+            for word in &misspelled {
+                std::hint::black_box(handle.suggest(word));
+            }
+        });
+    });
+}
+
+criterion_group!(
+    benches,
+    bench_spell_words,
+    bench_analyze_words,
+    bench_fst_traverse,
+    bench_suggest_misspelled
+);
 criterion_main!(benches);
