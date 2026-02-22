@@ -6,6 +6,8 @@
 //
 // Origin: grammar/FinnishGrammarChecker.cpp, grammar/GrammarChecker.hpp
 
+use std::cell::RefCell;
+
 use voikko_core::enums::TokenType;
 use voikko_core::grammar_error::GrammarError;
 
@@ -18,15 +20,16 @@ use crate::tokenizer;
 
 /// Top-level Finnish grammar checker.
 ///
-/// Owns the rule engine and the grammar cache. Implements the `GrammarChecker`
-/// trait to provide the public API for checking a paragraph of text.
+/// Owns the rule engine and the grammar cache. The cache uses `RefCell` for
+/// interior mutability so that the `GrammarChecker` trait (`&self`) can
+/// read and update the cache.
 ///
 /// Origin: grammar/FinnishGrammarChecker.hpp, FinnishGrammarChecker.cpp
 pub(crate) struct FinnishGrammarChecker {
     /// The rule engine that orchestrates all individual checks.
     engine: FinnishRuleEngine,
-    /// Cache for grammar checking results.
-    cache: GcCache,
+    /// Cache for grammar checking results (interior mutability for &self).
+    cache: RefCell<GcCache>,
 }
 
 impl FinnishGrammarChecker {
@@ -42,7 +45,7 @@ impl FinnishGrammarChecker {
     ) -> Self {
         Self {
             engine: FinnishRuleEngine::new(options, autocorrect_transducer),
-            cache: GcCache::new(),
+            cache: RefCell::new(GcCache::new()),
         }
     }
 
@@ -52,7 +55,7 @@ impl FinnishGrammarChecker {
     }
 
     /// Access the cache (for error retrieval).
-    pub(crate) fn cache(&self) -> &GcCache {
+    pub(crate) fn cache(&self) -> &RefCell<GcCache> {
         &self.cache
     }
 
@@ -141,8 +144,21 @@ impl GrammarChecker for FinnishGrammarChecker {
     ///
     /// Origin: grammar/GrammarChecker.cpp:paragraphToCache + errorFromCache
     fn check(&self, text: &[char], text_len: usize) -> Vec<GrammarError> {
+        // Check cache first
+        {
+            let cache = self.cache.borrow();
+            if let Some(cached) = cache.check_cache(text) {
+                return cached.to_vec();
+            }
+        }
+
         let paragraph = Self::tokenize_paragraph(text, text_len);
-        self.engine.check(&paragraph)
+        let errors = self.engine.check(&paragraph);
+
+        // Store in cache
+        self.cache.borrow_mut().store_cache(text, errors.clone());
+
+        errors
     }
 }
 

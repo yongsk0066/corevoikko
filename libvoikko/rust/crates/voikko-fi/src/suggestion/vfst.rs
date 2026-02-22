@@ -90,7 +90,7 @@ impl VfstSuggestion {
 
         // Map from suggestion string to its minimum combined weight.
         // Origin: VfstSuggestion.cpp:67
-        let mut suggestion_weights: HashMap<String, i16> = HashMap::new();
+        let mut suggestion_weights: HashMap<String, i32> = HashMap::new();
 
         let mut error_model_output = String::new();
         let mut error_model_result = WeightedResult {
@@ -127,7 +127,8 @@ impl VfstSuggestion {
                     ) {
                         // Accepted: combine weights.
                         // Origin: VfstSuggestion.cpp:73-80
-                        let weight = acceptor_result.weight + error_model_result.weight;
+                        // Use i32 for combined weight to avoid i16 overflow
+                        let weight = acceptor_result.weight as i32 + error_model_result.weight as i32;
                         suggestion_weights
                             .entry(error_model_output.clone())
                             .and_modify(|existing| *existing = (*existing).min(weight))
@@ -152,7 +153,7 @@ impl VfstSuggestion {
         // via `Reverse`.
         //
         // Origin: VfstSuggestion.cpp:89-101
-        let mut heap: BinaryHeap<Reverse<(i16, String)>> = BinaryHeap::new();
+        let mut heap: BinaryHeap<Reverse<(i32, String)>> = BinaryHeap::new();
         for (suggestion, weight) in suggestion_weights {
             heap.push(Reverse((weight, suggestion)));
         }
@@ -161,7 +162,7 @@ impl VfstSuggestion {
             // The C++ code passes the weight directly as the priority.
             // Our SuggestionStatus::add_suggestion takes an i32 priority.
             // Origin: VfstSuggestion.cpp:100
-            status.add_suggestion(suggestion, i32::from(weight));
+            status.add_suggestion(suggestion, weight);
         }
     }
 }
