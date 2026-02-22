@@ -1,40 +1,49 @@
-import type {
-  EmscriptenModule,
-  EmscriptenModuleFactory,
-  VoikkoInitOptions,
-} from './types.js';
+import type { VoikkoInitOptions } from './types.js';
 
 /** Dictionary files required for Finnish V5 format */
 const DICT_FILES = ['index.txt', 'mor.vfst', 'autocorr.vfst'] as const;
 
-/** VFS path matching V5DictionaryLoader convention: {root}/5/mor-{variant}/ */
-const DICT_VFS_BASE = '/5/mor-standard';
+// ── WASM initialization (cached) ─────────────────────────────────
 
-// ── WASM loading (cached) ──────────────────────────────────────────
+type WasmModule = typeof import('../wasm/voikko_wasm.js');
 
-let cachedModule: Promise<EmscriptenModule> | null = null;
+let cachedInit: Promise<WasmModule> | null = null;
 
 /**
- * Load the Emscripten WASM module. Cached after first call —
- * the binary is identical regardless of language or dictionary.
+ * Load and initialize the Rust WASM module. Cached after first call.
+ * Returns the module with WasmVoikko class ready to use.
+ *
+ * In Node.js, the WASM binary is read from disk and passed directly
+ * to the init function (fetch() cannot resolve local file paths).
+ * In browsers, the init function fetches the WASM file automatically.
  */
-export function loadWasm(
-  locateFile?: (file: string, prefix: string) => string,
-): Promise<EmscriptenModule> {
-  return (cachedModule ??= (async () => {
-    const { default: createModule } = (await import(
-      '../wasm/libvoikko.mjs'
-    )) as { default: EmscriptenModuleFactory };
+export function loadWasm(): Promise<WasmModule> {
+  return (cachedInit ??= (async () => {
+    const wasm = await import('../wasm/voikko_wasm.js');
 
-    return createModule(locateFile ? { locateFile } : {});
+    if (typeof globalThis.window === 'undefined' && typeof globalThis.document === 'undefined') {
+      // Node.js: read WASM binary from disk
+      const { readFile } = await import('node:fs/promises');
+      const { fileURLToPath } = await import('node:url');
+      const { dirname, join } = await import('node:path');
+      const thisDir = dirname(fileURLToPath(import.meta.url));
+      const wasmPath = join(thisDir, '..', 'wasm', 'voikko_wasm_bg.wasm');
+      const wasmBytes = await readFile(wasmPath);
+      await wasm.default(wasmBytes);
+    } else {
+      // Browser: init() will auto-fetch the .wasm file
+      await wasm.default();
+    }
+
+    return wasm;
   })());
 }
 
-// ── Dictionary loading ─────────────────────────────────────────────
+// ── Dictionary loading ───────────────────────────────────────────
 
 /**
  * Load dictionary files from the appropriate source.
- * Returns filename → bytes entries, agnostic of Emscripten.
+ * Returns filename → bytes entries.
  */
 export async function loadDict(
   options: VoikkoInitOptions,
@@ -90,22 +99,4 @@ async function readDict(dirPath: string): Promise<Map<string, Uint8Array>> {
   );
 
   return new Map(entries);
-}
-
-// ── VFS mounting ───────────────────────────────────────────────────
-
-/**
- * Mount dictionary files into the Emscripten virtual filesystem.
- * Safe to call multiple times — overwrites are idempotent.
- */
-export function mountDict(
-  module: EmscriptenModule,
-  files: Map<string, Uint8Array>,
-): void {
-  try { module.FS.mkdir('/5'); } catch { /* already exists */ }
-  try { module.FS.mkdir(DICT_VFS_BASE); } catch { /* already exists */ }
-
-  for (const [name, data] of files) {
-    module.FS.writeFile(`${DICT_VFS_BASE}/${name}`, data);
-  }
 }

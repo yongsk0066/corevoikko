@@ -13,5 +13,6 @@ crate-type = ["cdylib", "rlib"]
 voikko-core.workspace = true
 voikko-fi = { workspace = true, features = ["handle"] }
 wasm-bindgen.workspace = true
+js-sys = "0.3"
 serde.workspace = true
 serde-wasm-bindgen.workspace = true

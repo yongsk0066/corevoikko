@@ -26,17 +26,6 @@ use voikko_fi::handle::{VoikkoError, VoikkoHandle};
 // Serde-serializable DTO types for JS interop
 // ============================================================================
 
-/// Serializable representation of a morphological analysis.
-///
-/// The C++ API returns analyses as lists of key-value pairs.
-/// We serialize them as JS objects with string keys and values.
-#[derive(Serialize)]
-struct JsAnalysis {
-    /// All attributes as a flat key-value map.
-    #[serde(flatten)]
-    attributes: std::collections::HashMap<String, String>,
-}
-
 /// Serializable representation of a grammar error.
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -141,14 +130,16 @@ impl WasmVoikko {
     /// STRUCTURE, etc.).
     pub fn analyze(&self, word: &str) -> Result<JsValue, JsError> {
         let analyses = self.handle.analyze(word);
-        let js_analyses: Vec<JsAnalysis> = analyses
-            .into_iter()
-            .map(|a| JsAnalysis {
-                attributes: a.attributes().clone(),
-            })
-            .collect();
-        serde_wasm_bindgen::to_value(&js_analyses)
-            .map_err(|e| JsError::new(&e.to_string()))
+        let arr = js_sys::Array::new();
+        for a in &analyses {
+            let obj = js_sys::Object::new();
+            for (k, v) in a.attributes() {
+                js_sys::Reflect::set(&obj, &JsValue::from_str(k), &JsValue::from_str(v))
+                    .map_err(|e| JsError::new(&format!("{e:?}")))?;
+            }
+            arr.push(&obj);
+        }
+        Ok(arr.into())
     }
 
     /// Hyphenate a word.

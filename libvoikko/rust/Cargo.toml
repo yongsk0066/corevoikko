@@ -14,6 +14,7 @@ hashbrown = "0.15"
 serde = { version = "1", features = ["derive"] }
 serde-wasm-bindgen = "0.6"
 wasm-bindgen = "0.2"
+criterion = { version = "0.5", features = ["html_reports"] }
 
 # Internal crates
 voikko-core = { path = "crates/voikko-core" }
