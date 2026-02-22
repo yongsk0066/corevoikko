@@ -1,0 +1,3299 @@
+{
+  "Helinki": [],
+  "Helsinki": [
+    {
+      "BASEFORM": "Helsinki",
+      "CLASS": "paikannimi",
+      "FSTOUTPUT": "[Lep][Xp]Helsinki[X]helsink[Sn][Ny]i",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ippppppp",
+      "WORDBASES": "+Helsinki(Helsinki)"
+    }
+  ],
+  "ajatella": [
+    {
+      "BASEFORM": "ajatella",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]ajatella[X]ajatell[Tt][Ap][P4][Et]a",
+      "MOOD": "indicative",
+      "NEGATIVE": "true",
+      "PERSON": "4",
+      "STRUCTURE": "=pppppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+ajatella(ajatella)"
+    },
+    {
+      "BASEFORM": "ajatella",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]ajatella[X]ajatell[Tn1][Eb]a",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=pppppppp",
+      "WORDBASES": "+ajatella(ajatella)"
+    }
+  ],
+  "ajatlla": [],
+  "aloittaa": [
+    {
+      "BASEFORM": "aloittaa",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]aloittaa[X]aloitt[Tt][Ap][P3][Ny][Ef]aa",
+      "MOOD": "indicative",
+      "NEGATIVE": "false",
+      "NUMBER": "singular",
+      "PERSON": "3",
+      "STRUCTURE": "=pppppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+aloittaa(aloittaa)"
+    },
+    {
+      "BASEFORM": "aloittaa",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]aloittaa[X]aloitta[Tn1][Eb]a",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=pppppppp",
+      "WORDBASES": "+aloittaa(aloittaa)"
+    }
+  ],
+  "antaa": [
+    {
+      "BASEFORM": "antaa",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]antaa[X]ant[Tt][Ap][P3][Ny][Ef]aa",
+      "MOOD": "indicative",
+      "NEGATIVE": "false",
+      "NUMBER": "singular",
+      "PERSON": "3",
+      "STRUCTURE": "=ppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+antaa(antaa)"
+    },
+    {
+      "BASEFORM": "antaa",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]antaa[X]anta[Tn1][Eb]a",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=ppppp",
+      "WORDBASES": "+antaa(antaa)"
+    }
+  ],
+  "anteeksi": [
+    {
+      "BASEFORM": "anteeksi",
+      "CLASS": "seikkasana",
+      "FSTOUTPUT": "[Ls][Xp]anteeksi[X]anteeksi",
+      "STRUCTURE": "=pppppppp",
+      "WORDBASES": "+anteeksi(anteeksi)"
+    }
+  ],
+  "apteekki": [
+    {
+      "BASEFORM": "apteekki",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]apteekki[X]apteekk[Sn][Ny]i",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppppppp",
+      "WORDBASES": "+apteekki(apteekki)"
+    }
+  ],
+  "auto": [
+    {
+      "BASEFORM": "auto",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]auto[X]auto[Sn][Ny]",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppp",
+      "WORDBASES": "+auto(auto)"
+    }
+  ],
+  "autokorjaamo": [
+    {
+      "BASEFORM": "autokorjaamo",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]auto[X]auto[Sn][Ny][Bh][Bc][Ln][Xp]korjaamo[X]korjaamo[Sn][Ny]",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppp=pppppppp",
+      "WORDBASES": "+auto(auto)+korjaamo(korjaamo)"
+    }
+  ],
+  "autoo": [],
+  "auttaa": [
+    {
+      "BASEFORM": "auttaa",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]auttaa[X]autt[Tt][Ap][P3][Ny][Ef]aa",
+      "MOOD": "indicative",
+      "NEGATIVE": "false",
+      "NUMBER": "singular",
+      "PERSON": "3",
+      "STRUCTURE": "=pppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+auttaa(auttaa)"
+    },
+    {
+      "BASEFORM": "auttaa",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]auttaa[X]autta[Tn1][Eb]a",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=pppppp",
+      "WORDBASES": "+auttaa(auttaa)"
+    }
+  ],
+  "avata": [
+    {
+      "BASEFORM": "avata",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]avata[X]avat[Tt][Ap][P4][Et]a",
+      "MOOD": "indicative",
+      "NEGATIVE": "true",
+      "PERSON": "4",
+      "STRUCTURE": "=ppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+avata(avata)"
+    },
+    {
+      "BASEFORM": "avata",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]avata[X]avat[Tn1][Eb]a",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=ppppp",
+      "WORDBASES": "+avata(avata)"
+    }
+  ],
+  "biologia": [
+    {
+      "BASEFORM": "biologi",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]biologi[X]biolog[Sp][Ny]ia",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "osanto",
+      "STRUCTURE": "=pppppppp",
+      "WORDBASES": "+biologi(biologi)"
+    },
+    {
+      "BASEFORM": "biologia",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]biologia[X]biologia[Sn][Ny]",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppppppp",
+      "WORDBASES": "+biologia(biologia)"
+    }
+  ],
+  "bussi": [
+    {
+      "BASEFORM": "bussi",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]bussi[X]buss[Sn][Ny]i",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppp",
+      "WORDBASES": "+bussi(bussi)"
+    }
+  ],
+  "elintarvikeliike": [
+    {
+      "BASEFORM": "elintarvikeliike",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]elin[X]elin[Sn][Ny][Bh][Bc][Ln][Xp]tarvike[X]tarvike[Sn][Ny][Bh][Bc][Ln][Xp]liike[X]liike[Sn][Ny]",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppp=ppppppp=ppppp",
+      "WORDBASES": "+elin(elin)+tarvike(tarvike)+liike(liike)"
+    }
+  ],
+  "elokuva": [
+    {
+      "BASEFORM": "elokuva",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]elo=kuva[X]elo[Bm]kuv[Sn][Ny]a",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppp=pppp",
+      "WORDBASES": "+elokuva(elo=kuva)"
+    },
+    {
+      "BASEFORM": "elokuva",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Lt][Xp]elää[X]el[Xj]o[X][Ln]o[Sn][Ny][Bh][Bc][Ln][Xp]kuva[X]kuv[Sn][Ny]a",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppp=pppp",
+      "WORDBASES": "+el(elää)(+o)+o+kuva(kuva)"
+    }
+  ],
+  "eläin": [
+    {
+      "BASEFORM": "eläin",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]eläin[X]eläin[Sn][Ny]",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppp",
+      "WORDBASES": "+eläin(eläin)"
+    }
+  ],
+  "etsiä": [
+    {
+      "BASEFORM": "etsiä",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]etsiä[X]etsi[Tn1][Eb]ä",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=ppppp",
+      "WORDBASES": "+etsiä(etsiä)"
+    }
+  ],
+  "fysiikka": [
+    {
+      "BASEFORM": "fysiikka",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]fysiikka[X]fysiikk[Sn][Ny]a",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppppppp",
+      "WORDBASES": "+fysiikka(fysiikka)"
+    }
+  ],
+  "golf": [
+    {
+      "BASEFORM": "golf",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Isf][Xp]golf[X]golf[Sn][Ny]",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppp",
+      "WORDBASES": "+golf(golf)"
+    }
+  ],
+  "halata": [
+    {
+      "BASEFORM": "halata",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]halata[X]halat[Tt][Ap][P4][Et]a",
+      "MOOD": "indicative",
+      "NEGATIVE": "true",
+      "PERSON": "4",
+      "STRUCTURE": "=pppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+halata(halata)"
+    },
+    {
+      "BASEFORM": "halata",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]halata[X]halat[Tn1][Eb]a",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=pppppp",
+      "WORDBASES": "+halata(halata)"
+    }
+  ],
+  "hertä": [],
+  "herätä": [
+    {
+      "BASEFORM": "herätä",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]herätä[X]herät[Tt][Ap][P4][Et]ä",
+      "MOOD": "indicative",
+      "NEGATIVE": "true",
+      "PERSON": "4",
+      "STRUCTURE": "=pppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+herätä(herätä)"
+    },
+    {
+      "BASEFORM": "herätä",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]herätä[X]herät[Tn1][Eb]ä",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=pppppp",
+      "WORDBASES": "+herätä(herätä)"
+    },
+    {
+      "BASEFORM": "herättää",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]herättää[X]herätä[Tk][Ap][P2][Ny][Eb]",
+      "MOOD": "imperative",
+      "NEGATIVE": "both",
+      "NUMBER": "singular",
+      "PERSON": "2",
+      "STRUCTURE": "=pppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+herättää(herättää)"
+    }
+  ],
+  "hiihto": [
+    {
+      "BASEFORM": "hiihto",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Lt][Xp]hiihtää[X]hiih[Ln][Xj]to[X]to[Sn][Ny]",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppppp",
+      "WORDBASES": "+hiih(hiihtää)+to(+to)"
+    }
+  ],
+  "historia": [
+    {
+      "BASEFORM": "historia",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]historia[X]historia[Sn][Ny]",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppppppp",
+      "WORDBASES": "+historia(historia)"
+    }
+  ],
+  "hotelli": [
+    {
+      "BASEFORM": "hotelli",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]hotelli[X]hotell[Sn][Ny]i",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppppp",
+      "WORDBASES": "+hotelli(hotelli)"
+    }
+  ],
+  "huoltoasema": [
+    {
+      "BASEFORM": "huoltoasema",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]huolto[X]huolto[Sn][Ny][Bh][Bc][Ln][Xp]asema[X]asem[Sn][Ny]a",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppppp=ppppp",
+      "WORDBASES": "+huolto(huolto)+asema(asema)"
+    }
+  ],
+  "huomenta": [
+    {
+      "BASEFORM": "huomen",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]huomen[X]huomen[Sp][Ny]ta",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "osanto",
+      "STRUCTURE": "=pppppppp",
+      "WORDBASES": "+huomen(huomen)"
+    }
+  ],
+  "hymyillä": [
+    {
+      "BASEFORM": "hymy",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]hymy[X]hymy[Sade][Nm]illä",
+      "NUMBER": "plural",
+      "SIJAMUOTO": "ulkoolento",
+      "STRUCTURE": "=pppppppp",
+      "WORDBASES": "+hymy(hymy)"
+    },
+    {
+      "BASEFORM": "hymyillä",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]hymyillä[X]hymyill[Tt][Ap][P4][Et]ä",
+      "MOOD": "indicative",
+      "NEGATIVE": "true",
+      "PERSON": "4",
+      "STRUCTURE": "=pppppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+hymyillä(hymyillä)"
+    },
+    {
+      "BASEFORM": "hymyillä",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]hymyillä[X]hymyill[Tn1][Eb]ä",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=pppppppp",
+      "WORDBASES": "+hymyillä(hymyillä)"
+    }
+  ],
+  "hyvä": [
+    {
+      "BASEFORM": "hyvä",
+      "CLASS": "laatusana",
+      "COMPARISON": "positive",
+      "FSTOUTPUT": "[Ll][Xp]hyvä[X]hyv[Sn][Ny]ä",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppp",
+      "WORDBASES": "+hyvä(hyvä)"
+    }
+  ],
+  "iltaa": [
+    {
+      "BASEFORM": "ilta",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]ilta[X]ilt[Sp][Ny]aa",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "osanto",
+      "STRUCTURE": "=ppppp",
+      "WORDBASES": "+ilta(ilta)"
+    },
+    {
+      "BASEFORM": "Ilta",
+      "CLASS": "etunimi",
+      "FSTOUTPUT": "[Lee][Xp]Ilta[X]ilt[Sp][Ny]aa",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "osanto",
+      "STRUCTURE": "=ipppp",
+      "WORDBASES": "+Ilta(Ilta)"
+    }
+  ],
+  "insinööri": [
+    {
+      "BASEFORM": "insinööri",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]insinööri[X]insinöör[Sn][Ny]i",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppppppp",
+      "WORDBASES": "+insinööri(insinööri)"
+    }
+  ],
+  "istua": [
+    {
+      "BASEFORM": "istua",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]istua[X]istu[Tn1][Eb]a",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=ppppp",
+      "WORDBASES": "+istua(istua)"
+    }
+  ],
+  "istuua": [],
+  "isä": [
+    {
+      "BASEFORM": "isä",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]isä[X]is[Sn][Ny]ä",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppp",
+      "WORDBASES": "+isä(isä)"
+    }
+  ],
+  "itkeä": [
+    {
+      "BASEFORM": "itkeä",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]itkeä[X]itke[Tn1][Eb]ä",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=ppppp",
+      "WORDBASES": "+itkeä(itkeä)"
+    }
+  ],
+  "jalkakäytävä": [
+    {
+      "BASEFORM": "jalkakäytävä",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]jalka[X]jalk[Sn][Ny]a[Bh][Bc][Ln][Xp]käytävä[X]käytäv[Sn][Ny]ä",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppp=ppppppp",
+      "WORDBASES": "+jalka(jalka)+käytävä(käytävä)"
+    },
+    {
+      "BASEFORM": "jalkakäytävä",
+      "CLASS": "laatusana",
+      "COMPARISON": "positive",
+      "FSTOUTPUT": "[Ln][Xp]jalka[X]jalk[Sn][Ny]a[Bh][Bc][Lt][Xp]käydä[X]käy[Ll][Ra]täv[Xj]ä[X][Sn][Ny]ä",
+      "NUMBER": "singular",
+      "PARTICIPLE": "present_passive",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppp=ppppppp",
+      "WORDBASES": "+jalka(jalka)+käy(käydä)+täv+ä(+ä)"
+    }
+  ],
+  "jalkapallo": [
+    {
+      "BASEFORM": "jalkapallo",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]jalka[X]jalk[Sn][Ny]a[Bh][Bc][Ln][Xp]pallo[X]pallo[Sn][Ny]",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppp=ppppp",
+      "WORDBASES": "+jalka(jalka)+pallo(pallo)"
+    }
+  ],
+  "jatkaa": [
+    {
+      "BASEFORM": "jatkaa",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]jatkaa[X]jatk[Tt][Ap][P3][Ny][Ef]aa",
+      "MOOD": "indicative",
+      "NEGATIVE": "false",
+      "NUMBER": "singular",
+      "PERSON": "3",
+      "STRUCTURE": "=pppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+jatkaa(jatkaa)"
+    },
+    {
+      "BASEFORM": "jatkaa",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]jatkaa[X]jatka[Tn1][Eb]a",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=pppppp",
+      "WORDBASES": "+jatkaa(jatkaa)"
+    }
+  ],
+  "joki": [
+    {
+      "BASEFORM": "joki",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Ica][Xp]joki[X]jok[Sn][Ny]i",
+      "NUMBER": "singular",
+      "POSSIBLE_GEOGRAPHICAL_NAME": "true",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppp",
+      "WORDBASES": "+joki(joki)"
+    }
+  ],
+  "jrvi": [],
+  "juna": [
+    {
+      "BASEFORM": "juna",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]juna[X]jun[Sn][Ny]a",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppp",
+      "WORDBASES": "+juna(juna)"
+    }
+  ],
+  "juoda": [
+    {
+      "BASEFORM": "juoda",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]juoda[X]juod[Tt][Ap][P4][Et]a",
+      "MOOD": "indicative",
+      "NEGATIVE": "true",
+      "PERSON": "4",
+      "STRUCTURE": "=ppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+juoda(juoda)"
+    },
+    {
+      "BASEFORM": "juoda",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]juoda[X]juod[Tn1][Eb]a",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=ppppp",
+      "WORDBASES": "+juoda(juoda)"
+    }
+  ],
+  "juokeen": [],
+  "juoksee": [
+    {
+      "BASEFORM": "juosta",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]juosta[X]juo[Tt][Ap][P3][Ny][Ef]ksee",
+      "MOOD": "indicative",
+      "NEGATIVE": "false",
+      "NUMBER": "singular",
+      "PERSON": "3",
+      "STRUCTURE": "=ppppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+juosta(juosta)"
+    }
+  ],
+  "juoksen": [
+    {
+      "BASEFORM": "juosta",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]juosta[X]juokse[Tt][Ap][P1][Ny][Ef]n",
+      "MOOD": "indicative",
+      "NEGATIVE": "false",
+      "NUMBER": "singular",
+      "PERSON": "1",
+      "STRUCTURE": "=ppppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+juosta(juosta)"
+    }
+  ],
+  "juoksu": [
+    {
+      "BASEFORM": "juoksu",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]juoksu[X]juoksu[Sn][Ny]",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppppp",
+      "WORDBASES": "+juoksu(juoksu)"
+    }
+  ],
+  "juooda": [],
+  "järvi": [
+    {
+      "BASEFORM": "järvi",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Ica][Xp]järvi[X]järv[Sn][Ny]i",
+      "NUMBER": "singular",
+      "POSSIBLE_GEOGRAPHICAL_NAME": "true",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppp",
+      "WORDBASES": "+järvi(järvi)"
+    }
+  ],
+  "jääkiekko": [
+    {
+      "BASEFORM": "jääkiekko",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]jää[X]jää[Sn][Ny][Bh][Bc][Ln][Xp]kiekko[X]kiekko[Sn][Ny]",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppp=pppppp",
+      "WORDBASES": "+jää(jää)+kiekko(kiekko)"
+    }
+  ],
+  "kalastaa": [
+    {
+      "BASEFORM": "kalastaa",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]kalastaa[X]kalast[Tt][Ap][P3][Ny][Ef]aa",
+      "MOOD": "indicative",
+      "NEGATIVE": "false",
+      "NUMBER": "singular",
+      "PERSON": "3",
+      "STRUCTURE": "=pppppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+kalastaa(kalastaa)"
+    },
+    {
+      "BASEFORM": "kalastaa",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]kalastaa[X]kalasta[Tn1][Eb]a",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=pppppppp",
+      "WORDBASES": "+kalastaa(kalastaa)"
+    }
+  ],
+  "kalasttta": [],
+  "kalastuspaikka": [
+    {
+      "BASEFORM": "kalastuspaikka",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Lt][Xp]kalastaa[X]kalast[Ln][Xj]us[X]u[Sn][Ny]s[Bh][Bc][Ln][Xp]paikka[X]paikk[Sn][Ny]a",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppppppp=pppppp",
+      "WORDBASES": "+kalast(kalastaa)+us(+us)+paikka(paikka)"
+    }
+  ],
+  "kampaamokäynti": [
+    {
+      "BASEFORM": "kampaamokäynti",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]kampaamo[X]kampaamo[Sn][Ny][Bh][Bc][Ln][Xp]käynti[X]käynt[Sn][Ny]i",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppppppp=pppppp",
+      "WORDBASES": "+kampaamo(kampaamo)+käynti(käynti)"
+    },
+    {
+      "BASEFORM": "kampaamokäynti",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]kampaamo[X]kampaamo[Sn][Ny][Bh][Bc][Lt][Xp]käydä[X]käy[Ln]n[Xj]ti[X]t[Sn][Ny]i",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppppppp=pppppp",
+      "WORDBASES": "+kampaamo(kampaamo)+käy(käydä)+n+ti(+ti)"
+    }
+  ],
+  "kasvi": [
+    {
+      "BASEFORM": "kasvi",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]kasvi[X]kasv[Sn][Ny]i",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppp",
+      "WORDBASES": "+kasvi(kasvi)"
+    }
+  ],
+  "katsoa": [
+    {
+      "BASEFORM": "katsoa",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]katsoa[X]katso[Tn1][Eb]a",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=pppppp",
+      "WORDBASES": "+katsoa(katsoa)"
+    }
+  ],
+  "kauniis": [],
+  "kaunis": [
+    {
+      "BASEFORM": "kaunis",
+      "CLASS": "laatusana",
+      "COMPARISON": "positive",
+      "FSTOUTPUT": "[Ll][Xp]kaunis[X]kauni[Sn][Ny]s",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppppp",
+      "WORDBASES": "+kaunis(kaunis)"
+    }
+  ],
+  "kauppa": [
+    {
+      "BASEFORM": "kauppa",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]kauppa[X]kaupp[Sn][Ny]a",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppppp",
+      "WORDBASES": "+kauppa(kauppa)"
+    }
+  ],
+  "kauppakeskus": [
+    {
+      "BASEFORM": "kauppakeskus",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]kauppa[X]kaupp[Sn][Ny]a[Bh][Bc][Ln][Ion][Xp]keskus[X]kesku[Sn][Ny]s",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppppp=pppppp",
+      "WORDBASES": "+kauppa(kauppa)+keskus(keskus)"
+    },
+    {
+      "BASEFORM": "Kauppakeskus",
+      "CLASS": "nimi",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ippppp=pppppp"
+    }
+  ],
+  "kemia": [
+    {
+      "BASEFORM": "kemia",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]kemia[X]kemia[Sn][Ny]",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppp",
+      "WORDBASES": "+kemia(kemia)"
+    }
+  ],
+  "kiitos": [
+    {
+      "BASEFORM": "kiitos",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]kiitos[X]kiito[Sn][Ny]s",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppppp",
+      "WORDBASES": "+kiitos(kiitos)"
+    }
+  ],
+  "kiittää": [
+    {
+      "BASEFORM": "kiittää",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]kiittää[X]kiitt[Tt][Ap][P3][Ny][Ef]ää",
+      "MOOD": "indicative",
+      "NEGATIVE": "false",
+      "NUMBER": "singular",
+      "PERSON": "3",
+      "STRUCTURE": "=ppppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+kiittää(kiittää)"
+    },
+    {
+      "BASEFORM": "kiittää",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]kiittää[X]kiittä[Tn1][Eb]ä",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=ppppppp",
+      "WORDBASES": "+kiittää(kiittää)"
+    }
+  ],
+  "kirjailija": [
+    {
+      "BASEFORM": "kirjailija",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Lt][Xp]kirjata[X]kirjail[Xj]la[X]i[Ln][Xj]ja[X][Sn][Ny]ja",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppppppppp",
+      "WORDBASES": "+kirjail(kirjata)i(+la)+ja(+ja)"
+    }
+  ],
+  "kirjakauppa": [
+    {
+      "BASEFORM": "kirjakauppa",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]kirja[X]kirj[Sn][Ny]a[Bh][Bc][Ln][Xp]kauppa[X]kaupp[Sn][Ny]a",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppp=pppppp",
+      "WORDBASES": "+kirja(kirja)+kauppa(kauppa)"
+    }
+  ],
+  "kirjallisuus": [
+    {
+      "BASEFORM": "kirjallisuus",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]kirja[X]kirja[Ll]lli[Xj]nen[X]su[Ln][Xj]us[X]u[Sn][Ny]s",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppppppppppp",
+      "WORDBASES": "+kirja(kirja)+llisu(+nen)+us(+us)"
+    }
+  ],
+  "kirjasto": [
+    {
+      "BASEFORM": "kirjasto",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]kirjasto[X]kirjasto[Sn][Ny]",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppppppp",
+      "WORDBASES": "+kirjasto(kirjasto)"
+    }
+  ],
+  "kirjoittaa": [
+    {
+      "BASEFORM": "kirjoittaa",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]kirjoittaa[X]kirjoitt[Tt][Ap][P3][Ny][Ef]aa",
+      "MOOD": "indicative",
+      "NEGATIVE": "false",
+      "NUMBER": "singular",
+      "PERSON": "3",
+      "STRUCTURE": "=pppppppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+kirjoittaa(kirjoittaa)"
+    },
+    {
+      "BASEFORM": "kirjoittaa",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]kirjoittaa[X]kirjoitta[Tn1][Eb]a",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=pppppppppp",
+      "WORDBASES": "+kirjoittaa(kirjoittaa)"
+    }
+  ],
+  "kirjottaa": [],
+  "kissa": [
+    {
+      "BASEFORM": "kissa",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]kissa[X]kiss[Sn][Ny]a",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppp",
+      "WORDBASES": "+kissa(kissa)"
+    }
+  ],
+  "kissaa": [
+    {
+      "BASEFORM": "kissa",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]kissa[X]kiss[Sp][Ny]aa",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "osanto",
+      "STRUCTURE": "=pppppp",
+      "WORDBASES": "+kissa(kissa)"
+    }
+  ],
+  "kissalle": [
+    {
+      "BASEFORM": "kissa",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]kissa[X]kissa[Sall][Ny]lle",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "ulkotulento",
+      "STRUCTURE": "=pppppppp",
+      "WORDBASES": "+kissa(kissa)"
+    }
+  ],
+  "koira": [
+    {
+      "BASEFORM": "koira",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]koira[X]koir[Sn][Ny]a",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppp",
+      "WORDBASES": "+koira(koira)"
+    }
+  ],
+  "koiran": [
+    {
+      "BASEFORM": "koira",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]koira[X]koir[Sg][Ny]an",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "omanto",
+      "STRUCTURE": "=pppppp",
+      "WORDBASES": "+koira(koira)"
+    }
+  ],
+  "koiranruoka": [
+    {
+      "BASEFORM": "koiranruoka",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]koira[X]koir[Sg][Ny]an[Bh][Bc][Ln][Xp]ruoka[X]ruok[Sn][Ny]a",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppppp=ppppp",
+      "WORDBASES": "+koiran(koira)+ruoka(ruoka)"
+    }
+  ],
+  "koiranruokaa": [
+    {
+      "BASEFORM": "koiranruoka",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]koira[X]koir[Sg][Ny]an[Bh][Bc][Ln][Xp]ruoka[X]ruok[Sp][Ny]aa",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "osanto",
+      "STRUCTURE": "=pppppp=pppppp",
+      "WORDBASES": "+koiran(koira)+ruoka(ruoka)"
+    }
+  ],
+  "koirra": [],
+  "konsertti": [
+    {
+      "BASEFORM": "konsertti",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]konsertti[X]konsertt[Sn][Ny]i",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppppppp",
+      "WORDBASES": "+konsertti(konsertti)"
+    }
+  ],
+  "koripallo": [
+    {
+      "BASEFORM": "koripallo",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]kori[X]kor[Sn][Ny]i[Bh][Bc][Ln][Xp]pallo[X]pallo[Sn][Ny]",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppp=ppppp",
+      "WORDBASES": "+kori(kori)+pallo(pallo)"
+    }
+  ],
+  "koskettaa": [
+    {
+      "BASEFORM": "koskettaa",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]koskettaa[X]koskett[Tt][Ap][P3][Ny][Ef]aa",
+      "MOOD": "indicative",
+      "NEGATIVE": "false",
+      "NUMBER": "singular",
+      "PERSON": "3",
+      "STRUCTURE": "=ppppppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+koskettaa(koskettaa)"
+    },
+    {
+      "BASEFORM": "koskettaa",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]koskettaa[X]kosketta[Tn1][Eb]a",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=ppppppppp",
+      "WORDBASES": "+koskettaa(koskettaa)"
+    }
+  ],
+  "koulu": [
+    {
+      "BASEFORM": "koulu",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Ica][Ion][Xp]koulu[X]koulu[Sn][Ny]",
+      "NUMBER": "singular",
+      "POSSIBLE_GEOGRAPHICAL_NAME": "true",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppp",
+      "WORDBASES": "+koulu(koulu)"
+    }
+  ],
+  "kukka": [
+    {
+      "BASEFORM": "Kukka",
+      "CLASS": "etunimi",
+      "FSTOUTPUT": "[Lee][Xp]Kukka[X]kukk[Sn][Ny]a",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ipppp",
+      "WORDBASES": "+Kukka(Kukka)"
+    },
+    {
+      "BASEFORM": "kukka",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]kukka[X]kukk[Sn][Ny]a",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppp",
+      "WORDBASES": "+kukka(kukka)"
+    }
+  ],
+  "kukkakauppa": [
+    {
+      "BASEFORM": "kukkakauppa",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]kukka[X]kukk[Sn][Ny]a[Bh][Bc][Ln][Xp]kauppa[X]kaupp[Sn][Ny]a",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppp=pppppp",
+      "WORDBASES": "+kukka(kukka)+kauppa(kauppa)"
+    }
+  ],
+  "kuulla": [
+    {
+      "BASEFORM": "kuultaa",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]kuultaa[X]kuulla[Tk][Ap][P2][Ny][Eb]",
+      "MOOD": "imperative",
+      "NEGATIVE": "both",
+      "NUMBER": "singular",
+      "PERSON": "2",
+      "STRUCTURE": "=pppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+kuultaa(kuultaa)"
+    },
+    {
+      "BASEFORM": "kuulla",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]kuulla[X]kuull[Tt][Ap][P4][Et]a",
+      "MOOD": "indicative",
+      "NEGATIVE": "true",
+      "PERSON": "4",
+      "STRUCTURE": "=pppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+kuulla(kuulla)"
+    },
+    {
+      "BASEFORM": "kuulla",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]kuulla[X]kuull[Tn1][Eb]a",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=pppppp",
+      "WORDBASES": "+kuulla(kuulla)"
+    },
+    {
+      "BASEFORM": "kuu",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]kuu[X]kuu[Sade][Ny]lla",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "ulkoolento",
+      "STRUCTURE": "=pppppp",
+      "WORDBASES": "+kuu(kuu)"
+    }
+  ],
+  "kuunella": [],
+  "kuunnella": [
+    {
+      "BASEFORM": "kuunnella",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]kuunnella[X]kuunnell[Tt][Ap][P4][Et]a",
+      "MOOD": "indicative",
+      "NEGATIVE": "true",
+      "PERSON": "4",
+      "STRUCTURE": "=ppppppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+kuunnella(kuunnella)"
+    },
+    {
+      "BASEFORM": "kuunnella",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]kuunnella[X]kuunnell[Tn1][Eb]a",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=ppppppppp",
+      "WORDBASES": "+kuunnella(kuunnella)"
+    }
+  ],
+  "kävelllä": [],
+  "kävellä": [
+    {
+      "BASEFORM": "kävellä",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]kävellä[X]kävell[Tt][Ap][P4][Et]ä",
+      "MOOD": "indicative",
+      "NEGATIVE": "true",
+      "PERSON": "4",
+      "STRUCTURE": "=ppppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+kävellä(kävellä)"
+    },
+    {
+      "BASEFORM": "kävellä",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]kävellä[X]kävell[Tn1][Eb]ä",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=ppppppp",
+      "WORDBASES": "+kävellä(kävellä)"
+    }
+  ],
+  "kävely": [
+    {
+      "BASEFORM": "kävely",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Lt][Xp]kävellä[X]kävel[Ln][Xj]y[X]y[Sn][Ny]",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppppp",
+      "WORDBASES": "+kävel(kävellä)+y(+y)"
+    }
+  ],
+  "kävelykatu": [
+    {
+      "BASEFORM": "kävelykatu",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Lt][Xp]kävellä[X]kävel[Ln][Xj]y[X]y[Sn][Ny][Bh][Bc][Ln][Ica][Xp]katu[X]katu[Sn][Ny]",
+      "NUMBER": "singular",
+      "POSSIBLE_GEOGRAPHICAL_NAME": "true",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppppp=pppp",
+      "WORDBASES": "+kävel(kävellä)+y(+y)+katu(katu)"
+    }
+  ],
+  "laiva": [
+    {
+      "BASEFORM": "laiva",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]laiva[X]laiv[Sn][Ny]a",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppp",
+      "WORDBASES": "+laiva(laiva)"
+    }
+  ],
+  "lapsi": [
+    {
+      "BASEFORM": "lapsi",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]lapsi[X]la[Sn][Ny]psi",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppp",
+      "WORDBASES": "+lapsi(lapsi)"
+    }
+  ],
+  "laskea": [
+    {
+      "BASEFORM": "laskea",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]laskea[X]laske[Tn1][Eb]a",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=pppppp",
+      "WORDBASES": "+laskea(laskea)"
+    }
+  ],
+  "laskee": [
+    {
+      "BASEFORM": "laskea",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]laskea[X]lask[Tt][Ap][P3][Ny][Ef]ee",
+      "MOOD": "indicative",
+      "NEGATIVE": "false",
+      "NUMBER": "singular",
+      "PERSON": "3",
+      "STRUCTURE": "=pppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+laskea(laskea)"
+    }
+  ],
+  "laskettelurinne": [
+    {
+      "BASEFORM": "laskettelurinne",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Lt][Xp]laskettaa[X]lasket[Xj]ella[X]tel[Ln][Xj]u[X]u[Sn][Ny][Bh][Bc][Ln][Ica][Xp]rinne[X]rinne[Sn][Ny]",
+      "NUMBER": "singular",
+      "POSSIBLE_GEOGRAPHICAL_NAME": "true",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppppppppp=ppppp",
+      "WORDBASES": "+lasket(laskettaa)tel(+ella)+u(+u)+rinne(rinne)"
+    }
+  ],
+  "lauaa": [],
+  "laulaa": [
+    {
+      "BASEFORM": "laulaa",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]laulaa[X]laul[Tt][Ap][P3][Ny][Ef]aa",
+      "MOOD": "indicative",
+      "NEGATIVE": "false",
+      "NUMBER": "singular",
+      "PERSON": "3",
+      "STRUCTURE": "=pppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+laulaa(laulaa)"
+    },
+    {
+      "BASEFORM": "laulaa",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]laulaa[X]laula[Tn1][Eb]a",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=pppppp",
+      "WORDBASES": "+laulaa(laulaa)"
+    }
+  ],
+  "leipomo": [
+    {
+      "BASEFORM": "leipomo",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]leipomo[X]leipomo[Sn][Ny]",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppppp",
+      "WORDBASES": "+leipomo(leipomo)"
+    }
+  ],
+  "leirintäalue": [
+    {
+      "BASEFORM": "leirintäalue",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]leirintä[X]leirint[Sn][Ny]ä[Bh][Bc][Ln][Xp]alue[X]alue[Sn][Ny]",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppppppp=pppp",
+      "WORDBASES": "+leirintä(leirintä)+alue(alue)"
+    }
+  ],
+  "lento": [
+    {
+      "BASEFORM": "lento",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Lt][Xp]lentää[X]len[Ln][Xj]to[X]to[Sn][Ny]",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppp",
+      "WORDBASES": "+len(lentää)+to(+to)"
+    }
+  ],
+  "lentokenttä": [
+    {
+      "BASEFORM": "lentokenttä",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Lt][Xp]lentää[X]len[Ln][Xj]to[X]to[Sn][Ny][Bh][Bc][Ln][Ica][Xp]kenttä[X]kentt[Sn][Ny]ä",
+      "NUMBER": "singular",
+      "POSSIBLE_GEOGRAPHICAL_NAME": "true",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppp=pppppp",
+      "WORDBASES": "+len(lentää)+to(+to)+kenttä(kenttä)"
+    }
+  ],
+  "lentopallo": [
+    {
+      "BASEFORM": "lentopallo",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Lt][Xp]lentää[X]len[Ln][Xj]to[X]to[Sn][Ny][Bh][Bc][Ln][Xp]pallo[X]pallo[Sn][Ny]",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppp=ppppp",
+      "WORDBASES": "+len(lentää)+to(+to)+pallo(pallo)"
+    }
+  ],
+  "liikennevalo": [
+    {
+      "BASEFORM": "liikennevalo",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]liikenne[X]liikenne[Sn][Ny][Bh][Bc][Ln][Xp]valo[X]valo[Sn][Ny]",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppppppp=pppp",
+      "WORDBASES": "+liikenne(liikenne)+valo(valo)"
+    }
+  ],
+  "lopettaa": [
+    {
+      "BASEFORM": "lopettaa",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]lopettaa[X]lopett[Tt][Ap][P3][Ny][Ef]aa",
+      "MOOD": "indicative",
+      "NEGATIVE": "false",
+      "NUMBER": "singular",
+      "PERSON": "3",
+      "STRUCTURE": "=pppppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+lopettaa(lopettaa)"
+    },
+    {
+      "BASEFORM": "lopettaa",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]lopettaa[X]lopetta[Tn1][Eb]a",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=pppppppp",
+      "WORDBASES": "+lopettaa(lopettaa)"
+    }
+  ],
+  "luistelu": [
+    {
+      "BASEFORM": "luistelu",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Lt][Xp]luistaa[X]luistel[Xj]la[X][Ln][Xj]u[X]u[Sn][Ny]",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppppppp",
+      "WORDBASES": "+luistel(luistaa)(+la)+u(+u)"
+    }
+  ],
+  "lukea": [
+    {
+      "BASEFORM": "lukea",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]lukea[X]luke[Tn1][Eb]a",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=ppppp",
+      "WORDBASES": "+lukea(lukea)"
+    }
+  ],
+  "lukkea": [],
+  "luonto": [
+    {
+      "BASEFORM": "luonto",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]luonto[X]luonto[Sn][Ny]",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppppp",
+      "WORDBASES": "+luonto(luonto)"
+    }
+  ],
+  "lähteä": [
+    {
+      "BASEFORM": "lähteä",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]lähteä[X]lähte[Tn1][Eb]ä",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=pppppp",
+      "WORDBASES": "+lähteä(lähteä)"
+    }
+  ],
+  "lähtä": [],
+  "lääkäri": [
+    {
+      "BASEFORM": "lääkäri",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]lääkäri[X]lääkär[Sn][Ny]i",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppppp",
+      "WORDBASES": "+lääkäri(lääkäri)"
+    }
+  ],
+  "löytää": [
+    {
+      "BASEFORM": "löytää",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]löytää[X]löy[Tn1][Eb]tää",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=pppppp",
+      "WORDBASES": "+löytää(löytää)"
+    },
+    {
+      "BASEFORM": "löytää",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]löytää[X]löy[Tt][Ap][P3][Ny][Ef]tää",
+      "MOOD": "indicative",
+      "NEGATIVE": "false",
+      "NUMBER": "singular",
+      "PERSON": "3",
+      "STRUCTURE": "=pppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+löytää(löytää)"
+    }
+  ],
+  "maalata": [
+    {
+      "BASEFORM": "maalata",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]maalata[X]maalat[Tt][Ap][P4][Et]a",
+      "MOOD": "indicative",
+      "NEGATIVE": "true",
+      "PERSON": "4",
+      "STRUCTURE": "=ppppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+maalata(maalata)"
+    },
+    {
+      "BASEFORM": "maalata",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]maalata[X]maalat[Tn1][Eb]a",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=ppppppp",
+      "WORDBASES": "+maalata(maalata)"
+    }
+  ],
+  "maalta": [
+    {
+      "BASEFORM": "maa",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Ica][Xp]maa[X]maa[Sabl][Ny]lta",
+      "NUMBER": "singular",
+      "POSSIBLE_GEOGRAPHICAL_NAME": "true",
+      "SIJAMUOTO": "ulkoeronto",
+      "STRUCTURE": "=pppppp",
+      "WORDBASES": "+maa(maa)"
+    },
+    {
+      "BASEFORM": "Maa",
+      "CLASS": "nimi",
+      "FSTOUTPUT": "[Lem][Xp]Maa[X]maa[Sabl][Ny]lta",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "ulkoeronto",
+      "STRUCTURE": "=ippppp",
+      "WORDBASES": "+Maa(Maa)"
+    }
+  ],
+  "maantiede": [
+    {
+      "BASEFORM": "maantiede",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Ica][Xp]maa[X]maa[Sg][Ny]n[Bh][Bc][Ln][Xp]tiede[X]tiede[Sn][Ny]",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppp=ppppp",
+      "WORDBASES": "+maan(maa)+tiede(tiede)"
+    }
+  ],
+  "maata": [
+    {
+      "BASEFORM": "maa",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Ica][Xp]maa[X]maa[Sp][Ny]ta",
+      "NUMBER": "singular",
+      "POSSIBLE_GEOGRAPHICAL_NAME": "true",
+      "SIJAMUOTO": "osanto",
+      "STRUCTURE": "=ppppp",
+      "WORDBASES": "+maa(maa)"
+    },
+    {
+      "BASEFORM": "Maa",
+      "CLASS": "nimi",
+      "FSTOUTPUT": "[Lem][Xp]Maa[X]maa[Sp][Ny]ta",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "osanto",
+      "STRUCTURE": "=ipppp",
+      "WORDBASES": "+Maa(Maa)"
+    },
+    {
+      "BASEFORM": "maata",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]maata[X]maat[Tt][Ap][P4][Et]a",
+      "MOOD": "indicative",
+      "NEGATIVE": "true",
+      "PERSON": "4",
+      "STRUCTURE": "=ppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+maata(maata)"
+    },
+    {
+      "BASEFORM": "maata",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]maata[X]maat[Tn1][Eb]a",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=ppppp",
+      "WORDBASES": "+maata(maata)"
+    }
+  ],
+  "maataa": [],
+  "marjapaikka": [
+    {
+      "BASEFORM": "marjapaikka",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]marja[X]marj[Sn][Ny]a[Bh][Bc][Ln][Xp]paikka[X]paikk[Sn][Ny]a",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppp=pppppp",
+      "WORDBASES": "+marja(marja)+paikka(paikka)"
+    }
+  ],
+  "matematiikka": [
+    {
+      "BASEFORM": "matematiikka",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]matematiikka[X]matematiikk[Sn][Ny]a",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppppppppppp",
+      "WORDBASES": "+matematiikka(matematiikka)"
+    }
+  ],
+  "matka": [
+    {
+      "BASEFORM": "matka",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]matka[X]matk[Sn][Ny]a",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppp",
+      "WORDBASES": "+matka(matka)"
+    }
+  ],
+  "meri": [
+    {
+      "BASEFORM": "meri",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Ica][Xp]meri[X]mer[Sn][Ny]i",
+      "NUMBER": "singular",
+      "POSSIBLE_GEOGRAPHICAL_NAME": "true",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppp",
+      "WORDBASES": "+meri(meri)"
+    },
+    {
+      "BASEFORM": "Meri",
+      "CLASS": "etunimi",
+      "FSTOUTPUT": "[Lee][Xp]Meri[X]mer[Sn][Ny]i",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ippp",
+      "WORDBASES": "+Meri(Meri)"
+    }
+  ],
+  "metssä": [],
+  "metsä": [
+    {
+      "BASEFORM": "metsä",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Ica][Xp]metsä[X]mets[Sn][Ny]ä",
+      "NUMBER": "singular",
+      "POSSIBLE_GEOGRAPHICAL_NAME": "true",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppp",
+      "WORDBASES": "+metsä(metsä)"
+    }
+  ],
+  "metsämansikka": [
+    {
+      "BASEFORM": "metsämansikka",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Ica][Xp]metsä[X]mets[Sn][Ny]ä[Bh][Bc][Ln][Xp]mansikka[X]mansikk[Sn][Ny]a",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppp=pppppppp",
+      "WORDBASES": "+metsä(metsä)+mansikka(mansikka)"
+    }
+  ],
+  "mies": [
+    {
+      "BASEFORM": "mies",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]mies[X]mies[Sn][Ny]",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppp",
+      "WORDBASES": "+mies(mies)"
+    }
+  ],
+  "moottoritie": [
+    {
+      "BASEFORM": "moottoritie",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]moottori[X]moottor[Sn][Ny]i[Bh][Bc][Ln][Ica][Xp]tie[X]tie[Sn][Ny]",
+      "NUMBER": "singular",
+      "POSSIBLE_GEOGRAPHICAL_NAME": "true",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppppppp=ppp",
+      "WORDBASES": "+moottori(moottori)+tie(tie)"
+    }
+  ],
+  "muistaa": [
+    {
+      "BASEFORM": "muistaa",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]muistaa[X]muist[Tt][Ap][P3][Ny][Ef]aa",
+      "MOOD": "indicative",
+      "NEGATIVE": "false",
+      "NUMBER": "singular",
+      "PERSON": "3",
+      "STRUCTURE": "=ppppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+muistaa(muistaa)"
+    },
+    {
+      "BASEFORM": "muistaa",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]muistaa[X]muista[Tn1][Eb]a",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=ppppppp",
+      "WORDBASES": "+muistaa(muistaa)"
+    }
+  ],
+  "museo": [
+    {
+      "BASEFORM": "museo",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]museo[X]museo[Sn][Ny]",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppp",
+      "WORDBASES": "+museo(museo)"
+    }
+  ],
+  "musiikki": [
+    {
+      "BASEFORM": "musiikki",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]musiikki[X]musiikk[Sn][Ny]i",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppppppp",
+      "WORDBASES": "+musiikki(musiikki)"
+    }
+  ],
+  "muusikko": [
+    {
+      "BASEFORM": "muusikko",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]muusikko[X]muusik[Sn][Ny]ko",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppppppp",
+      "WORDBASES": "+muusikko(muusikko)"
+    }
+  ],
+  "myydä": [
+    {
+      "BASEFORM": "myydä",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]myydä[X]myyd[Tt][Ap][P4][Et]ä",
+      "MOOD": "indicative",
+      "NEGATIVE": "true",
+      "PERSON": "4",
+      "STRUCTURE": "=ppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+myydä(myydä)"
+    },
+    {
+      "BASEFORM": "myydä",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]myydä[X]myyd[Tn1][Eb]ä",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=ppppp",
+      "WORDBASES": "+myydä(myydä)"
+    }
+  ],
+  "mökkikylä": [
+    {
+      "BASEFORM": "mökkikylä",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]mökki[X]mökk[Sn][Ny]i[Bh][Bc][Ln][Ica][Xp]kylä[X]kyl[Sn][Ny]ä",
+      "NUMBER": "singular",
+      "POSSIBLE_GEOGRAPHICAL_NAME": "true",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppp=pppp",
+      "WORDBASES": "+mökki(mökki)+kylä(kylä)"
+    }
+  ],
+  "nainen": [
+    {
+      "BASEFORM": "nainen",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]nainen[X]nai[Sn][Ny]nen",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppppp",
+      "WORDBASES": "+nainen(nainen)"
+    },
+    {
+      "BASEFORM": "naida",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]naida[X]nain[Tm][Ap][P1][Ny][Ef]en",
+      "MOOD": "potential",
+      "NEGATIVE": "false",
+      "NUMBER": "singular",
+      "PERSON": "1",
+      "STRUCTURE": "=pppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+naida(naida)"
+    }
+  ],
+  "nauraa": [
+    {
+      "BASEFORM": "nauraa",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]nauraa[X]naur[Tt][Ap][P3][Ny][Ef]aa",
+      "MOOD": "indicative",
+      "NEGATIVE": "false",
+      "NUMBER": "singular",
+      "PERSON": "3",
+      "STRUCTURE": "=pppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+nauraa(nauraa)"
+    },
+    {
+      "BASEFORM": "nauraa",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]nauraa[X]naura[Tn1][Eb]a",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=pppppp",
+      "WORDBASES": "+nauraa(nauraa)"
+    }
+  ],
+  "nopea": [
+    {
+      "BASEFORM": "nopea",
+      "CLASS": "laatusana",
+      "COMPARISON": "positive",
+      "FSTOUTPUT": "[Ll][Xp]nopea[X]nope[Sn][Ny]a",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppp",
+      "WORDBASES": "+nopea(nopea)"
+    }
+  ],
+  "nopeaa": [
+    {
+      "BASEFORM": "nopea",
+      "CLASS": "laatusana",
+      "COMPARISON": "positive",
+      "FSTOUTPUT": "[Ll][Xp]nopea[X]nope[Sp][Ny]aa",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "osanto",
+      "STRUCTURE": "=pppppp",
+      "WORDBASES": "+nopea(nopea)"
+    }
+  ],
+  "nousta": [
+    {
+      "BASEFORM": "nousta",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]nousta[X]noust[Tt][Ap][P4][Et]a",
+      "MOOD": "indicative",
+      "NEGATIVE": "true",
+      "PERSON": "4",
+      "STRUCTURE": "=pppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+nousta(nousta)"
+    },
+    {
+      "BASEFORM": "nousta",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]nousta[X]noust[Tn1][Eb]a",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=pppppp",
+      "WORDBASES": "+nousta(nousta)"
+    }
+  ],
+  "nukkua": [
+    {
+      "BASEFORM": "nukkua",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]nukkua[X]nukku[Tn1][Eb]a",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=pppppp",
+      "WORDBASES": "+nukkua(nukkua)"
+    }
+  ],
+  "nukkuua": [],
+  "nähdä": [
+    {
+      "BASEFORM": "nähdä",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]nähdä[X]nähd[Tt][Ap][P4][Et]ä",
+      "MOOD": "indicative",
+      "NEGATIVE": "true",
+      "PERSON": "4",
+      "STRUCTURE": "=ppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+nähdä(nähdä)"
+    },
+    {
+      "BASEFORM": "nähdä",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]nähdä[X]nähd[Tn1][Eb]ä",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=ppppp",
+      "WORDBASES": "+nähdä(nähdä)"
+    }
+  ],
+  "näkemiin": [
+    {
+      "BASEFORM": "näkemä",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Lt][Xp]nähdä[X]näke[Ln][Rm]m[Xj]ä[X][Sill][Nm]iin",
+      "NUMBER": "plural",
+      "PARTICIPLE": "agent",
+      "SIJAMUOTO": "sisatulento",
+      "STRUCTURE": "=pppppppp",
+      "WORDBASES": "+näke(nähdä)+m+ä(+ä)"
+    },
+    {
+      "BASEFORM": "näkemiin",
+      "CLASS": "seikkasana",
+      "FSTOUTPUT": "[Ls][Xp]näkemiin[X]näkemiin",
+      "STRUCTURE": "=pppppppp",
+      "WORDBASES": "+näkemiin(näkemiin)"
+    }
+  ],
+  "näyttely": [
+    {
+      "BASEFORM": "näyttely",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Lt][Xp]näytellä[X]näyttel[Ln][Xj]y[X]y[Sn][Ny]",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppppppp",
+      "WORDBASES": "+näyttel(näytellä)+y(+y)"
+    },
+    {
+      "BASEFORM": "näyttely",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Lt][Xp]näyttää[X]näyt[Xj]ellä[X]tel[Ln][Xj]y[X]y[Sn][Ny]",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppppppp",
+      "WORDBASES": "+näyt(näyttää)tel(+ellä)+y(+y)"
+    }
+  ],
+  "odottaa": [
+    {
+      "BASEFORM": "odottaa",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]odottaa[X]odott[Tt][Ap][P3][Ny][Ef]aa",
+      "MOOD": "indicative",
+      "NEGATIVE": "false",
+      "NUMBER": "singular",
+      "PERSON": "3",
+      "STRUCTURE": "=ppppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+odottaa(odottaa)"
+    },
+    {
+      "BASEFORM": "odottaa",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]odottaa[X]odotta[Tn1][Eb]a",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=ppppppp",
+      "WORDBASES": "+odottaa(odottaa)"
+    }
+  ],
+  "ohjelmointi": [
+    {
+      "BASEFORM": "ohjelmointi",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Lt][Xp]ohjelmoida[X]ohjelmoi[Ln]n[Xj]ti[X]t[Sn][Ny]i",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppppppppp",
+      "WORDBASES": "+ohjelmoi(ohjelmoida)+n+ti(+ti)"
+    }
+  ],
+  "ole": [
+    {
+      "BASEFORM": "olla",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]olla[X]ole[Tk][Ap][P2][Ny][Eb]",
+      "MOOD": "imperative",
+      "NEGATIVE": "both",
+      "NUMBER": "singular",
+      "PERSON": "2",
+      "STRUCTURE": "=ppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+olla(olla)"
+    }
+  ],
+  "olemme": [
+    {
+      "BASEFORM": "olla",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]olla[X]o[Tt][Ap][P1][Nm][Ef]lemme",
+      "MOOD": "indicative",
+      "NEGATIVE": "false",
+      "NUMBER": "plural",
+      "PERSON": "1",
+      "STRUCTURE": "=pppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+olla(olla)"
+    }
+  ],
+  "olen": [
+    {
+      "BASEFORM": "olla",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]olla[X]o[Tt][Ap][P1][Ny][Ef]len",
+      "MOOD": "indicative",
+      "NEGATIVE": "false",
+      "NUMBER": "singular",
+      "PERSON": "1",
+      "STRUCTURE": "=pppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+olla(olla)"
+    }
+  ],
+  "olet": [
+    {
+      "BASEFORM": "olla",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]olla[X]o[Tt][Ap][P2][Ny][Ef]let",
+      "MOOD": "indicative",
+      "NEGATIVE": "false",
+      "NUMBER": "singular",
+      "PERSON": "2",
+      "STRUCTURE": "=pppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+olla(olla)"
+    }
+  ],
+  "olette": [
+    {
+      "BASEFORM": "olla",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]olla[X]o[Tt][Ap][P2][Nm][Ef]lette",
+      "MOOD": "indicative",
+      "NEGATIVE": "false",
+      "NUMBER": "plural",
+      "PERSON": "2",
+      "STRUCTURE": "=pppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+olla(olla)"
+    }
+  ],
+  "oli": [
+    {
+      "BASEFORM": "olla",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]olla[X]o[Tt][Ai][P3][Ny][Ef]li",
+      "MOOD": "indicative",
+      "NEGATIVE": "false",
+      "NUMBER": "singular",
+      "PERSON": "3",
+      "STRUCTURE": "=ppp",
+      "TENSE": "past_imperfective",
+      "WORDBASES": "+olla(olla)"
+    }
+  ],
+  "olisi": [
+    {
+      "BASEFORM": "olla",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]olla[X]ol[Te][Ap][P3][Ny][Eb]isi",
+      "MOOD": "conditional",
+      "NEGATIVE": "both",
+      "NUMBER": "singular",
+      "PERSON": "3",
+      "STRUCTURE": "=ppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+olla(olla)"
+    }
+  ],
+  "olisivat": [
+    {
+      "BASEFORM": "olla",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]olla[X]ol[Te][Ap][P3][Nm][Ef]isivat",
+      "MOOD": "conditional",
+      "NEGATIVE": "false",
+      "NUMBER": "plural",
+      "PERSON": "3",
+      "STRUCTURE": "=pppppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+olla(olla)"
+    }
+  ],
+  "olivat": [
+    {
+      "BASEFORM": "olla",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]olla[X]o[Tt][Ai][P3][Nm][Ef]livat",
+      "MOOD": "indicative",
+      "NEGATIVE": "false",
+      "NUMBER": "plural",
+      "PERSON": "3",
+      "STRUCTURE": "=pppppp",
+      "TENSE": "past_imperfective",
+      "WORDBASES": "+olla(olla)"
+    }
+  ],
+  "olkoon": [
+    {
+      "BASEFORM": "olla",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]olla[X]ol[Tk][Ap][P3][Ny][Ef]koon",
+      "MOOD": "imperative",
+      "NEGATIVE": "false",
+      "NUMBER": "singular",
+      "PERSON": "3",
+      "STRUCTURE": "=pppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+olla(olla)"
+    }
+  ],
+  "on": [
+    {
+      "BASEFORM": "olla",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]olla[X]o[Tt][Ap][P3][Ny][Ef]n",
+      "MOOD": "indicative",
+      "NEGATIVE": "false",
+      "NUMBER": "singular",
+      "PERSON": "3",
+      "STRUCTURE": "=pp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+olla(olla)"
+    }
+  ],
+  "opettaja": [
+    {
+      "BASEFORM": "opettaja",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Lt][Xp]opettaa[X]opetta[Ln][Xj]ja[X][Sn][Ny]ja",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppppppp",
+      "WORDBASES": "+opetta(opettaa)+ja(+ja)"
+    }
+  ],
+  "opiskella": [
+    {
+      "BASEFORM": "opiskella",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]opiskella[X]opiskell[Tt][Ap][P4][Et]a",
+      "MOOD": "indicative",
+      "NEGATIVE": "true",
+      "PERSON": "4",
+      "STRUCTURE": "=ppppppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+opiskella(opiskella)"
+    },
+    {
+      "BASEFORM": "opiskella",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]opiskella[X]opiskell[Tn1][Eb]a",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=ppppppppp",
+      "WORDBASES": "+opiskella(opiskella)"
+    }
+  ],
+  "opiskellla": [],
+  "ostaa": [
+    {
+      "BASEFORM": "Osta",
+      "CLASS": "paikannimi",
+      "FSTOUTPUT": "[Lep][Xp]Osta[X]ost[Sp][Ny]aa",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "osanto",
+      "STRUCTURE": "=ipppp",
+      "WORDBASES": "+Osta(Osta)"
+    },
+    {
+      "BASEFORM": "ostaa",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]ostaa[X]ost[Tt][Ap][P3][Ny][Ef]aa",
+      "MOOD": "indicative",
+      "NEGATIVE": "false",
+      "NUMBER": "singular",
+      "PERSON": "3",
+      "STRUCTURE": "=ppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+ostaa(ostaa)"
+    },
+    {
+      "BASEFORM": "ostaa",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]ostaa[X]osta[Tn1][Eb]a",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=ppppp",
+      "WORDBASES": "+ostaa(ostaa)"
+    }
+  ],
+  "ottaa": [
+    {
+      "BASEFORM": "ottaa",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]ottaa[X]ott[Tt][Ap][P3][Ny][Ef]aa",
+      "MOOD": "indicative",
+      "NEGATIVE": "false",
+      "NUMBER": "singular",
+      "PERSON": "3",
+      "STRUCTURE": "=ppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+ottaa(ottaa)"
+    },
+    {
+      "BASEFORM": "ottaa",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]ottaa[X]otta[Tn1][Eb]a",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=ppppp",
+      "WORDBASES": "+ottaa(ottaa)"
+    }
+  ],
+  "ovat": [
+    {
+      "BASEFORM": "olla",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]olla[X]o[Tt][Ap][P3][Nm][Ef]vat",
+      "MOOD": "indicative",
+      "NEGATIVE": "false",
+      "NUMBER": "plural",
+      "PERSON": "3",
+      "STRUCTURE": "=pppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+olla(olla)"
+    }
+  ],
+  "paalta": [],
+  "palata": [
+    {
+      "BASEFORM": "palata",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]palata[X]palat[Tt][Ap][P4][Et]a",
+      "MOOD": "indicative",
+      "NEGATIVE": "true",
+      "PERSON": "4",
+      "STRUCTURE": "=pppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+palata(palata)"
+    },
+    {
+      "BASEFORM": "palata",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]palata[X]palat[Tn1][Eb]a",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=pppppp",
+      "WORDBASES": "+palata(palata)"
+    }
+  ],
+  "palomies": [
+    {
+      "BASEFORM": "palomies",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]palo[X]palo[Sn][Ny][Bh][Bc][Ln][Xp]mies[X]mies[Sn][Ny]",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppp=pppp",
+      "WORDBASES": "+palo(palo)+mies(mies)"
+    }
+  ],
+  "pankki": [
+    {
+      "BASEFORM": "pankki",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]pankki[X]pankk[Sn][Ny]i",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppppp",
+      "WORDBASES": "+pankki(pankki)"
+    }
+  ],
+  "pelata": [
+    {
+      "BASEFORM": "pelata",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]pelata[X]pelat[Tt][Ap][P4][Et]a",
+      "MOOD": "indicative",
+      "NEGATIVE": "true",
+      "PERSON": "4",
+      "STRUCTURE": "=pppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+pelata(pelata)"
+    },
+    {
+      "BASEFORM": "pelata",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]pelata[X]pelat[Tn1][Eb]a",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=pppppp",
+      "WORDBASES": "+pelata(pelata)"
+    }
+  ],
+  "peltta": [],
+  "pelätä": [
+    {
+      "BASEFORM": "pelätä",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]pelätä[X]pelät[Tt][Ap][P4][Et]ä",
+      "MOOD": "indicative",
+      "NEGATIVE": "true",
+      "PERSON": "4",
+      "STRUCTURE": "=pppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+pelätä(pelätä)"
+    },
+    {
+      "BASEFORM": "pelätä",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]pelätä[X]pelät[Tn1][Eb]ä",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=pppppp",
+      "WORDBASES": "+pelätä(pelätä)"
+    }
+  ],
+  "perhe": [
+    {
+      "BASEFORM": "perhe",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]perhe[X]perhe[Sn][Ny]",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppp",
+      "WORDBASES": "+perhe(perhe)"
+    }
+  ],
+  "perunapellava": [
+    {
+      "BASEFORM": "perunapellava",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]peruna[X]peruna[Sn][Ny][Bh][Bc][Ln][Xp]pellava[X]pellav[Sn][Ny]a",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppppp=ppppppp",
+      "WORDBASES": "+peruna(peruna)+pellava(pellava)"
+    }
+  ],
+  "pieni": [
+    {
+      "BASEFORM": "pieni",
+      "CLASS": "laatusana",
+      "COMPARISON": "positive",
+      "FSTOUTPUT": "[Ll][Xp]pieni[X]pien[Sn][Ny]i",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppp",
+      "WORDBASES": "+pieni(pieni)"
+    },
+    {
+      "BASEFORM": "pieniä",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]pieniä[X]pien[Tt][Ai][P3][Ny][Ef]i",
+      "MOOD": "indicative",
+      "NEGATIVE": "false",
+      "NUMBER": "singular",
+      "PERSON": "3",
+      "STRUCTURE": "=ppppp",
+      "TENSE": "past_imperfective",
+      "WORDBASES": "+pieniä(pieniä)"
+    },
+    {
+      "BASEFORM": "pieniä",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]pieniä[X]pieni[Tk][Ap][P2][Ny][Eb]",
+      "MOOD": "imperative",
+      "NEGATIVE": "both",
+      "NUMBER": "singular",
+      "PERSON": "2",
+      "STRUCTURE": "=ppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+pieniä(pieniä)"
+    }
+  ],
+  "pienii": [
+    {
+      "BASEFORM": "pieniä",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]pieniä[X]pien[Tt][Ap][P3][Ny][Ef]ii",
+      "MOOD": "indicative",
+      "NEGATIVE": "false",
+      "NUMBER": "singular",
+      "PERSON": "3",
+      "STRUCTURE": "=pppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+pieniä(pieniä)"
+    }
+  ],
+  "poika": [
+    {
+      "BASEFORM": "poika",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]poika[X]poik[Sn][Ny]a",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppp",
+      "WORDBASES": "+poika(poika)"
+    }
+  ],
+  "poliisi": [
+    {
+      "BASEFORM": "poliisi",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]poliisi[X]poliis[Sn][Ny]i",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppppp",
+      "WORDBASES": "+poliisi(poliisi)"
+    }
+  ],
+  "politiikka": [
+    {
+      "BASEFORM": "politiikka",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]politiikka[X]politiikk[Sn][Ny]a",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppppppppp",
+      "WORDBASES": "+politiikka(politiikka)"
+    }
+  ],
+  "polkupyörä": [
+    {
+      "BASEFORM": "polkupyörä",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Ica][Xp]polku[X]polku[Sn][Ny][Bh][Bc][Ln][Xp]pyörä[X]pyör[Sn][Ny]ä",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppp=ppppp",
+      "WORDBASES": "+polku(polku)+pyörä(pyörä)"
+    }
+  ],
+  "postitoimisto": [
+    {
+      "BASEFORM": "postitoimisto",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]posti[X]post[Sn][Ny]i[Bh][Bc][Ln][Xp]toimisto[X]toimisto[Sn][Ny]",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppp=pppppppp",
+      "WORDBASES": "+posti(posti)+toimisto(toimisto)"
+    }
+  ],
+  "puhua": [
+    {
+      "BASEFORM": "puhua",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]puhua[X]puhu[Tn1][Eb]a",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=ppppp",
+      "WORDBASES": "+puhua(puhua)"
+    }
+  ],
+  "puhuua": [],
+  "puistokäytävä": [
+    {
+      "BASEFORM": "puistokäytävä",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Ica][Xp]puisto[X]puisto[Sn][Ny][Bh][Bc][Ln][Xp]käytävä[X]käytäv[Sn][Ny]ä",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppppp=ppppppp",
+      "WORDBASES": "+puisto(puisto)+käytävä(käytävä)"
+    },
+    {
+      "BASEFORM": "puistokäytävä",
+      "CLASS": "laatusana",
+      "COMPARISON": "positive",
+      "FSTOUTPUT": "[Ln][Ica][Xp]puisto[X]puisto[Sn][Ny][Bh][Bc][Lt][Xp]käydä[X]käy[Ll][Ra]täv[Xj]ä[X][Sn][Ny]ä",
+      "NUMBER": "singular",
+      "PARTICIPLE": "present_passive",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppppp=ppppppp",
+      "WORDBASES": "+puisto(puisto)+käy(käydä)+täv+ä(+ä)"
+    }
+  ],
+  "puu": [
+    {
+      "BASEFORM": "puu",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]puu[X]puu[Sn][Ny]",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppp",
+      "WORDBASES": "+puu(puu)"
+    }
+  ],
+  "pysäköintialue": [
+    {
+      "BASEFORM": "pysäköintialue",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Lt][Xp]pysäköidä[X]pysäköi[Ln]n[Xj]ti[X]t[Sn][Ny]i[Bh][Bc][Ln][Xp]alue[X]alue[Sn][Ny]",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppppppppp=pppp",
+      "WORDBASES": "+pysäköi(pysäköidä)+nti(+ti)+alue(alue)"
+    }
+  ],
+  "pyytää": [
+    {
+      "BASEFORM": "pyytää",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]pyytää[X]pyy[Tn1][Eb]tää",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=pppppp",
+      "WORDBASES": "+pyytää(pyytää)"
+    },
+    {
+      "BASEFORM": "pyytää",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]pyytää[X]pyy[Tt][Ap][P3][Ny][Ef]tää",
+      "MOOD": "indicative",
+      "NEGATIVE": "false",
+      "NUMBER": "singular",
+      "PERSON": "3",
+      "STRUCTURE": "=pppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+pyytää(pyytää)"
+    }
+  ],
+  "pyörätie": [
+    {
+      "BASEFORM": "pyörätie",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]pyörä[X]pyör[Sn][Ny]ä[Bh][Bc][Ln][Ica][Xp]tie[X]tie[Sn][Ny]",
+      "NUMBER": "singular",
+      "POSSIBLE_GEOGRAPHICAL_NAME": "true",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppp=ppp",
+      "WORDBASES": "+pyörä(pyörä)+tie(tie)"
+    }
+  ],
+  "päivää": [
+    {
+      "BASEFORM": "Päivä",
+      "CLASS": "etunimi",
+      "FSTOUTPUT": "[Lee][Xp]Päivä[X]päiv[Sp][Ny]ää",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "osanto",
+      "STRUCTURE": "=ippppp",
+      "WORDBASES": "+Päivä(Päivä)"
+    },
+    {
+      "BASEFORM": "päivä",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]päivä[X]päiv[Sp][Ny]ää",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "osanto",
+      "STRUCTURE": "=pppppp",
+      "WORDBASES": "+päivä(päivä)"
+    },
+    {
+      "BASEFORM": "päivätä",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]päivätä[X]päivä[Tt][Ap][P3][Ny][Eb]ä",
+      "MOOD": "indicative",
+      "NEGATIVE": "both",
+      "NUMBER": "singular",
+      "PERSON": "3",
+      "STRUCTURE": "=pppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+päivätä(päivätä)"
+    }
+  ],
+  "rakastaa": [
+    {
+      "BASEFORM": "rakastaa",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]rakastaa[X]rakast[Tt][Ap][P3][Ny][Ef]aa",
+      "MOOD": "indicative",
+      "NEGATIVE": "false",
+      "NUMBER": "singular",
+      "PERSON": "3",
+      "STRUCTURE": "=pppppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+rakastaa(rakastaa)"
+    },
+    {
+      "BASEFORM": "rakastaa",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]rakastaa[X]rakasta[Tn1][Eb]a",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=pppppppp",
+      "WORDBASES": "+rakastaa(rakastaa)"
+    }
+  ],
+  "rakentaa": [
+    {
+      "BASEFORM": "rakentaa",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]rakentaa[X]raken[Tn1][Eb]taa",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=pppppppp",
+      "WORDBASES": "+rakentaa(rakentaa)"
+    },
+    {
+      "BASEFORM": "rakentaa",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]rakentaa[X]raken[Tt][Ap][P3][Ny][Ef]taa",
+      "MOOD": "indicative",
+      "NEGATIVE": "false",
+      "NUMBER": "singular",
+      "PERSON": "3",
+      "STRUCTURE": "=pppppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+rakentaa(rakentaa)"
+    }
+  ],
+  "raketaa": [],
+  "rautatieasema": [
+    {
+      "BASEFORM": "rautatieasema",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]rauta[X]raut[Sn][Ny]a[Bh][Bc][Ln][Ica][Xp]tie[X]tie[Sn][Ny][Bh][Bc][Ln][Xp]asema[X]asem[Sn][Ny]a",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppp=ppp=ppppp",
+      "WORDBASES": "+rauta(rauta)+tie(tie)+asema(asema)"
+    }
+  ],
+  "ravintola": [
+    {
+      "BASEFORM": "ravintola",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]ravintola[X]ravintola[Sn][Ny]",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppppppp",
+      "WORDBASES": "+ravintola(ravintola)"
+    }
+  ],
+  "risteysalue": [
+    {
+      "BASEFORM": "risteysalue",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]risteys[X]ristey[Sn][Ny]s[Bh][Bc][Ln][Xp]alue[X]alue[Sn][Ny]",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppppp=pppp",
+      "WORDBASES": "+risteys(risteys)+alue(alue)"
+    }
+  ],
+  "ruoho": [
+    {
+      "BASEFORM": "ruoho",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]ruoho[X]ruoho[Sn][Ny]",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppp",
+      "WORDBASES": "+ruoho(ruoho)"
+    }
+  ],
+  "saapua": [
+    {
+      "BASEFORM": "saapua",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]saapua[X]saapu[Tn1][Eb]a",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=pppppp",
+      "WORDBASES": "+saapua(saapua)"
+    }
+  ],
+  "saapuua": [],
+  "saari": [
+    {
+      "BASEFORM": "saari",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Ica][Xp]saari[X]saar[Sn][Ny]i",
+      "NUMBER": "singular",
+      "POSSIBLE_GEOGRAPHICAL_NAME": "true",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppp",
+      "WORDBASES": "+saari(saari)"
+    },
+    {
+      "BASEFORM": "Saari",
+      "CLASS": "sukunimi",
+      "FSTOUTPUT": "[Les][Xp]Saari[X]saar[Sn][Ny]i",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ipppp",
+      "WORDBASES": "+Saari(Saari)"
+    }
+  ],
+  "sairaala": [
+    {
+      "BASEFORM": "sairaala",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]sairaala[X]sairaal[Sn][Ny]a",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppppppp",
+      "WORDBASES": "+sairaala(sairaala)"
+    }
+  ],
+  "seisoa": [
+    {
+      "BASEFORM": "seisoa",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]seisoa[X]seiso[Tn1][Eb]a",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=pppppp",
+      "WORDBASES": "+seisoa(seisoa)"
+    }
+  ],
+  "seisoo": [
+    {
+      "BASEFORM": "seisoa",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]seisoa[X]seisoo[Tt][Ap][P3][Ny][Ef]",
+      "MOOD": "indicative",
+      "NEGATIVE": "false",
+      "NUMBER": "singular",
+      "PERSON": "3",
+      "STRUCTURE": "=pppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+seisoa(seisoa)"
+    }
+  ],
+  "shakki": [
+    {
+      "BASEFORM": "shakki",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]shakki[X]shakk[Sn][Ny]i",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppppp",
+      "WORDBASES": "+shakki(shakki)"
+    }
+  ],
+  "sienimetsä": [
+    {
+      "BASEFORM": "sienimetsä",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]sieni[X]sien[Sn][Ny]i[Bh][Bc][Ln][Ica][Xp]metsä[X]mets[Sn][Ny]ä",
+      "NUMBER": "singular",
+      "POSSIBLE_GEOGRAPHICAL_NAME": "true",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppp=ppppp",
+      "WORDBASES": "+sieni(sieni)+metsä(metsä)"
+    }
+  ],
+  "sisko": [
+    {
+      "BASEFORM": "sisko",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]sisko[X]sisko[Sn][Ny]",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppp",
+      "WORDBASES": "+sisko(sisko)"
+    },
+    {
+      "BASEFORM": "Sisko",
+      "CLASS": "etunimi",
+      "FSTOUTPUT": "[Lee][Xp]Sisko[X]sisko[Sn][Ny]",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ipppp",
+      "WORDBASES": "+Sisko(Sisko)"
+    }
+  ],
+  "sulkea": [
+    {
+      "BASEFORM": "sulkea",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]sulkea[X]sulke[Tn1][Eb]a",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=pppppp",
+      "WORDBASES": "+sulkea(sulkea)"
+    }
+  ],
+  "suojatie": [
+    {
+      "BASEFORM": "suojatie",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]suoja[X]suoj[Sn][Ny]a[Bh][Bc][Ln][Ica][Xp]tie[X]tie[Sn][Ny]",
+      "NUMBER": "singular",
+      "POSSIBLE_GEOGRAPHICAL_NAME": "true",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppp=ppp",
+      "WORDBASES": "+suoja(suoja)+tie(tie)"
+    },
+    {
+      "BASEFORM": "suojatie",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Lt][Xp]suoda[X]suo[Ln][Xj]ja[X][Sn][Ny]ja[Bh][Bc][Ln][Ica][Xp]tie[X]tie[Sn][Ny]",
+      "NUMBER": "singular",
+      "POSSIBLE_GEOGRAPHICAL_NAME": "true",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppp=ppp",
+      "WORDBASES": "+suo(suoda)+ja(+ja)+tie(tie)"
+    }
+  ],
+  "suudella": [
+    {
+      "BASEFORM": "suudella",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]suudella[X]suudell[Tt][Ap][P4][Et]a",
+      "MOOD": "indicative",
+      "NEGATIVE": "true",
+      "PERSON": "4",
+      "STRUCTURE": "=pppppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+suudella(suudella)"
+    },
+    {
+      "BASEFORM": "suudella",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]suudella[X]suudell[Tn1][Eb]a",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=pppppppp",
+      "WORDBASES": "+suudella(suudella)"
+    }
+  ],
+  "suurempi": [
+    {
+      "BASEFORM": "suuri",
+      "CLASS": "laatusana",
+      "COMPARISON": "comparative",
+      "FSTOUTPUT": "[Lnl][Xp]suuri[X]suure[Sn][Ny][Cc]mpi",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppppppp",
+      "WORDBASES": "+suuri(suuri)"
+    }
+  ],
+  "suurenmpi": [],
+  "suuri": [
+    {
+      "BASEFORM": "suuri",
+      "CLASS": "nimisana_laatusana",
+      "COMPARISON": "positive",
+      "FSTOUTPUT": "[Lnl][Xp]suuri[X]suur[Sn][Ny]i",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppp",
+      "WORDBASES": "+suuri(suuri)"
+    }
+  ],
+  "sydä": [],
+  "syödä": [
+    {
+      "BASEFORM": "syödä",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]syödä[X]syöd[Tt][Ap][P4][Et]ä",
+      "MOOD": "indicative",
+      "NEGATIVE": "true",
+      "PERSON": "4",
+      "STRUCTURE": "=ppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+syödä(syödä)"
+    },
+    {
+      "BASEFORM": "syödä",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]syödä[X]syöd[Tn1][Eb]ä",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=ppppp",
+      "WORDBASES": "+syödä(syödä)"
+    }
+  ],
+  "taide": [
+    {
+      "BASEFORM": "taide",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]taide[X]taide[Sn][Ny]",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppp",
+      "WORDBASES": "+taide(taide)"
+    }
+  ],
+  "taiteilija": [
+    {
+      "BASEFORM": "taiteilija",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Lt][Xp]taiteilla[X]taiteili[Ln][Xj]ja[X][Sn][Ny]ja",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppppppppp",
+      "WORDBASES": "+taiteili(taiteilla)+ja(+ja)"
+    }
+  ],
+  "talo": [
+    {
+      "BASEFORM": "talo",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Ica][Xp]talo[X]talo[Sn][Ny]",
+      "NUMBER": "singular",
+      "POSSIBLE_GEOGRAPHICAL_NAME": "true",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppp",
+      "WORDBASES": "+talo(talo)"
+    }
+  ],
+  "talol": [],
+  "talon": [
+    {
+      "BASEFORM": "talo",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Ica][Xp]talo[X]talo[Sg][Ny]n",
+      "NUMBER": "singular",
+      "POSSIBLE_GEOGRAPHICAL_NAME": "true",
+      "SIJAMUOTO": "omanto",
+      "STRUCTURE": "=ppppp",
+      "WORDBASES": "+talo(talo)"
+    }
+  ],
+  "talous": [
+    {
+      "BASEFORM": "talous",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]talous[X]talou[Sn][Ny]s",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppppp",
+      "WORDBASES": "+talous(talous)"
+    }
+  ],
+  "tansia": [],
+  "tanssia": [
+    {
+      "BASEFORM": "tanssi",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]tanssi[X]tanss[Sp][Ny]ia",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "osanto",
+      "STRUCTURE": "=ppppppp",
+      "WORDBASES": "+tanssi(tanssi)"
+    },
+    {
+      "BASEFORM": "tanssia",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]tanssia[X]tanssi[Tn1][Eb]a",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=ppppppp",
+      "WORDBASES": "+tanssia(tanssia)"
+    }
+  ],
+  "teatteri": [
+    {
+      "BASEFORM": "teatteri",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]teatteri[X]teatter[Sn][Ny]i",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppppppp",
+      "WORDBASES": "+teatteri(teatteri)"
+    }
+  ],
+  "tennis": [
+    {
+      "BASEFORM": "tennis",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]tennis[X]tenni[Sn][Ny]s",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppppp",
+      "WORDBASES": "+tennis(tennis)"
+    }
+  ],
+  "tervetuloa": [
+    {
+      "BASEFORM": "tervetuloa",
+      "CLASS": "huudahdussana",
+      "FSTOUTPUT": "[Lh][Xp]terve=tuloa[X]terve[Bm]tuloa",
+      "STRUCTURE": "=ppppp=ppppp",
+      "WORDBASES": "+tervetuloa(terve=tuloa)"
+    },
+    {
+      "BASEFORM": "tervetulo",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Lnl][Xp]terve[X]terve[Sn][Ny][Bh][Bc][Ln][Xp]tulo[X]tulo[Sp][Ny]a",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "osanto",
+      "STRUCTURE": "=ppppp=ppppp",
+      "WORDBASES": "+terve(terve)+tulo(tulo)"
+    }
+  ],
+  "tietotekniikka": [
+    {
+      "BASEFORM": "tietotekniikka",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]tieto[X]tieto[Sn][Ny][Bh][Bc][Ln][Xp]tekniikka[X]tekniikk[Sn][Ny]a",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppp=ppppppppp",
+      "WORDBASES": "+tieto(tieto)+tekniikka(tekniikka)"
+    }
+  ],
+  "tietää": [
+    {
+      "BASEFORM": "tietää",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]tietää[X]tie[Tn1][Eb]tää",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=pppppp",
+      "WORDBASES": "+tietää(tietää)"
+    },
+    {
+      "BASEFORM": "tietää",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]tietää[X]tie[Tt][Ap][P3][Ny][Ef]tää",
+      "MOOD": "indicative",
+      "NEGATIVE": "false",
+      "NUMBER": "singular",
+      "PERSON": "3",
+      "STRUCTURE": "=pppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+tietää(tietää)"
+    }
+  ],
+  "toivoa": [
+    {
+      "BASEFORM": "toivo",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]toivo[X]toivo[Sp][Ny]a",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "osanto",
+      "STRUCTURE": "=pppppp",
+      "WORDBASES": "+toivo(toivo)"
+    },
+    {
+      "BASEFORM": "toivoa",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]toivoa[X]toivo[Tn1][Eb]a",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=pppppp",
+      "WORDBASES": "+toivoa(toivoa)"
+    },
+    {
+      "BASEFORM": "Toivo",
+      "CLASS": "etunimi",
+      "FSTOUTPUT": "[Lee][Xp]Toivo[X]toivo[Sp][Ny]a",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "osanto",
+      "STRUCTURE": "=ippppp",
+      "WORDBASES": "+Toivo(Toivo)"
+    }
+  ],
+  "tuntea": [
+    {
+      "BASEFORM": "tuntea",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]tuntea[X]tunte[Tn1][Eb]a",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=pppppp",
+      "WORDBASES": "+tuntea(tuntea)"
+    }
+  ],
+  "tyskennellä": [],
+  "tyttö": [
+    {
+      "BASEFORM": "tyttö",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]tyttö[X]tyttö[Sn][Ny]",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppp",
+      "WORDBASES": "+tyttö(tyttö)"
+    }
+  ],
+  "työskennellä": [
+    {
+      "BASEFORM": "työskennellä",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]työskennellä[X]työskennell[Tt][Ap][P4][Et]ä",
+      "MOOD": "indicative",
+      "NEGATIVE": "true",
+      "PERSON": "4",
+      "STRUCTURE": "=pppppppppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+työskennellä(työskennellä)"
+    },
+    {
+      "BASEFORM": "työskennellä",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]työskennellä[X]työskennell[Tn1][Eb]ä",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=pppppppppppp",
+      "WORDBASES": "+työskennellä(työskennellä)"
+    }
+  ],
+  "uimaranta": [
+    {
+      "BASEFORM": "uimaranta",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Lp]uima[Bh][Bc][Ln][Ica][Xp]ranta[X]rant[Sn][Ny]a",
+      "NUMBER": "singular",
+      "POSSIBLE_GEOGRAPHICAL_NAME": "true",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppp=ppppp",
+      "WORDBASES": "+uima+ranta(ranta)"
+    }
+  ],
+  "uinti": [
+    {
+      "BASEFORM": "uinti",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Lt][Xp]uida[X]ui[Ln]n[Xj]ti[X]t[Sn][Ny]i",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppp",
+      "WORDBASES": "+ui(uida)+n+ti(+ti)"
+    }
+  ],
+  "unohtaa": [
+    {
+      "BASEFORM": "unohtaa",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]unohtaa[X]unoht[Tt][Ap][P3][Ny][Ef]aa",
+      "MOOD": "indicative",
+      "NEGATIVE": "false",
+      "NUMBER": "singular",
+      "PERSON": "3",
+      "STRUCTURE": "=ppppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+unohtaa(unohtaa)"
+    },
+    {
+      "BASEFORM": "unohtaa",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]unohtaa[X]unohta[Tn1][Eb]a",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=ppppppp",
+      "WORDBASES": "+unohtaa(unohtaa)"
+    }
+  ],
+  "urheilija": [
+    {
+      "BASEFORM": "urheilija",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Lt][Xp]urheilla[X]urheili[Ln][Xj]ja[X][Sn][Ny]ja",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppppppp",
+      "WORDBASES": "+urheili(urheilla)+ja(+ja)"
+    }
+  ],
+  "uskoa": [
+    {
+      "BASEFORM": "uskoa",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]uskoa[X]usko[Tn1][Eb]a",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=ppppp",
+      "WORDBASES": "+uskoa(uskoa)"
+    },
+    {
+      "BASEFORM": "usko",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]usko[X]usko[Sp][Ny]a",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "osanto",
+      "STRUCTURE": "=ppppp",
+      "WORDBASES": "+usko(usko)"
+    }
+  ],
+  "vaatekauppa": [
+    {
+      "BASEFORM": "vaatekauppa",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]vaate[X]vaate[Sn][Ny][Bh][Bc][Ln][Xp]kauppa[X]kaupp[Sn][Ny]a",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppp=pppppp",
+      "WORDBASES": "+vaate(vaate)+kauppa(kauppa)"
+    }
+  ],
+  "vaellusreitti": [
+    {
+      "BASEFORM": "vaellusreitti",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Lt][Xp]vaeltaa[X]vaell[Ln][Xj]us[X]u[Sn][Ny]s[Bh][Bc][Ln][Xp]reitti[X]reitt[Sn][Ny]i",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppppp=pppppp",
+      "WORDBASES": "+vaell(vaeltaa)+us(+us)+reitti(reitti)"
+    }
+  ],
+  "veli": [
+    {
+      "BASEFORM": "veli",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]veli[X]vel[Sn][Ny]i",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppp",
+      "WORDBASES": "+veli(veli)"
+    },
+    {
+      "BASEFORM": "Veli",
+      "CLASS": "etunimi",
+      "FSTOUTPUT": "[Lee][Xp]Veli[X]vel[Sn][Ny]i",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ippp",
+      "WORDBASES": "+Veli(Veli)"
+    }
+  ],
+  "vesi": [
+    {
+      "BASEFORM": "vesi",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Ica][Xp]vesi[X]ve[Sn][Ny]si",
+      "NUMBER": "singular",
+      "POSSIBLE_GEOGRAPHICAL_NAME": "true",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppp",
+      "WORDBASES": "+vesi(vesi)"
+    }
+  ],
+  "vihata": [
+    {
+      "BASEFORM": "vihata",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]vihata[X]vihat[Tt][Ap][P4][Et]a",
+      "MOOD": "indicative",
+      "NEGATIVE": "true",
+      "PERSON": "4",
+      "STRUCTURE": "=pppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+vihata(vihata)"
+    },
+    {
+      "BASEFORM": "vihata",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]vihata[X]vihat[Tn1][Eb]a",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=pppppp",
+      "WORDBASES": "+vihata(vihata)"
+    }
+  ],
+  "vuori": [
+    {
+      "BASEFORM": "vuori",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Ica][Xp]vuori[X]vuor[Sn][Ny]i",
+      "NUMBER": "singular",
+      "POSSIBLE_GEOGRAPHICAL_NAME": "true",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppp",
+      "WORDBASES": "+vuori(vuori)"
+    },
+    {
+      "BASEFORM": "vuori",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]vuori[X]vuor[Sn][Ny]i",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppp",
+      "WORDBASES": "+vuori(vuori)"
+    },
+    {
+      "BASEFORM": "Vuori",
+      "CLASS": "sukunimi",
+      "FSTOUTPUT": "[Les][Xp]Vuori[X]vuor[Sn][Ny]i",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ipppp",
+      "WORDBASES": "+Vuori(Vuori)"
+    }
+  ],
+  "yliopisto": [
+    {
+      "BASEFORM": "yliopisto",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Lp]yli[Bh][Bc][Ln][Ion][Xp]opisto[X]opisto[Sn][Ny]",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppp=pppppp",
+      "WORDBASES": "+yli+opisto(opisto)"
+    },
+    {
+      "BASEFORM": "Yliopisto",
+      "CLASS": "nimi",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ipp=pppppp"
+    }
+  ],
+  "ymmärtää": [
+    {
+      "BASEFORM": "ymmärtää",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]ymmärtää[X]ymmär[Tn1][Eb]tää",
+      "MOOD": "A-infinitive",
+      "NEGATIVE": "both",
+      "STRUCTURE": "=pppppppp",
+      "WORDBASES": "+ymmärtää(ymmärtää)"
+    },
+    {
+      "BASEFORM": "ymmärtää",
+      "CLASS": "teonsana",
+      "FSTOUTPUT": "[Lt][Xp]ymmärtää[X]ymmär[Tt][Ap][P3][Ny][Ef]tää",
+      "MOOD": "indicative",
+      "NEGATIVE": "false",
+      "NUMBER": "singular",
+      "PERSON": "3",
+      "STRUCTURE": "=pppppppp",
+      "TENSE": "present_simple",
+      "WORDBASES": "+ymmärtää(ymmärtää)"
+    }
+  ],
+  "ympäristö": [
+    {
+      "BASEFORM": "ympäristö",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]ympäristö[X]ympäristö[Sn][Ny]",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=ppppppppp",
+      "WORDBASES": "+ympäristö(ympäristö)"
+    }
+  ],
+  "ystävä": [
+    {
+      "BASEFORM": "ystävä",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]ystävä[X]ystäv[Sn][Ny]ä",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppppp",
+      "WORDBASES": "+ystävä(ystävä)"
+    }
+  ],
+  "äiti": [
+    {
+      "BASEFORM": "äiti",
+      "CLASS": "nimisana",
+      "FSTOUTPUT": "[Ln][Xp]äiti[X]äit[Sn][Ny]i",
+      "NUMBER": "singular",
+      "SIJAMUOTO": "nimento",
+      "STRUCTURE": "=pppp",
+      "WORDBASES": "+äiti(äiti)"
+    }
+  ]
+}

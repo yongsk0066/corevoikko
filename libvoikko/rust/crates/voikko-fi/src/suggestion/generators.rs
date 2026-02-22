@@ -3,24 +3,15 @@
 //
 // Origin: spellchecker/suggestion/SuggestionGenerator*.cpp
 
+use voikko_core::analysis::ATTR_STRUCTURE;
 use voikko_core::character::{is_upper, simple_lower, simple_upper};
 use voikko_core::enums::SpellResult;
 
+use crate::morphology::Analyzer;
 use crate::speller::Speller;
 use super::status::SuggestionStatus;
 
-/// Back vowels used in Finnish vowel harmony (lowercase + uppercase).
-///
-/// Origin: SuggestionGeneratorVowelChange.cpp:35, SuggestionGeneratorSwap.cpp:38
-const BACK_VOWELS: &[char] = &['a', 'o', 'u', 'A', 'O', 'U'];
-
-/// Front vowels corresponding to back vowels (same index order).
-///
-/// Origin: SuggestionGeneratorVowelChange.cpp:36, SuggestionGeneratorSwap.cpp:39
-const FRONT_VOWELS: &[char] = &[
-    '\u{00E4}', '\u{00F6}', 'y',
-    '\u{00C4}', '\u{00D6}', 'Y',
-];
+use crate::finnish::constants::{BACK_VOWELS, FRONT_VOWELS};
 
 /// Soft hyphen character (U+00AD).
 const SOFT_HYPHEN: char = '\u{00AD}';
@@ -49,9 +40,9 @@ pub trait SuggestionGenerator {
 /// Check a candidate buffer against the speller and, if it passes, add
 /// it to the suggestion status with appropriate case corrections.
 ///
-/// This is the Rust equivalent of the static
-/// `SuggestionGeneratorCaseChange::suggestForBuffer` which every generator
-/// calls after constructing a candidate.
+/// This is the backward-compatible variant that does not use morphological
+/// analysis. For `CapitalizationError` results, the word is added as-is
+/// since no STRUCTURE data is available to determine correct case.
 ///
 /// Origin: SuggestionGeneratorCaseChange.cpp:49-106
 pub fn suggest_for_buffer(
@@ -59,6 +50,31 @@ pub fn suggest_for_buffer(
     status: &mut SuggestionStatus<'_>,
     buffer: &[char],
     buf_len: usize,
+) {
+    suggest_for_buffer_with_analyzer(speller, status, buffer, buf_len, None);
+}
+
+/// Check a candidate buffer against the speller and, if it passes, add
+/// it to the suggestion status with appropriate case corrections.
+///
+/// When an `Analyzer` is provided and the spell result is
+/// `CapitalizationError`, the analyzer is called to retrieve the
+/// STRUCTURE attribute. The STRUCTURE is then used to correct the
+/// capitalization of each letter:
+/// - `i` / `j` in STRUCTURE => uppercase
+/// - `p` / `q` in STRUCTURE => lowercase
+/// - `=` markers are skipped (compound boundaries)
+///
+/// This matches the C++ `SuggestionGeneratorCaseChange::suggestForBuffer`
+/// logic for the `SPELL_CAP_ERROR` case.
+///
+/// Origin: SuggestionGeneratorCaseChange.cpp:49-106
+pub fn suggest_for_buffer_with_analyzer(
+    speller: &dyn Speller,
+    status: &mut SuggestionStatus<'_>,
+    buffer: &[char],
+    buf_len: usize,
+    analyzer: Option<&dyn Analyzer>,
 ) {
     if status.should_abort() {
         return;
@@ -69,29 +85,99 @@ pub fn suggest_for_buffer(
     match result {
         SpellResult::Failed => {}
         SpellResult::Ok => {
+            let prio = compute_priority(analyzer, word, buf_len, result);
             let s: String = word.iter().collect();
-            status.add_suggestion(s, priority_from_result(result));
+            status.add_suggestion(s, prio);
         }
         SpellResult::CapitalizeFirst => {
+            let prio = compute_priority(analyzer, word, buf_len, result);
             let mut corrected: Vec<char> = word.to_vec();
             corrected[0] = simple_upper(corrected[0]);
             let s: String = corrected.iter().collect();
-            status.add_suggestion(s, priority_from_result(result));
+            status.add_suggestion(s, prio);
         }
         SpellResult::CapitalizationError => {
-            // The speller already told us the word exists but with
-            // different capitalization. We would need analysis STRUCTURE
-            // data to fix it properly. For now, just add the word as-is
-            // with a high priority penalty, matching the C++ behavior
-            // where the full analysis path is available.
+            // Use morphological analysis to determine correct capitalization
+            // from the STRUCTURE attribute when an analyzer is available.
             //
-            // In the C++ code this calls morAnalyzer->analyze() to read
-            // the STRUCTURE attribute and fix case. We approximate by
-            // adding the word unchanged.
-            let s: String = word.iter().collect();
-            status.add_suggestion(s, priority_from_result(result));
+            // Origin: SuggestionGeneratorCaseChange.cpp:75-104
+            if let Some(analyzer) = analyzer {
+                let analyses = analyzer.analyze(word, buf_len);
+                status.charge();
+                if analyses.is_empty() {
+                    return;
+                }
+                let prio = best_priority_from_analyses(&analyses, result);
+                // Use the STRUCTURE from the first analysis.
+                if let Some(structure) = analyses[0].get(ATTR_STRUCTURE) {
+                    let corrected = apply_structure_case(word, structure);
+                    let s: String = corrected.iter().collect();
+                    status.add_suggestion(s, prio);
+                } else {
+                    // No STRUCTURE attribute; add word as-is.
+                    let s: String = word.iter().collect();
+                    status.add_suggestion(s, prio);
+                }
+            } else {
+                // No analyzer available; add the word unchanged.
+                let s: String = word.iter().collect();
+                status.add_suggestion(s, priority_from_result(result));
+            }
         }
     }
+}
+
+/// Compute priority, using rich analysis-based priority when an analyzer
+/// is available, or falling back to simple spell-result-based priority.
+fn compute_priority(
+    analyzer: Option<&dyn Analyzer>,
+    word: &[char],
+    word_len: usize,
+    result: SpellResult,
+) -> i32 {
+    if let Some(analyzer) = analyzer {
+        let analyses = analyzer.analyze(word, word_len);
+        if !analyses.is_empty() {
+            return best_priority_from_analyses(&analyses, result);
+        }
+    }
+    priority_from_result(result)
+}
+
+/// Apply case corrections to a word based on its STRUCTURE attribute.
+///
+/// The STRUCTURE attribute encodes the expected case for each letter:
+/// - `i` / `j` => the corresponding letter should be uppercase
+/// - `p` / `q` => the corresponding letter should be lowercase
+/// - `=` => compound boundary marker (skipped; does not consume a word char)
+///
+/// Origin: SuggestionGeneratorCaseChange.cpp:86-101
+fn apply_structure_case(word: &[char], structure: &str) -> Vec<char> {
+    let mut result: Vec<char> = word.to_vec();
+    let struct_chars: Vec<char> = structure.chars().collect();
+    let mut j = 0;
+
+    for ch in &mut result {
+        // Skip compound boundary markers.
+        while j < struct_chars.len() && struct_chars[j] == '=' {
+            j += 1;
+        }
+        if j >= struct_chars.len() {
+            break;
+        }
+        match struct_chars[j] {
+            'i' | 'j' => {
+                *ch = simple_upper(*ch);
+            }
+            'p' | 'q' => {
+                *ch = simple_lower(*ch);
+            }
+            _ => {}
+        }
+        j += 1;
+    }
+
+    result
 }
 
 /// Map a `SpellResult` to a base priority value.
@@ -108,6 +194,124 @@ fn priority_from_result(result: SpellResult) -> i32 {
         SpellResult::CapitalizationError => 3,
         SpellResult::Failed => i32::MAX,
     }
+}
+
+// =========================================================================
+// Rich priority calculation (with morphological analysis)
+// =========================================================================
+
+/// Compute a priority value from a noun's inflection form (SIJAMUOTO).
+///
+/// Nominative and genitive forms get the best priority because they are
+/// the most commonly used forms. Rarer cases get progressively higher
+/// (worse) priority values.
+///
+/// Origin: SpellWithPriority.cpp:38-90 (getPriorityFromNounInflection)
+fn priority_from_noun_inflection(sijamuoto: Option<&str>) -> i32 {
+    match sijamuoto {
+        None => 4,
+        Some("nimento") => 2,          // nominative
+        Some("omanto") => 3,            // genitive
+        Some("osanto") => 5,            // partitive
+        Some("sisaolento") => 8,        // inessive
+        Some("sisaeronto") => 12,       // elative
+        Some("sisatulento") => 8,       // illative
+        Some("ulkoolento") => 12,       // adessive
+        Some("ulkoeronto") => 30,       // ablative
+        Some("ulkotulento") => 20,      // allative
+        Some("olento") => 20,           // essive
+        Some("tulento") => 20,          // translative
+        Some("vajanto") => 60,          // abessive
+        Some("seuranto") => 60,         // comitative
+        Some("keinonto") => 20,         // instructive
+        Some(_) => 4,
+    }
+}
+
+/// Compute a priority value from a word's CLASS and inflection.
+///
+/// Nouns, adjectives, pronouns, and proper names use inflection-based
+/// priority. Other word classes get a default priority of 4.
+///
+/// Origin: SpellWithPriority.cpp:92-112 (getPriorityFromWordClassAndInflection)
+fn priority_from_word_class_and_inflection(
+    word_class: Option<&str>,
+    sijamuoto: Option<&str>,
+) -> i32 {
+    match word_class {
+        Some("nimisana")
+        | Some("laatusana")
+        | Some("nimisana_laatusana")
+        | Some("asemosana")
+        | Some("etunimi")
+        | Some("sukunimi")
+        | Some("paikannimi")
+        | Some("nimi") => priority_from_noun_inflection(sijamuoto),
+        _ => 4,
+    }
+}
+
+/// Compute a priority penalty based on the number of compound word parts
+/// in the STRUCTURE attribute.
+///
+/// Non-compound words (1 part) get priority 1 (best). Each additional
+/// compound part multiplies the priority by 8 (i.e., `1 << (3 * (parts - 1))`).
+///
+/// Origin: SpellWithPriority.cpp:114-130 (getPriorityFromStructure)
+fn priority_from_structure(structure: &str) -> i32 {
+    let count_parts = structure
+        .chars()
+        .filter(|&c| c == '=')
+        .take(5)
+        .count();
+    if count_parts == 0 {
+        return 1; // won't happen with a valid dictionary
+    }
+    1 << (3 * (count_parts - 1))
+}
+
+/// Compute a rich priority for a single morphological analysis.
+///
+/// Combines word class/inflection priority, compound structure penalty,
+/// and spell result priority: `class_prio * structure_prio * result_prio`.
+///
+/// Origin: SpellWithPriority.cpp:146-154 (handleAnalysis)
+pub(crate) fn priority_from_analysis(
+    analysis: &voikko_core::analysis::Analysis,
+    result: SpellResult,
+) -> i32 {
+    let word_class = analysis.get(voikko_core::analysis::ATTR_CLASS);
+    let sijamuoto = analysis.get(voikko_core::analysis::ATTR_SIJAMUOTO);
+    let structure = analysis
+        .get(ATTR_STRUCTURE)
+        .unwrap_or("=p");
+
+    let class_prio = priority_from_word_class_and_inflection(word_class, sijamuoto);
+    let struct_prio = priority_from_structure(structure);
+    let result_prio = priority_from_result(result);
+
+    class_prio * struct_prio * result_prio
+}
+
+/// Compute the best priority across all analyses of a word.
+///
+/// Iterates through all analyses, picking the best (lowest) priority
+/// for the best spell result. This matches the C++ `spellWithPriority`
+/// behavior.
+///
+/// Origin: SpellWithPriority.cpp:156-187
+pub(crate) fn best_priority_from_analyses(
+    analyses: &[voikko_core::analysis::Analysis],
+    result: SpellResult,
+) -> i32 {
+    if analyses.is_empty() {
+        return priority_from_result(result);
+    }
+    analyses
+        .iter()
+        .map(|a| priority_from_analysis(a, result))
+        .min()
+        .unwrap_or(priority_from_result(result))
 }
 
 // =========================================================================
@@ -1097,5 +1301,281 @@ mod tests {
         status.set_max_cost(0); // will abort immediately
         Deletion.generate(&speller, &mut status);
         // Should not panic, even if budget is 0
+    }
+
+    // --- apply_structure_case ---
+
+    #[test]
+    fn apply_structure_case_all_lowercase() {
+        let word = chars("koira");
+        let result = apply_structure_case(&word, "=ppppp");
+        let s: String = result.iter().collect();
+        assert_eq!(s, "koira");
+    }
+
+    #[test]
+    fn apply_structure_case_first_uppercase() {
+        let word = chars("helsinki");
+        let result = apply_structure_case(&word, "=ippppppp");
+        let s: String = result.iter().collect();
+        assert_eq!(s, "Helsinki");
+    }
+
+    #[test]
+    fn apply_structure_case_mixed() {
+        // "abc" with structure "=ipq" -> "Abc"
+        let word = chars("abc");
+        let result = apply_structure_case(&word, "=ipq");
+        let s: String = result.iter().collect();
+        assert_eq!(s, "Abc");
+    }
+
+    #[test]
+    fn apply_structure_case_compound() {
+        // Compound word: skip '=' markers
+        let word = chars("koiratalo");
+        let result = apply_structure_case(&word, "=ppppp=pppp");
+        let s: String = result.iter().collect();
+        assert_eq!(s, "koiratalo");
+    }
+
+    #[test]
+    fn apply_structure_case_uppercase_to_lowercase() {
+        // "KOIRA" with structure "=ppppp" -> "koira"
+        let word = chars("KOIRA");
+        let result = apply_structure_case(&word, "=ppppp");
+        let s: String = result.iter().collect();
+        assert_eq!(s, "koira");
+    }
+
+    // --- suggest_for_buffer_with_analyzer ---
+
+    /// A mock speller that returns a specific SpellResult for specific words.
+    struct CapErrorSpeller {
+        cap_error_words: Vec<String>,
+    }
+
+    impl CapErrorSpeller {
+        fn new(words: &[&str]) -> Self {
+            Self {
+                cap_error_words: words.iter().map(|s| s.to_string()).collect(),
+            }
+        }
+    }
+
+    impl Speller for CapErrorSpeller {
+        fn spell(&self, word: &[char], word_len: usize) -> SpellResult {
+            let s: String = word[..word_len].iter().collect();
+            if self.cap_error_words.contains(&s) {
+                SpellResult::CapitalizationError
+            } else {
+                SpellResult::Failed
+            }
+        }
+    }
+
+    /// A mock analyzer that returns pre-configured analyses.
+    struct MockAnalyzer {
+        entries: Vec<(String, Vec<voikko_core::analysis::Analysis>)>,
+    }
+
+    impl MockAnalyzer {
+        fn new() -> Self {
+            Self {
+                entries: Vec::new(),
+            }
+        }
+
+        fn add(&mut self, word: &str, analyses: Vec<voikko_core::analysis::Analysis>) {
+            self.entries.push((word.to_string(), analyses));
+        }
+    }
+
+    impl Analyzer for MockAnalyzer {
+        fn analyze(&self, word: &[char], _word_len: usize) -> Vec<voikko_core::analysis::Analysis> {
+            let word_str: String = word.iter().collect();
+            for (w, analyses) in &self.entries {
+                if *w == word_str {
+                    return analyses.clone();
+                }
+            }
+            Vec::new()
+        }
+    }
+
+    fn make_analysis(pairs: &[(&str, &str)]) -> voikko_core::analysis::Analysis {
+        let mut a = voikko_core::analysis::Analysis::new();
+        for &(k, v) in pairs {
+            a.set(k, v);
+        }
+        a
+    }
+
+    #[test]
+    fn suggest_for_buffer_with_analyzer_fixes_case() {
+        // "helsinki" -> speller returns CapitalizationError
+        // analyzer says STRUCTURE "=ippppppp" -> should produce "Helsinki"
+        let speller = CapErrorSpeller::new(&["helsinki"]);
+        let mut analyzer = MockAnalyzer::new();
+        analyzer.add(
+            "helsinki",
+            vec![make_analysis(&[(ATTR_STRUCTURE, "=ippppppp")])],
+        );
+
+        let word = chars("helsinki");
+        let mut status = SuggestionStatus::new(&word, 5);
+        status.set_max_cost(100);
+
+        suggest_for_buffer_with_analyzer(
+            &speller,
+            &mut status,
+            &word,
+            word.len(),
+            Some(&analyzer),
+        );
+
+        assert_eq!(status.suggestion_count(), 1);
+        assert_eq!(status.suggestions()[0].word, "Helsinki");
+    }
+
+    #[test]
+    fn suggest_for_buffer_without_analyzer_adds_unchanged() {
+        // Without analyzer, CapitalizationError adds word as-is.
+        let speller = CapErrorSpeller::new(&["helsinki"]);
+        let word = chars("helsinki");
+        let mut status = SuggestionStatus::new(&word, 5);
+        status.set_max_cost(100);
+
+        suggest_for_buffer_with_analyzer(&speller, &mut status, &word, word.len(), None);
+
+        assert_eq!(status.suggestion_count(), 1);
+        assert_eq!(status.suggestions()[0].word, "helsinki");
+    }
+
+    #[test]
+    fn suggest_for_buffer_with_analyzer_no_analyses_returns_nothing() {
+        // If the analyzer returns no analyses, no suggestion is added.
+        let speller = CapErrorSpeller::new(&["xyz"]);
+        let analyzer = MockAnalyzer::new(); // empty
+
+        let word = chars("xyz");
+        let mut status = SuggestionStatus::new(&word, 5);
+        status.set_max_cost(100);
+
+        suggest_for_buffer_with_analyzer(
+            &speller,
+            &mut status,
+            &word,
+            word.len(),
+            Some(&analyzer),
+        );
+
+        assert_eq!(status.suggestion_count(), 0);
+    }
+
+    // --- Rich priority tests ---
+
+    #[test]
+    fn priority_from_noun_inflection_nominative_best() {
+        assert_eq!(priority_from_noun_inflection(Some("nimento")), 2);
+    }
+
+    #[test]
+    fn priority_from_noun_inflection_genitive() {
+        assert_eq!(priority_from_noun_inflection(Some("omanto")), 3);
+    }
+
+    #[test]
+    fn priority_from_noun_inflection_abessive_worst() {
+        assert_eq!(priority_from_noun_inflection(Some("vajanto")), 60);
+    }
+
+    #[test]
+    fn priority_from_noun_inflection_unknown() {
+        assert_eq!(priority_from_noun_inflection(None), 4);
+        assert_eq!(priority_from_noun_inflection(Some("tuntematon")), 4);
+    }
+
+    #[test]
+    fn priority_noun_nominative_is_better_than_verb() {
+        // Noun in nominative: class=2, struct=1, result=1 => 2
+        // Verb (default class=4): class=4, struct=1, result=1 => 4
+        let noun = make_analysis(&[
+            (ATTR_STRUCTURE, "=ppppp"),
+            ("CLASS", "nimisana"),
+            ("SIJAMUOTO", "nimento"),
+        ]);
+        let verb = make_analysis(&[
+            (ATTR_STRUCTURE, "=pppppp"),
+            ("CLASS", "teonsana"),
+        ]);
+        let noun_prio = priority_from_analysis(&noun, SpellResult::Ok);
+        let verb_prio = priority_from_analysis(&verb, SpellResult::Ok);
+        assert!(noun_prio < verb_prio);
+    }
+
+    #[test]
+    fn priority_compound_word_penalty() {
+        // Single part: structure "=ppppp" (1 '=') => struct_prio = 1
+        // Two parts: structure "=ppp=ppppp" (2 '=') => struct_prio = 8
+        assert_eq!(priority_from_structure("=ppppp"), 1);
+        assert_eq!(priority_from_structure("=ppp=ppppp"), 8);
+        assert_eq!(priority_from_structure("=pp=pp=pp"), 64);
+    }
+
+    #[test]
+    fn priority_compound_word_worse_than_simple() {
+        let simple = make_analysis(&[
+            (ATTR_STRUCTURE, "=ppppp"),
+            ("CLASS", "nimisana"),
+            ("SIJAMUOTO", "nimento"),
+        ]);
+        let compound = make_analysis(&[
+            (ATTR_STRUCTURE, "=ppppp=pppp"),
+            ("CLASS", "nimisana"),
+            ("SIJAMUOTO", "nimento"),
+        ]);
+        let simple_prio = priority_from_analysis(&simple, SpellResult::Ok);
+        let compound_prio = priority_from_analysis(&compound, SpellResult::Ok);
+        assert!(simple_prio < compound_prio);
+    }
+
+    #[test]
+    fn priority_spell_ok_better_than_cap_first() {
+        let analysis = make_analysis(&[
+            (ATTR_STRUCTURE, "=ppppp"),
+            ("CLASS", "nimisana"),
+            ("SIJAMUOTO", "nimento"),
+        ]);
+        let ok_prio = priority_from_analysis(&analysis, SpellResult::Ok);
+        let cap_prio = priority_from_analysis(&analysis, SpellResult::CapitalizeFirst);
+        assert!(ok_prio < cap_prio);
+    }
+
+    #[test]
+    fn best_priority_picks_lowest() {
+        let analyses = vec![
+            make_analysis(&[
+                (ATTR_STRUCTURE, "=ppppp=pppp"),
+                ("CLASS", "nimisana"),
+                ("SIJAMUOTO", "ulkoeronto"),
+            ]),
+            make_analysis(&[
+                (ATTR_STRUCTURE, "=ppppp"),
+                ("CLASS", "nimisana"),
+                ("SIJAMUOTO", "nimento"),
+            ]),
+        ];
+        let best = best_priority_from_analyses(&analyses, SpellResult::Ok);
+        // The second analysis (simple noun, nominative) should win.
+        let expected = priority_from_analysis(&analyses[1], SpellResult::Ok);
+        assert_eq!(best, expected);
+    }
+
+    #[test]
+    fn best_priority_empty_analyses_uses_flat() {
+        let empty: Vec<voikko_core::analysis::Analysis> = Vec::new();
+        let prio = best_priority_from_analyses(&empty, SpellResult::Ok);
+        assert_eq!(prio, priority_from_result(SpellResult::Ok));
     }
 }

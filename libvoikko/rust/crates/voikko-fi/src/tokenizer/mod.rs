@@ -410,13 +410,38 @@ fn dot_part_of_word(text: &[char], spell_check: SpellCheckFn<'_>) -> bool {
 /// from `pos` to the end of the sentence (including trailing whitespace up
 /// to but not including the next sentence's first token).
 ///
-/// The optional `spell_check` callback is used for abbreviation detection in
-/// `dot_part_of_word`. If `None`, only heuristic abbreviation detection is
-/// used (initials and ordinal numbers).
+/// This version uses heuristic-only abbreviation detection (initials and
+/// ordinal numbers). Use `next_sentence_with_speller` for speller-backed
+/// abbreviation detection, or `next_sentence_with_spell_check` for a
+/// custom callback.
 ///
 /// Origin: Sentence.cpp:72-142 (Sentence::next)
 pub fn next_sentence(text: &[char], text_len: usize, pos: usize) -> (SentenceType, usize) {
     next_sentence_with_spell_check(text, text_len, pos, None)
+}
+
+/// Find the next sentence boundary with speller-backed abbreviation detection.
+///
+/// When a word followed by a dot is recognized by the speller (i.e., the
+/// word-with-dot is a valid dictionary entry), the dot is treated as part
+/// of the word (abbreviation) rather than a sentence-ending period. This
+/// prevents false sentence splits at abbreviations like "esim." or "huom.".
+///
+/// The speller is called with the word INCLUDING the trailing dot (matching
+/// the C++ `dot_part_of_word` behavior at Sentence.cpp:66-68).
+///
+/// Origin: Sentence.cpp:42-70 (dot_part_of_word with speller), Sentence.cpp:72-142
+pub fn next_sentence_with_speller(
+    text: &[char],
+    text_len: usize,
+    pos: usize,
+    speller: &dyn crate::speller::Speller,
+) -> (SentenceType, usize) {
+    let check_fn = |word: &[char]| -> bool {
+        use voikko_core::enums::SpellResult;
+        speller.spell(word, word.len()) != SpellResult::Failed
+    };
+    next_sentence_with_spell_check(text, text_len, pos, Some(&check_fn))
 }
 
 /// Find the next sentence boundary with an optional spell-checker callback
@@ -1345,5 +1370,105 @@ mod tests {
         }
         // We should find at least 3 sentence boundaries (Hei!, Miten menee?, Hyvin kiitos.)
         assert!(sentence_count >= 3);
+    }
+
+    // =========================================================================
+    // Spell-check callback tests
+    // =========================================================================
+
+    #[test]
+    fn spell_check_callback_abbreviation_detection() {
+        // Without spell checker: "esim. talo" splits at "esim." because
+        // it doesn't match the heuristic checks (not an initial, not a number).
+        let s = "esim. talo on korkea.";
+        let chars: Vec<char> = s.chars().collect();
+        let (stype_no_spell, slen_no_spell) = next_sentence(&chars, chars.len(), 0);
+        // Without speller: "esim." is followed by " " then "talo" => Probable
+        assert_eq!(stype_no_spell, SentenceType::Probable);
+        let first_text: String = chars[..slen_no_spell].iter().collect();
+        assert_eq!(first_text, "esim. ");
+
+        // With spell checker: "esim." is a known abbreviation, so the dot
+        // is part of the word and the sentence boundary is Possible (dotword).
+        let check_fn = |word: &[char]| -> bool {
+            let s: String = word.iter().collect();
+            // "esim." is a known abbreviation
+            s == "esim."
+        };
+        let (stype_with_spell, _) =
+            next_sentence_with_spell_check(&chars, chars.len(), 0, Some(&check_fn));
+        assert_eq!(stype_with_spell, SentenceType::Possible);
+    }
+
+    #[test]
+    fn spell_check_callback_non_abbreviation() {
+        // "koira." is not a known abbreviation, so speller returns false
+        // and the dot is treated as sentence-ending.
+        let s = "koira. kissa.";
+        let chars: Vec<char> = s.chars().collect();
+        let check_fn = |_word: &[char]| -> bool { false };
+        let (stype, slen) =
+            next_sentence_with_spell_check(&chars, chars.len(), 0, Some(&check_fn));
+        assert_eq!(stype, SentenceType::Probable);
+        let first_text: String = chars[..slen].iter().collect();
+        assert_eq!(first_text, "koira. ");
+    }
+
+    #[test]
+    fn next_sentence_with_speller_abbreviation() {
+        use crate::speller::Speller;
+        use voikko_core::enums::SpellResult;
+
+        /// Mock speller that accepts specific words.
+        struct AbbrevSpeller;
+        impl Speller for AbbrevSpeller {
+            fn spell(&self, word: &[char], word_len: usize) -> SpellResult {
+                let s: String = word[..word_len].iter().collect();
+                // "esim." is a known abbreviation (spelled correctly with dot)
+                if s == "esim." {
+                    SpellResult::Ok
+                } else {
+                    SpellResult::Failed
+                }
+            }
+        }
+
+        let speller = AbbrevSpeller;
+        let s = "esim. talo on korkea.";
+        let chars: Vec<char> = s.chars().collect();
+
+        // With speller: "esim." recognized => dotword => Possible
+        let (stype, _) =
+            next_sentence_with_speller(&chars, chars.len(), 0, &speller);
+        assert_eq!(stype, SentenceType::Possible);
+
+        // Compare with no speller: "esim." not recognized => Probable
+        let (stype_no, _) = next_sentence(&chars, chars.len(), 0);
+        assert_eq!(stype_no, SentenceType::Probable);
+    }
+
+    #[test]
+    fn next_sentence_with_speller_non_abbreviation() {
+        use crate::speller::Speller;
+        use voikko_core::enums::SpellResult;
+
+        /// Mock speller that rejects all words.
+        struct RejectAllSpeller;
+        impl Speller for RejectAllSpeller {
+            fn spell(&self, _word: &[char], _word_len: usize) -> SpellResult {
+                SpellResult::Failed
+            }
+        }
+
+        let speller = RejectAllSpeller;
+        let s = "Koira juoksi. Kissa nukkui.";
+        let chars: Vec<char> = s.chars().collect();
+
+        // Normal sentence boundary behavior should still work
+        let (stype, slen) =
+            next_sentence_with_speller(&chars, chars.len(), 0, &speller);
+        assert_eq!(stype, SentenceType::Probable);
+        let first_text: String = chars[..slen].iter().collect();
+        assert_eq!(first_text, "Koira juoksi. ");
     }
 }

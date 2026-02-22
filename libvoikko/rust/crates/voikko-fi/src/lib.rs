@@ -1,3 +1,4 @@
+pub(crate) mod finnish;
 #[cfg(feature = "analyze")]
 pub mod morphology;
 #[cfg(feature = "spell")]
@@ -9,3 +10,5 @@ pub mod tokenizer;
 pub mod suggestion;
 #[cfg(feature = "grammar")]
 pub mod grammar;
+#[cfg(feature = "handle")]
+pub mod handle;

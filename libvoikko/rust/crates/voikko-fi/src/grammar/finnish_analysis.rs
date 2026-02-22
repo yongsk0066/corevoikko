@@ -1,6 +1,5 @@
 // Finnish morphological analysis to grammar token annotation
 // Origin: grammar/FinnishAnalysis.hpp, FinnishAnalysis.cpp
-#![allow(dead_code)]
 
 use voikko_core::analysis::{
     ATTR_CLASS, ATTR_MOOD, ATTR_NEGATIVE, ATTR_PARTICIPLE, ATTR_PERSON,

@@ -3,7 +3,6 @@
 // Each check is an independent function that takes annotated tokens and
 // returns a list of grammar errors. The checks are composed by the engine
 // module (FinnishRuleEngine).
-#![allow(dead_code)]
 //
 // Origin: grammar/FinnishRuleEngine/checks.cpp
 //         grammar/FinnishRuleEngine/CapitalizationCheck.cpp

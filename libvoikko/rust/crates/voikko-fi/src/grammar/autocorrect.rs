@@ -1,4 +1,3 @@
-#![allow(dead_code)]
 // VfstAutocorrectCheck: autocorrect via FST transducer.
 //
 // For each word in a sentence, checks if the autocorrect transducer
@@ -145,10 +144,8 @@ fn gc_autocorrect_inner(
 
     // Run the transducer at each word start position.
     let mut config = transducer.new_config(BUFFER_SIZE);
-    let mut ucs_iter = lookup_positions_ucs.iter();
 
-    for &position in &lookup_positions_utf {
-        let ucs_position = *ucs_iter.next().unwrap();
+    for (&position, &ucs_position) in lookup_positions_utf.iter().zip(lookup_positions_ucs.iter()) {
 
         if lower_first && position > 0 {
             break;
@@ -272,42 +269,306 @@ mod tests {
         assert!(errs.is_empty());
     }
 
-    // Helper: build a minimal VFST that accepts nothing (no normal transitions).
-    fn build_minimal_vfst() -> Vec<u8> {
-        use voikko_fst::transition::Transition;
+    // ====================================================================
+    // VFST builder helpers
+    // ====================================================================
 
-        // Symbols: [epsilon]
-        let symbols: &[&str] = &[""];
-        let mut data = Vec::new();
+    use voikko_fst::transition::Transition;
 
-        // Header (16 bytes)
-        let mut header = vec![0u8; 16];
-        header[..4].copy_from_slice(&0x0001_3A6Eu32.to_le_bytes());
-        header[4..8].copy_from_slice(&0x0003_51FAu32.to_le_bytes());
-        header[8] = 0; // unweighted
-        data.extend_from_slice(&header);
+    fn build_header() -> Vec<u8> {
+        let mut buf = vec![0u8; 16];
+        buf[..4].copy_from_slice(&0x0001_3A6Eu32.to_le_bytes());
+        buf[4..8].copy_from_slice(&0x0003_51FAu32.to_le_bytes());
+        buf[8] = 0; // unweighted
+        buf
+    }
 
-        // Symbol table
-        data.extend_from_slice(&(symbols.len() as u16).to_le_bytes());
+    fn build_symbol_table(symbols: &[&str]) -> Vec<u8> {
+        let mut buf = Vec::new();
+        buf.extend_from_slice(&(symbols.len() as u16).to_le_bytes());
         for s in symbols {
-            data.extend_from_slice(s.as_bytes());
-            data.push(0);
+            buf.extend_from_slice(s.as_bytes());
+            buf.push(0);
         }
+        buf
+    }
 
-        // Align to 8 bytes
+    fn make_transition(sym_in: u16, sym_out: u16, target: u32, more: u8) -> Transition {
+        Transition {
+            sym_in,
+            sym_out,
+            trans_info: (target & 0x00FF_FFFF) | ((more as u32) << 24),
+        }
+    }
+
+    fn align_to_8(data: &mut Vec<u8>) {
         let partial = data.len() % 8;
         if partial > 0 {
             data.extend(std::iter::repeat_n(0u8, 8 - partial));
         }
+    }
+
+    /// Build a minimal VFST that accepts nothing (no normal transitions).
+    fn build_minimal_vfst() -> Vec<u8> {
+        let symbols: &[&str] = &[""];
+        let mut data = Vec::new();
+        data.extend_from_slice(&build_header());
+        data.extend_from_slice(&build_symbol_table(symbols));
+        align_to_8(&mut data);
 
         // State 0: final transition only
-        let t = Transition {
-            sym_in: 0xFFFF,
-            sym_out: 0,
-            trans_info: 0,
-        };
-        data.extend_from_slice(bytemuck::bytes_of(&t));
+        data.extend_from_slice(bytemuck::bytes_of(&make_transition(0xFFFF, 0, 0, 0)));
+        data
+    }
+
+    /// Build a VFST that maps "ab" -> "xy".
+    ///
+    /// Symbol table: ["", "a", "b", "x", "y"]
+    ///   index:        0    1    2    3    4
+    ///
+    /// States:
+    ///   State 0 (idx 0): 'a'(1) -> State 1, output 'x'(3)
+    ///   State 1 (idx 1): 'b'(2) -> State 2, output 'y'(4)
+    ///   State 2 (idx 2): final (0xFFFF)
+    fn build_ab_to_xy_vfst() -> Vec<u8> {
+        let symbols: &[&str] = &["", "a", "b", "x", "y"];
+        let mut data = Vec::new();
+        data.extend_from_slice(&build_header());
+        data.extend_from_slice(&build_symbol_table(symbols));
+        align_to_8(&mut data);
+
+        // State 0: 'a' -> state 1, output 'x'
+        data.extend_from_slice(bytemuck::bytes_of(&make_transition(1, 3, 1, 0)));
+        // State 1: 'b' -> state 2, output 'y'
+        data.extend_from_slice(bytemuck::bytes_of(&make_transition(2, 4, 2, 0)));
+        // State 2: final
+        data.extend_from_slice(bytemuck::bytes_of(&make_transition(0xFFFF, 0, 0, 0)));
 
         data
+    }
+
+    /// Build a VFST that maps "abc" -> "xyz".
+    ///
+    /// Symbol table: ["", "a", "b", "c", "x", "y", "z"]
+    ///   index:        0    1    2    3    4    5    6
+    fn build_abc_to_xyz_vfst() -> Vec<u8> {
+        let symbols: &[&str] = &["", "a", "b", "c", "x", "y", "z"];
+        let mut data = Vec::new();
+        data.extend_from_slice(&build_header());
+        data.extend_from_slice(&build_symbol_table(symbols));
+        align_to_8(&mut data);
+
+        // State 0: 'a'(1) -> state 1, output 'x'(4)
+        data.extend_from_slice(bytemuck::bytes_of(&make_transition(1, 4, 1, 0)));
+        // State 1: 'b'(2) -> state 2, output 'y'(5)
+        data.extend_from_slice(bytemuck::bytes_of(&make_transition(2, 5, 2, 0)));
+        // State 2: 'c'(3) -> state 3, output 'z'(6)
+        data.extend_from_slice(bytemuck::bytes_of(&make_transition(3, 6, 3, 0)));
+        // State 3: final
+        data.extend_from_slice(bytemuck::bytes_of(&make_transition(0xFFFF, 0, 0, 0)));
+
+        data
+    }
+
+    /// Build a VFST that maps "ab cd" -> "ef gh" (multi-word prefix match).
+    ///
+    /// The transducer matches "ab cd" as a 5-character prefix (a, b, space, c, d).
+    ///
+    /// Symbol table: ["", "a", "b", " ", "c", "d", "e", "f", "g", "h"]
+    ///   index:        0    1    2    3    4    5    6    7    8    9
+    fn build_ab_cd_to_ef_gh_vfst() -> Vec<u8> {
+        let symbols: &[&str] = &["", "a", "b", " ", "c", "d", "e", "f", "g", "h"];
+        let mut data = Vec::new();
+        data.extend_from_slice(&build_header());
+        data.extend_from_slice(&build_symbol_table(symbols));
+        align_to_8(&mut data);
+
+        // State 0: 'a'(1) -> state 1, output 'e'(6)
+        data.extend_from_slice(bytemuck::bytes_of(&make_transition(1, 6, 1, 0)));
+        // State 1: 'b'(2) -> state 2, output 'f'(7)
+        data.extend_from_slice(bytemuck::bytes_of(&make_transition(2, 7, 2, 0)));
+        // State 2: ' '(3) -> state 3, output ' '(3)
+        data.extend_from_slice(bytemuck::bytes_of(&make_transition(3, 3, 3, 0)));
+        // State 3: 'c'(4) -> state 4, output 'g'(8)
+        data.extend_from_slice(bytemuck::bytes_of(&make_transition(4, 8, 4, 0)));
+        // State 4: 'd'(5) -> state 5, output 'h'(9)
+        data.extend_from_slice(bytemuck::bytes_of(&make_transition(5, 9, 5, 0)));
+        // State 5: final
+        data.extend_from_slice(bytemuck::bytes_of(&make_transition(0xFFFF, 0, 0, 0)));
+
+        data
+    }
+
+    // ====================================================================
+    // Successful match tests
+    // ====================================================================
+
+    #[test]
+    fn single_word_match_produces_correction() {
+        // Sentence: "ab" (single word token).
+        // Transducer maps "ab" -> "xy".
+        // Expected: one GCERR_INVALID_SPELLING error with suggestion "xy".
+        let s = sentence(vec![word("ab", 0)], 0);
+        let data = build_ab_to_xy_vfst();
+        let t = UnweightedTransducer::from_bytes(&data).unwrap();
+        let errs = gc_autocorrect(&s, &t);
+
+        assert_eq!(errs.len(), 1);
+        assert_eq!(errs[0].error_code, GCERR_INVALID_SPELLING);
+        assert_eq!(errs[0].start_pos, 0);
+        assert_eq!(errs[0].error_len, 2);
+        assert_eq!(errs[0].suggestions, vec!["xy"]);
+    }
+
+    #[test]
+    fn multi_char_input_match() {
+        // Sentence: "abc" (single word token).
+        // Transducer maps "abc" -> "xyz".
+        let s = sentence(vec![word("abc", 0)], 0);
+        let data = build_abc_to_xyz_vfst();
+        let t = UnweightedTransducer::from_bytes(&data).unwrap();
+        let errs = gc_autocorrect(&s, &t);
+
+        assert_eq!(errs.len(), 1);
+        assert_eq!(errs[0].error_code, GCERR_INVALID_SPELLING);
+        assert_eq!(errs[0].start_pos, 0);
+        assert_eq!(errs[0].error_len, 3);
+        assert_eq!(errs[0].suggestions, vec!["xyz"]);
+    }
+
+    #[test]
+    fn match_at_second_word() {
+        // Sentence: "zz ab" — first word "zz" has no match, second word "ab" matches.
+        // Transducer maps "ab" -> "xy".
+        // Expected: one error at position 3 (after "zz ").
+        let s = sentence(
+            vec![word("zz", 0), ws(" ", 2), word("ab", 3)],
+            0,
+        );
+        let data = build_ab_to_xy_vfst();
+        let t = UnweightedTransducer::from_bytes(&data).unwrap();
+        let errs = gc_autocorrect(&s, &t);
+
+        assert_eq!(errs.len(), 1);
+        assert_eq!(errs[0].start_pos, 3);
+        assert_eq!(errs[0].error_len, 2);
+        assert_eq!(errs[0].suggestions, vec!["xy"]);
+    }
+
+    #[test]
+    fn prefix_must_end_at_word_boundary() {
+        // Sentence: "abc" but transducer matches "ab" (prefix).
+        // The prefix "ab" ends at position 2, but the word "abc" ends at 3.
+        // Since the prefix does NOT end at a word boundary (no token boundary
+        // at position 2), no error should be produced.
+        let s = sentence(vec![word("abc", 0)], 0);
+        let data = build_ab_to_xy_vfst();
+        let t = UnweightedTransducer::from_bytes(&data).unwrap();
+        let errs = gc_autocorrect(&s, &t);
+
+        assert!(errs.is_empty());
+    }
+
+    #[test]
+    fn multi_word_prefix_match() {
+        // Sentence: "ab cd" — two word tokens.
+        // Transducer maps "ab cd" -> "ef gh" (spans word boundary including space).
+        // The prefix "ab cd" is 5 chars and ends at the boundary after "cd".
+        let s = sentence(
+            vec![word("ab", 0), ws(" ", 2), word("cd", 3)],
+            0,
+        );
+        let data = build_ab_cd_to_ef_gh_vfst();
+        let t = UnweightedTransducer::from_bytes(&data).unwrap();
+        let errs = gc_autocorrect(&s, &t);
+
+        assert_eq!(errs.len(), 1);
+        assert_eq!(errs[0].error_code, GCERR_INVALID_SPELLING);
+        assert_eq!(errs[0].start_pos, 0);
+        assert_eq!(errs[0].error_len, 5);
+        assert_eq!(errs[0].suggestions, vec!["ef gh"]);
+    }
+
+    // ====================================================================
+    // Uppercase lowering / re-uppercasing tests
+    // ====================================================================
+
+    #[test]
+    fn uppercase_first_letter_retried_with_lowercase() {
+        // Sentence: "Ab" — first letter uppercase.
+        // Transducer maps "ab" -> "xy" (lowercase only).
+        // gc_autocorrect first tries "Ab" which doesn't match, then sets
+        // need_lowering=true, and retries with "ab" which matches.
+        // The suggestion should be uppercased: "Xy".
+        let s = sentence(vec![word("Ab", 0)], 0);
+        let data = build_ab_to_xy_vfst();
+        let t = UnweightedTransducer::from_bytes(&data).unwrap();
+        let errs = gc_autocorrect(&s, &t);
+
+        assert_eq!(errs.len(), 1);
+        assert_eq!(errs[0].error_code, GCERR_INVALID_SPELLING);
+        assert_eq!(errs[0].start_pos, 0);
+        assert_eq!(errs[0].error_len, 2);
+        assert_eq!(errs[0].suggestions, vec!["Xy"]);
+    }
+
+    #[test]
+    fn lowercase_first_no_retry() {
+        // Sentence: "ab" — already lowercase.
+        // Transducer maps "ab" -> "xy".
+        // No need_lowering since first letter is not uppercase.
+        // Suggestion stays "xy".
+        let s = sentence(vec![word("ab", 0)], 0);
+        let data = build_ab_to_xy_vfst();
+        let t = UnweightedTransducer::from_bytes(&data).unwrap();
+        let errs = gc_autocorrect(&s, &t);
+
+        assert_eq!(errs.len(), 1);
+        assert_eq!(errs[0].suggestions, vec!["xy"]);
+    }
+
+    // ====================================================================
+    // Sentence position offset tests
+    // ====================================================================
+
+    #[test]
+    fn sentence_pos_offset_applied() {
+        // Sentence at paragraph offset 10.
+        // Word "ab" at position 10 within the paragraph.
+        let s = sentence(vec![word("ab", 10)], 10);
+        let data = build_ab_to_xy_vfst();
+        let t = UnweightedTransducer::from_bytes(&data).unwrap();
+        let errs = gc_autocorrect(&s, &t);
+
+        assert_eq!(errs.len(), 1);
+        assert_eq!(errs[0].start_pos, 10);
+        assert_eq!(errs[0].error_len, 2);
+    }
+
+    // ====================================================================
+    // No-match scenarios
+    // ====================================================================
+
+    #[test]
+    fn partial_prefix_no_word_boundary_no_error() {
+        // Sentence: "abcd" — single word, 4 characters.
+        // Transducer matches prefix "abc" (3 chars) but no word boundary at pos 3.
+        let s = sentence(vec![word("abcd", 0)], 0);
+        let data = build_abc_to_xyz_vfst();
+        let t = UnweightedTransducer::from_bytes(&data).unwrap();
+        let errs = gc_autocorrect(&s, &t);
+
+        assert!(errs.is_empty());
+    }
+
+    #[test]
+    fn unknown_characters_no_match() {
+        // Sentence has characters not in the transducer's symbol table.
+        let s = sentence(vec![word("zzz", 0)], 0);
+        let data = build_ab_to_xy_vfst();
+        let t = UnweightedTransducer::from_bytes(&data).unwrap();
+        let errs = gc_autocorrect(&s, &t);
+
+        assert!(errs.is_empty());
     }
 }

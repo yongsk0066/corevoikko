@@ -1,4 +1,3 @@
-#![allow(dead_code)]
 // FinnishRuleEngine: orchestrates all individual grammar checks on a paragraph.
 //
 // This module runs all sentence-level and paragraph-level checks in order

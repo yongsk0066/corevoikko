@@ -1,7 +1,6 @@
 // Paragraph structure with tokenized sentences for grammar checking
 // Origin: grammar/Paragraph.hpp, Paragraph.cpp, Sentence.hpp, Sentence.cpp,
 //         grammar/Token.hpp, FinnishAnalysis.cpp:194-269 (analyseParagraph/analyseSentence)
-#![allow(dead_code)]
 
 use voikko_core::enums::{SentenceType, TokenType};
 

@@ -23,3 +23,13 @@ pub trait Analyzer {
     /// (needed by FinnishVfstAnalyzer's STRUCTURE parsing).
     fn analyze(&self, word: &[char], word_len: usize) -> Vec<Analysis>;
 }
+
+/// Blanket implementation: a shared reference to an analyzer also
+/// implements `Analyzer`. This allows code that holds `&T` (e.g.,
+/// `VoikkoHandle` lending a reference to its owned analyzer) to use
+/// it in generic contexts requiring `A: Analyzer`.
+impl<T: Analyzer + ?Sized> Analyzer for &T {
+    fn analyze(&self, word: &[char], word_len: usize) -> Vec<Analysis> {
+        (**self).analyze(word, word_len)
+    }
+}

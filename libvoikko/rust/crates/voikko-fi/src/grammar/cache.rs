@@ -1,6 +1,5 @@
 // Grammar checker cache for paragraph-level results
 // Origin: grammar/GcCache.hpp, GcCache.cpp, CacheEntry.hpp, CacheEntry.cpp
-#![allow(dead_code)]
 
 use voikko_core::grammar_error::GrammarError;
 

@@ -11,34 +11,7 @@ use voikko_core::character::{is_consonant, is_vowel, simple_lower};
 
 use crate::morphology::Analyzer;
 
-// ---------------------------------------------------------------------------
-// Finnish phonological constants
-// Origin: AnalyzerToFinnishHyphenatorAdapter.cpp:42-46
-// ---------------------------------------------------------------------------
-
-/// Vowel pairs that may be split by a hyphen in Finnish.
-/// These are vowel combinations that do NOT form diphthongs and can be separated.
-/// Origin: AnalyzerToFinnishHyphenatorAdapter.cpp:42-44 (SPLIT_VOWELS)
-const SPLIT_VOWELS: &[[char; 2]] = &[
-    ['a', 'e'],
-    ['a', 'o'],
-    ['e', 'a'],
-    ['e', 'o'],
-    ['i', 'a'],
-    ['i', 'o'],
-    ['o', 'a'],
-    ['o', 'e'],
-    ['u', 'a'],
-    ['u', 'e'],
-    ['y', 'e'],
-    ['e', '\u{00E4}'], // eä
-    ['e', '\u{00F6}'], // eö
-    ['i', '\u{00E4}'], // iä
-    ['i', '\u{00F6}'], // iö
-    ['y', '\u{00E4}'], // yä
-    ['\u{00E4}', 'e'], // äe
-    ['\u{00F6}', 'e'], // öe
-];
+use crate::finnish::constants::SPLIT_VOWELS;
 
 /// Long consonant sequences treated as indivisible units.
 /// A hyphen should be moved before the entire cluster rather than splitting it.
