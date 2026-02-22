@@ -22,17 +22,16 @@ jobs:
         with:
           workspaces: libvoikko/rust
 
-      - name: Run tests (without dictionary)
+      - name: Run tests
         working-directory: libvoikko/rust
         run: cargo test --all-features
-        # 637 tests run; 10 dictionary-dependent tests are #[ignore]'d
 
       - name: Clippy
         working-directory: libvoikko/rust
         run: cargo clippy --all-features -- -D warnings
 
   js:
-    name: JS/WASM (build + type check)
+    name: JS/WASM (build + test)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -63,14 +62,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: pnpm
-          cache-dependency-path: libvoikko/js/pnpm-lock.yaml
 
       - name: Install & build
         working-directory: libvoikko/js
         run: pnpm install && pnpm build
 
-      - name: Test (Tier 1 — no dictionary needed)
+      - name: Test
         working-directory: libvoikko/js
         run: pnpm test
-        # Tier 1 (2 tests) always run; Tier 2 (35 tests) auto-skip without dictionary
