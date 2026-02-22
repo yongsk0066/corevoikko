@@ -1,1 +1,2 @@
-// Finnish language module — populated in Phase 2+
+pub mod morphology;
+pub mod speller;
