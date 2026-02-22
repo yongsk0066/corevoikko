@@ -46,5 +46,4 @@ compile
 /js/wasm/*.data
 /js/wasm/*.js
 /js/wasm/*.d.ts
-/js/dict/
 /js/pnpm-lock.yaml

@@ -50,11 +50,11 @@ npm install @yongsk0066/voikko
 ```typescript
 import { Voikko } from '@yongsk0066/voikko';
 
-// Browser — dictionary files must be served via HTTP
-const voikko = await Voikko.init('fi', { dictionaryUrl: '/dict/' });
+// Node.js — dictionary is bundled, zero config
+const voikko = await Voikko.init();
 
-// Node.js — dictionary files on local filesystem
-const voikko = await Voikko.init('fi', { dictionaryPath: './dict/' });
+// Browser — serve dictionary files via HTTP
+const voikko = await Voikko.init('fi', { dictionaryUrl: '/dict/' });
 
 voikko.spell('koira');        // true
 voikko.suggest('koirra');     // ['koira', ...]
@@ -63,7 +63,7 @@ voikko.hyphenate('kissa');    // 'kis-sa'
 voikko.terminate();
 ```
 
-Dictionary files (`mor.vfst`, `autocorr.vfst`, `index.txt`) are not included in the npm package. Place them at `{path}/5/mor-standard/`. Build from `voikko-fi/` or copy pre-built files from `voikko-fi/vvfst/`.
+Finnish dictionary files are **bundled** in the npm package. Node.js users need no additional setup. For browser usage, copy the dictionary files from `node_modules/@yongsk0066/voikko/dict/` to your public directory and pass `dictionaryUrl`.
 
 ### Rust
 

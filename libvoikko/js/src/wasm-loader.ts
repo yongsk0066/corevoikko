@@ -47,14 +47,29 @@ export function loadWasm(): Promise<WasmModule> {
 /**
  * Load dictionary files from the appropriate source.
  * Returns filename → bytes entries.
+ *
+ * Resolution order (Node.js):
+ *   1. options.dictionaryPath (explicit)
+ *   2. Bundled dictionary shipped with the npm package (auto)
+ *
+ * Browser: options.dictionaryUrl is required.
  */
 export async function loadDict(
   options: VoikkoInitOptions,
 ): Promise<Map<string, Uint8Array>> {
   if (options.dictionaryUrl) return fetchDict(options.dictionaryUrl);
   if (options.dictionaryPath) return readDict(options.dictionaryPath);
+
+  // Node.js: try bundled dictionary
+  if (typeof globalThis.window === 'undefined' && typeof globalThis.document === 'undefined') {
+    const { fileURLToPath } = await import('node:url');
+    const { dirname, join } = await import('node:path');
+    const bundledDict = join(dirname(fileURLToPath(import.meta.url)), '..', 'dict');
+    return readDict(bundledDict);
+  }
+
   throw new Error(
-    'Voikko: either dictionaryUrl (browser) or dictionaryPath (Node.js) must be provided',
+    'Voikko: dictionaryUrl is required in browser environments',
   );
 }
 

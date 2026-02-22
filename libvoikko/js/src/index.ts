@@ -49,10 +49,14 @@ const SENTENCE_TYPE_MAP: Record<string, SentenceStartType> = {
  *
  * @example
  * ```typescript
- * const voikko = await Voikko.init('fi', { dictionaryPath: './dict' });
+ * // Node.js — uses bundled dictionary automatically
+ * const voikko = await Voikko.init();
  * voikko.spell('koira');    // true
  * voikko.suggest('koirra'); // ['koira', ...]
  * voikko.terminate();
+ *
+ * // Browser — dictionary URL required
+ * const voikko = await Voikko.init('fi', { dictionaryUrl: '/dict/' });
  * ```
  */
 export class Voikko {
