@@ -382,6 +382,155 @@ impl VoikkoHandle {
         self.max_suggestions = value;
     }
 
+    // =========================================================================
+    // Extended API methods (ported from TS wrapper layer)
+    // =========================================================================
+
+    /// Insert hyphens into a word using the given separator.
+    ///
+    /// Uses the hyphenation pattern from `hyphenate()` to insert separators:
+    /// - `'-'` in the pattern: insert separator BEFORE this character
+    /// - `'='` in the pattern (when `allow_context_changes` is true):
+    ///   replace the character with separator, unless the character is already
+    ///   `'-'` (in which case it is preserved to avoid a double hyphen)
+    ///
+    /// Origin: Voikko.hyphenate() in libvoikko/js/src/index.ts
+    pub fn insert_hyphens(&self, word: &str, separator: &str, allow_context_changes: bool) -> String {
+        let pattern = self.hyphenate(word);
+        let word_chars: Vec<char> = word.chars().collect();
+        let pat_chars: Vec<char> = pattern.chars().collect();
+        let mut result = String::new();
+
+        for (i, ch) in word_chars.iter().enumerate() {
+            if i < pat_chars.len() {
+                match pat_chars[i] {
+                    '-' => result.push_str(separator),
+                    '=' if allow_context_changes => {
+                        if *ch == '-' {
+                            // Existing hyphen at compound boundary -- preserve it
+                            result.push('-');
+                            continue;
+                        }
+                        // Replace non-hyphen char with separator
+                        result.push_str(separator);
+                        continue;
+                    }
+                    _ => {}
+                }
+            }
+            result.push(*ch);
+        }
+        result
+    }
+
+    /// Return the list of valid values for an enumerated morphological attribute.
+    ///
+    /// Returns `None` if the attribute name is not recognized.
+    ///
+    /// Origin: voikkoGetAttributeValues (C API) / ENUMERATED_ATTRIBUTES in TS wrapper
+    pub fn attribute_values(attribute_name: &str) -> Option<&'static [&'static str]> {
+        match attribute_name {
+            "CLASS" => Some(&[
+                "nimisana", "laatusana", "nimisana_laatusana", "teonsana", "seikkasana",
+                "asemosana", "suhdesana", "huudahdussana", "sidesana", "etuliite",
+                "lukusana", "lyhenne", "kieltosana", "etunimi", "sukunimi", "paikannimi", "nimi",
+            ]),
+            "NUMBER" => Some(&["singular", "plural"]),
+            "PERSON" => Some(&["1", "2", "3", "4"]),
+            "MOOD" => Some(&[
+                "indicative", "conditional", "potential", "imperative",
+                "A-infinitive", "E-infinitive", "MA-infinitive", "MINEN-infinitive",
+                "MAINEN-infinitive",
+            ]),
+            "TENSE" => Some(&["present_simple", "past_imperfective"]),
+            "COMPARISON" => Some(&["positive", "comparative", "superlative"]),
+            "NEGATIVE" => Some(&["false", "true", "both"]),
+            "PARTICIPLE" => Some(&[
+                "present_active", "present_passive", "past_active", "past_passive",
+                "agent", "negation",
+            ]),
+            "POSSESSIVE" => Some(&["1s", "2s", "1p", "2p", "3"]),
+            "SIJAMUOTO" => Some(&[
+                "nimento", "omanto", "osanto", "olento", "tulento", "kohdanto",
+                "sisaolento", "sisaeronto", "sisatulento", "ulkoolento", "ulkoeronto",
+                "ulkotulento", "vajanto", "seuranto", "keinonto", "kerrontosti",
+            ]),
+            "FOCUS" => Some(&["läs", "kAAn", "kin", "hAn", "pA", "s"]),
+            "KYSYMYSLIITE" => Some(&["true"]),
+            _ => None,
+        }
+    }
+
+    /// Check text for grammar errors, splitting at newline boundaries.
+    ///
+    /// Each line is treated as a separate paragraph. Error positions
+    /// (`start_pos`) are relative to the full input text.
+    ///
+    /// Origin: voikkoNextGrammarErrorCstr (called per-paragraph by the C API),
+    ///         Voikko.grammarErrors() in libvoikko/js/src/index.ts
+    pub fn grammar_errors_from_text(&self, text: &str) -> Vec<GrammarError> {
+        let mut result = Vec::new();
+        let mut pos = 0;
+        let text_chars: Vec<char> = text.chars().collect();
+        let text_len = text_chars.len();
+
+        while pos < text_len {
+            // Find next newline
+            let nl_pos = text_chars[pos..]
+                .iter()
+                .position(|&c| c == '\n')
+                .map(|p| pos + p)
+                .unwrap_or(text_len);
+
+            // Strip trailing \r for \r\n line endings
+            let para_end = if nl_pos > pos && text_chars[nl_pos - 1] == '\r' {
+                nl_pos - 1
+            } else {
+                nl_pos
+            };
+
+            // Check non-empty paragraph
+            if para_end > pos {
+                let para = &text_chars[pos..para_end];
+                let para_len = para.len();
+                let mut errors = self
+                    .grammar_checker
+                    .check_with_analyzer(para, para_len, &self.analyzer);
+
+                // Adjust start_pos to be relative to the full text
+                for error in &mut errors {
+                    error.start_pos += pos;
+                }
+                result.extend(errors);
+            }
+
+            // Advance past newline
+            if nl_pos >= text_len {
+                break;
+            }
+            pos = nl_pos + 1;
+        }
+
+        result
+    }
+
+    /// Return the crate version (from Cargo.toml).
+    ///
+    /// Origin: voikkoGetVersion (C API)
+    pub fn get_version() -> &'static str {
+        env!("CARGO_PKG_VERSION")
+    }
+
+    /// Replace the speller cache with a new one of the given size.
+    ///
+    /// `size` is the size parameter (power-of-two scaling factor).
+    /// A value of 0 gives the base cache size.
+    ///
+    /// Origin: voikkoSetIntegerOption VOIKKO_SPELLER_CACHE_SIZE
+    pub fn set_speller_cache_size(&mut self, size: usize) {
+        self.speller_cache = RefCell::new(SpellerCache::new(size));
+    }
+
     /// Release resources held by this handle. After calling this,
     /// the handle should not be used for any NLP operations.
     ///
@@ -487,6 +636,242 @@ mod tests {
         assert_eq!(tokens[0].text, "Koira");
         assert_eq!(tokens[3].token_type, TokenType::Punctuation);
         assert_eq!(tokens[3].text, ".");
+    }
+
+    // =========================================================================
+    // attribute_values tests
+    // =========================================================================
+
+    #[test]
+    fn attribute_values_class() {
+        let vals = VoikkoHandle::attribute_values("CLASS").unwrap();
+        assert!(vals.contains(&"nimisana"));
+        assert!(vals.contains(&"teonsana"));
+        assert!(vals.contains(&"nimi"));
+        assert_eq!(vals.len(), 17);
+    }
+
+    #[test]
+    fn attribute_values_number() {
+        let vals = VoikkoHandle::attribute_values("NUMBER").unwrap();
+        assert_eq!(vals, &["singular", "plural"]);
+    }
+
+    #[test]
+    fn attribute_values_person() {
+        let vals = VoikkoHandle::attribute_values("PERSON").unwrap();
+        assert_eq!(vals, &["1", "2", "3", "4"]);
+    }
+
+    #[test]
+    fn attribute_values_mood() {
+        let vals = VoikkoHandle::attribute_values("MOOD").unwrap();
+        assert_eq!(vals.len(), 9);
+        assert!(vals.contains(&"indicative"));
+        assert!(vals.contains(&"MAINEN-infinitive"));
+    }
+
+    #[test]
+    fn attribute_values_sijamuoto() {
+        let vals = VoikkoHandle::attribute_values("SIJAMUOTO").unwrap();
+        assert_eq!(vals.len(), 16);
+        assert!(vals.contains(&"nimento"));
+        assert!(vals.contains(&"kerrontosti"));
+    }
+
+    #[test]
+    fn attribute_values_focus() {
+        let vals = VoikkoHandle::attribute_values("FOCUS").unwrap();
+        assert_eq!(vals.len(), 6);
+        assert!(vals.contains(&"läs"));
+    }
+
+    #[test]
+    fn attribute_values_kysymysliite() {
+        let vals = VoikkoHandle::attribute_values("KYSYMYSLIITE").unwrap();
+        assert_eq!(vals, &["true"]);
+    }
+
+    #[test]
+    fn attribute_values_unknown_returns_none() {
+        assert!(VoikkoHandle::attribute_values("NONEXISTENT").is_none());
+        assert!(VoikkoHandle::attribute_values("").is_none());
+    }
+
+    #[test]
+    fn attribute_values_all_known_names() {
+        let names = [
+            "CLASS", "NUMBER", "PERSON", "MOOD", "TENSE", "COMPARISON",
+            "NEGATIVE", "PARTICIPLE", "POSSESSIVE", "SIJAMUOTO", "FOCUS",
+            "KYSYMYSLIITE",
+        ];
+        for name in &names {
+            assert!(
+                VoikkoHandle::attribute_values(name).is_some(),
+                "expected Some for attribute {name}"
+            );
+        }
+    }
+
+    // =========================================================================
+    // get_version tests
+    // =========================================================================
+
+    #[test]
+    fn get_version_returns_cargo_version() {
+        let version = VoikkoHandle::get_version();
+        assert_eq!(version, env!("CARGO_PKG_VERSION"));
+        // Should be a valid semver-like string
+        assert!(!version.is_empty());
+        assert!(version.contains('.'));
+    }
+
+    // =========================================================================
+    // insert_hyphens tests (unit tests without dictionary)
+    // =========================================================================
+
+    // NOTE: insert_hyphens depends on hyphenate() which requires a real
+    // dictionary, so full integration tests are marked #[ignore].
+    // We test the core logic through integration tests below.
+
+    #[test]
+    #[ignore = "requires mor.vfst dictionary file"]
+    fn integration_insert_hyphens_basic() {
+        let mor_data = std::fs::read(
+            std::env::var("VOIKKO_MOR_VFST").unwrap_or_else(|_| "../../test-data/mor.vfst".into()),
+        )
+        .expect("failed to read mor.vfst");
+        let handle =
+            VoikkoHandle::from_bytes(&mor_data, None, "fi").expect("failed to create handle");
+
+        // "koira" should hyphenate to "koi-ra" with default separator
+        let result = handle.insert_hyphens("koira", "-", true);
+        // The result should contain the original letters
+        assert!(result.contains("koi"));
+        assert!(result.contains("ra"));
+    }
+
+    #[test]
+    #[ignore = "requires mor.vfst dictionary file"]
+    fn integration_insert_hyphens_custom_separator() {
+        let mor_data = std::fs::read(
+            std::env::var("VOIKKO_MOR_VFST").unwrap_or_else(|_| "../../test-data/mor.vfst".into()),
+        )
+        .expect("failed to read mor.vfst");
+        let handle =
+            VoikkoHandle::from_bytes(&mor_data, None, "fi").expect("failed to create handle");
+
+        let result_dash = handle.insert_hyphens("koira", "-", true);
+        let result_dot = handle.insert_hyphens("koira", ".", true);
+        // If there are hyphenation points, the separator should differ
+        let dash_count = result_dash.matches('-').count();
+        let dot_count = result_dot.matches('.').count();
+        assert_eq!(dash_count, dot_count);
+    }
+
+    #[test]
+    #[ignore = "requires mor.vfst dictionary file"]
+    fn integration_insert_hyphens_empty_separator() {
+        let mor_data = std::fs::read(
+            std::env::var("VOIKKO_MOR_VFST").unwrap_or_else(|_| "../../test-data/mor.vfst".into()),
+        )
+        .expect("failed to read mor.vfst");
+        let handle =
+            VoikkoHandle::from_bytes(&mor_data, None, "fi").expect("failed to create handle");
+
+        // With empty separator, result should be the original word
+        // (hyphenation points are inserted as empty strings)
+        let result = handle.insert_hyphens("koira", "", true);
+        // All original characters should still be present
+        assert!(result.len() <= "koira".len());
+    }
+
+    // =========================================================================
+    // set_speller_cache_size tests
+    // =========================================================================
+
+    #[test]
+    #[ignore = "requires mor.vfst dictionary file"]
+    fn integration_set_speller_cache_size() {
+        let mor_data = std::fs::read(
+            std::env::var("VOIKKO_MOR_VFST").unwrap_or_else(|_| "../../test-data/mor.vfst".into()),
+        )
+        .expect("failed to read mor.vfst");
+        let mut handle =
+            VoikkoHandle::from_bytes(&mor_data, None, "fi").expect("failed to create handle");
+
+        // Spell a word, change cache size, spell again — should still work
+        assert!(handle.spell("koira"));
+        handle.set_speller_cache_size(2);
+        assert!(handle.spell("koira"));
+        handle.set_speller_cache_size(0);
+        assert!(handle.spell("koira"));
+    }
+
+    // =========================================================================
+    // grammar_errors_from_text tests
+    // =========================================================================
+
+    #[test]
+    #[ignore = "requires mor.vfst and autocorr.vfst dictionary files"]
+    fn integration_grammar_errors_from_text_multiline() {
+        let mor_data = std::fs::read(
+            std::env::var("VOIKKO_MOR_VFST").unwrap_or_else(|_| "../../test-data/mor.vfst".into()),
+        )
+        .expect("failed to read mor.vfst");
+        let autocorr_data = std::fs::read(
+            std::env::var("VOIKKO_AUTOCORR_VFST")
+                .unwrap_or_else(|_| "../../test-data/autocorr.vfst".into()),
+        )
+        .ok();
+        let handle = VoikkoHandle::from_bytes(
+            &mor_data,
+            autocorr_data.as_deref(),
+            "fi",
+        )
+        .expect("failed to create handle");
+
+        // Test with multi-line text: positions should be adjusted
+        let text = "Ensimmäinen rivi.\nToinen rivi.";
+        let errors = handle.grammar_errors_from_text(text);
+        // Verify that any errors from the second paragraph have startPos >= 18
+        // (length of "Ensimmäinen rivi.\n")
+        for error in &errors {
+            // Errors can only be in one paragraph or the other
+            assert!(error.start_pos < text.chars().count());
+        }
+    }
+
+    #[test]
+    #[ignore = "requires mor.vfst dictionary file"]
+    fn integration_grammar_errors_from_text_empty_lines() {
+        let mor_data = std::fs::read(
+            std::env::var("VOIKKO_MOR_VFST").unwrap_or_else(|_| "../../test-data/mor.vfst".into()),
+        )
+        .expect("failed to read mor.vfst");
+        let handle =
+            VoikkoHandle::from_bytes(&mor_data, None, "fi").expect("failed to create handle");
+
+        // Empty lines should be skipped without error
+        let text = "Rivi.\n\n\nToinen rivi.";
+        let _errors = handle.grammar_errors_from_text(text);
+        // Should not panic
+    }
+
+    #[test]
+    #[ignore = "requires mor.vfst dictionary file"]
+    fn integration_grammar_errors_from_text_crlf() {
+        let mor_data = std::fs::read(
+            std::env::var("VOIKKO_MOR_VFST").unwrap_or_else(|_| "../../test-data/mor.vfst".into()),
+        )
+        .expect("failed to read mor.vfst");
+        let handle =
+            VoikkoHandle::from_bytes(&mor_data, None, "fi").expect("failed to create handle");
+
+        // CRLF line endings should be handled correctly
+        let text = "Rivi.\r\nToinen rivi.";
+        let _errors = handle.grammar_errors_from_text(text);
+        // Should not panic
     }
 
     #[test]

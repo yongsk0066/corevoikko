@@ -39,57 +39,6 @@ const SENTENCE_TYPE_MAP: Record<string, SentenceStartType> = {
   NoStart: 'NO_START',
 };
 
-/** Grammar error short descriptions (Finnish, matching C++ voikko_error_message_cstr) */
-const GRAMMAR_ERROR_DESCRIPTIONS: Record<number, string> = {
-  1: 'Virheellinen kirjoitusasu',
-  2: 'Poista ylimääräinen väli.',
-  3: 'Ylimääräinen väli välimerkin edessä',
-  4: 'Poista ylimääräinen pilkku.',
-  5: 'Virheellinen virkkeen aloittava merkki',
-  6: 'Harkitse sanan kirjoittamista pienellä alkukirjaimella.',
-  7: 'Sana on kirjoitettava isolla alkukirjaimella.',
-  8: 'Sana on kirjoitettu kahteen kertaan.',
-  9: 'Välimerkki puuttuu virkkeen lopusta.',
-  10: 'Virheelliset välimerkit lainauksen lopussa',
-  11: 'Suomenkieliseen tekstiin sopimaton lainausmerkki',
-  12: 'Väärin sijoitettu sulkumerkki',
-  13: 'Kieltoverbi ja pääverbi eivät sovi yhteen.',
-  14: 'Jälkimmäisen verbin tulisi olla a/ä-päätteisessä infinitiivissä.',
-  15: 'Jälkimmäisen verbin tulisi olla maan/mään-päätteisessä infinitiivissä.',
-  16: 'Sidesana (ja, tai, mutta, ...) ei voi olla virkkeen viimeinen sana.',
-  17: 'Tarkista, puuttuuko virkkeestä pääverbi tai -verbejä.',
-  18: 'Virkkeestä saattaa puuttua pilkku, tai siinä voi olla ylimääräinen verbi.',
-};
-
-/** Enumerated attribute values (static, matching C++ voikkoGetAttributeValues) */
-const ENUMERATED_ATTRIBUTES: Record<string, string[]> = {
-  CLASS: [
-    'nimisana', 'laatusana', 'nimisana_laatusana', 'teonsana', 'seikkasana',
-    'asemosana', 'suhdesana', 'huudahdussana', 'sidesana', 'etuliite',
-    'lukusana', 'lyhenne', 'kieltosana', 'etunimi', 'sukunimi', 'paikannimi', 'nimi',
-  ],
-  NUMBER: ['singular', 'plural'],
-  PERSON: ['1', '2', '3', '4'],
-  MOOD: [
-    'indicative', 'conditional', 'potential', 'imperative',
-    'A-infinitive', 'E-infinitive', 'MA-infinitive', 'MINEN-infinitive', 'MAINEN-infinitive',
-  ],
-  TENSE: ['present_simple', 'past_imperfective'],
-  COMPARISON: ['positive', 'comparative', 'superlative'],
-  NEGATIVE: ['false', 'true', 'both'],
-  PARTICIPLE: [
-    'present_active', 'present_passive', 'past_active', 'past_passive', 'agent', 'negation',
-  ],
-  POSSESSIVE: ['1s', '2s', '1p', '2p', '3'],
-  SIJAMUOTO: [
-    'nimento', 'omanto', 'osanto', 'olento', 'tulento', 'kohdanto',
-    'sisaolento', 'sisaeronto', 'sisatulento', 'ulkoolento', 'ulkoeronto',
-    'ulkotulento', 'vajanto', 'seuranto', 'keinonto', 'kerrontosti',
-  ],
-  FOCUS: ['läs', 'kAAn', 'kin', 'hAn', 'pA', 's'],
-  KYSYMYSLIITE: ['true'],
-};
-
 // ── Voikko class ─────────────────────────────────────────────────
 
 /**
@@ -164,39 +113,14 @@ export class Voikko {
    * independently and error positions are adjusted to the original text offsets.
    */
   grammarErrors(text: string, _language: string = 'fi'): GrammarError[] {
-    const result: GrammarError[] = [];
-    let pos = 0;
-
-    while (pos <= text.length) {
-      // Find the next \n boundary in the original text
-      let nlPos = text.indexOf('\n', pos);
-      if (nlPos === -1) nlPos = text.length;
-
-      // Strip trailing \r for \r\n line endings
-      let paraEnd = nlPos;
-      if (paraEnd > pos && text[paraEnd - 1] === '\r') paraEnd--;
-
-      const para = text.substring(pos, paraEnd);
-      if (para.length > 0) {
-        const raw: { errorCode: number; startPos: number; errorLen: number; suggestions: string[]; shortDescription?: string }[] =
-          this.#handle.grammarErrors(para);
-        for (const e of raw) {
-          result.push({
-            errorCode: e.errorCode,
-            startPos: e.startPos + pos,
-            errorLen: e.errorLen,
-            suggestions: e.suggestions,
-            shortDescription: e.shortDescription || GRAMMAR_ERROR_DESCRIPTIONS[e.errorCode] || '',
-          });
-        }
-      }
-
-      // Advance past the \n (or stop if we reached end of text)
-      if (nlPos >= text.length) break;
-      pos = nlPos + 1;
-    }
-
-    return result;
+    const raw = this.#handle.grammarErrorsFromText(text);
+    return raw.map((e: any) => ({
+      errorCode: e.errorCode,
+      startPos: e.startPos,
+      errorLen: e.errorLen,
+      suggestions: e.suggestions,
+      shortDescription: e.shortDescription,
+    }));
   }
 
   /** Morphological analysis of a word. */
@@ -244,42 +168,12 @@ export class Voikko {
    * @param allowContextChanges - If true, handle context-sensitive hyphens (default: true)
    */
   hyphenate(word: string, separator: string = '-', allowContextChanges: boolean = true): string {
-    const pattern = this.#handle.hyphenate(word);
-    const chars = [...word];
-    const patChars = [...pattern];
-    let result = '';
-
-    // Pattern meanings (one character per input character):
-    // ' ' (space) = no hyphenation point
-    // '-' = soft hyphenation point: insert separator BEFORE this character
-    // '=' = compound boundary: REPLACE this character with separator
-    //       Exception: if the character is already '-', keep it (no double hyphen)
-    //       When allowContextChanges=false, '=' positions are skipped entirely
-
-    for (let i = 0; i < chars.length; i++) {
-      if (i < patChars.length) {
-        if (patChars[i] === '-') {
-          // Soft hyphen: insert separator before this character, then emit the char
-          result += separator;
-        } else if (patChars[i] === '=' && allowContextChanges) {
-          if (chars[i] === '-') {
-            // Existing hyphen at compound boundary — preserve it (no double hyphen)
-            result += chars[i];
-            continue;
-          }
-          // Replace the character (e.g., apostrophe in "vaa'an") with separator
-          result += separator;
-          continue;
-        }
-      }
-      result += chars[i];
-    }
-    return result;
+    return this.#handle.insertHyphens(word, separator, allowContextChanges);
   }
 
   /** Get possible values for an enumerated morphological attribute. */
   attributeValues(attributeName: string): string[] | null {
-    return ENUMERATED_ATTRIBUTES[attributeName] ?? null;
+    return this.#handle.attributeValues(attributeName) ?? null;
   }
 
   // -- Option setters --

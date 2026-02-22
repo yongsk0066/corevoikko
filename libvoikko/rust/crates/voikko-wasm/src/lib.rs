@@ -212,6 +212,57 @@ impl WasmVoikko {
             .map_err(|e| JsError::new(&e.to_string()))
     }
 
+    /// Hyphenate a word with the given separator inserted at hyphenation points.
+    ///
+    /// - `separator`: string to insert at hyphenation points (e.g. "-", "\u{00AD}")
+    /// - `allow_context_changes`: if true, handle compound-boundary replacements
+    #[wasm_bindgen(js_name = "insertHyphens")]
+    pub fn insert_hyphens(&self, word: &str, separator: &str, allow_context_changes: bool) -> String {
+        self.handle.insert_hyphens(word, separator, allow_context_changes)
+    }
+
+    /// Get possible values for an enumerated morphological attribute.
+    ///
+    /// Returns null if the attribute name is not recognized.
+    #[wasm_bindgen(js_name = "attributeValues")]
+    pub fn attribute_values(&self, attribute_name: &str) -> Option<Vec<String>> {
+        VoikkoHandle::attribute_values(attribute_name)
+            .map(|vals| vals.iter().map(|s| s.to_string()).collect())
+    }
+
+    /// Check text for grammar errors, splitting at newline boundaries.
+    ///
+    /// Each line is treated as a separate paragraph. Error positions are
+    /// relative to the full input text.
+    #[wasm_bindgen(js_name = "grammarErrorsFromText")]
+    pub fn grammar_errors_from_text(&self, text: &str) -> Result<JsValue, JsError> {
+        let errors = self.handle.grammar_errors_from_text(text);
+        let js_errors: Vec<JsGrammarError> = errors
+            .into_iter()
+            .map(|e| JsGrammarError {
+                error_code: e.error_code,
+                start_pos: e.start_pos,
+                error_len: e.error_len,
+                suggestions: e.suggestions,
+                short_description: e.short_description,
+            })
+            .collect();
+        serde_wasm_bindgen::to_value(&js_errors)
+            .map_err(|e| JsError::new(&e.to_string()))
+    }
+
+    /// Get the library version string.
+    #[wasm_bindgen(js_name = "getVersion")]
+    pub fn get_version() -> String {
+        VoikkoHandle::get_version().to_string()
+    }
+
+    /// Replace the speller cache with a new one of the given size parameter.
+    #[wasm_bindgen(js_name = "setSpellerCacheSize")]
+    pub fn set_speller_cache_size(&mut self, size: usize) {
+        self.handle.set_speller_cache_size(size);
+    }
+
     /// Release resources held by this instance.
     ///
     /// After calling this method, the instance should not be used.
