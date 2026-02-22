@@ -185,7 +185,8 @@ impl VoikkoHandle {
             self.finnish_spell_options,
         );
 
-        let mut status = SuggestionStatus::new(&word_chars, self.max_suggestions);
+        // Collect 3x candidates (matching C++ MAX_SUGGESTIONS * 3), sort, then truncate.
+        let mut status = SuggestionStatus::new(&word_chars, self.max_suggestions * 3);
 
         let strategy = if self.use_ocr_suggestions {
             &self.ocr_strategy
@@ -199,6 +200,7 @@ impl VoikkoHandle {
         status
             .into_suggestions()
             .into_iter()
+            .take(self.max_suggestions)
             .map(|s| s.word)
             .collect()
     }
