@@ -252,7 +252,7 @@ pub(crate) fn parse_structure(fst_output: &[char], wlen: usize) -> String {
                 if i != 1 && i + 5 < output_len && !structure.is_empty() && *structure.last().unwrap() != '=' {
                     structure.push('=');
                 }
-                i += 4;
+                i += 3; // C++ does i += 3 then for-loop i++; Rust while-loop i += 1 at end
                 chars_seen = 0;
                 chars_from_default = 0;
             }
@@ -1513,6 +1513,32 @@ mod tests {
         assert!(debug.wordids.is_some(), "wordids should be set when [Xs] present");
         let wi = debug.wordids.unwrap();
         assert!(wi.contains("DOG"), "wordids should contain 'DOG': {wi}");
+    }
+
+    #[test]
+    fn structure_three_part_compound_rautatieasema() {
+        // "rautatieasema" = 13 chars: rauta(5) + tie(3) + asema(5)
+        // FST: [Ln][Xp]rauta[X]raut[Sn][Ny]a[Bh][Bc][Ln][Ica][Xp]tie[X]tie[Sn][Ny][Bh][Bc][Ln][Xp]asema[X]asem[Sn][Ny]a
+        let fst = chars("[Ln][Xp]rauta[X]raut[Sn][Ny]a[Bh][Bc][Ln][Ica][Xp]tie[X]tie[Sn][Ny][Bh][Bc][Ln][Xp]asema[X]asem[Sn][Ny]a");
+        let result = parse_structure(&fst, 13);
+        assert_eq!(result, "=ppppp=ppp=ppppp");
+    }
+
+    #[test]
+    fn structure_three_part_compound_elintarvikeliike() {
+        // "elintarvikeliike" = 16 chars: elin(4) + tarvike(7) + liike(5)
+        // FST: [Ln][Xp]elin[X]elin[Sn][Ny][Bh][Bc][Ln][Xp]tarvike[X]tarvik[Sn][Ny]e[Bh][Bc][Ln][Xp]liike[X]liik[Sn][Ny]e
+        let fst = chars("[Ln][Xp]elin[X]elin[Sn][Ny][Bh][Bc][Ln][Xp]tarvike[X]tarvik[Sn][Ny]e[Bh][Bc][Ln][Xp]liike[X]liik[Sn][Ny]e");
+        let result = parse_structure(&fst, 16);
+        assert_eq!(result, "=pppp=ppppppp=ppppp");
+    }
+
+    #[test]
+    fn structure_two_part_compound() {
+        // "koirakoti" = 9 chars: koira(5) + koti(4)
+        let fst = chars("[Ln][Xp]koira[X]koira[Sn][Ny][Bh][Bc][Ln][Xp]koti[X]koti[Sn][Ny]");
+        let result = parse_structure(&fst, 9);
+        assert_eq!(result, "=ppppp=pppp");
     }
 
     // -- fix_structure tests --
