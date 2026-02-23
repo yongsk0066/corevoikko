@@ -80,7 +80,7 @@ export class Voikko {
     options: VoikkoInitOptions = {},
   ): Promise<Voikko> {
     const [{ WasmVoikko }, dict] = await Promise.all([
-      loadWasm(),
+      loadWasm(options),
       loadDict(options),
     ]);
 

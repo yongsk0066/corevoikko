@@ -118,12 +118,21 @@ export interface VoikkoInitOptions {
    * URL base path for fetching dictionary files (browser).
    * The path should contain the V5 dictionary structure:
    * `{url}/5/mor-standard/index.txt`, `mor.vfst`, `autocorr.vfst`
+   *
+   * If omitted in browser, defaults to the unpkg CDN.
    */
   dictionaryUrl?: string;
   /**
    * Local filesystem path for dictionary files (Node.js).
    * Accepts both flat layout (files directly in path) and
    * V5 structure ({path}/5/mor-standard/).
+   *
+   * If omitted in Node.js, uses the bundled dictionary.
    */
   dictionaryPath?: string;
+  /**
+   * URL to the WASM binary (browser only).
+   * If omitted, defaults to the unpkg CDN.
+   */
+  wasmUrl?: string;
 }
