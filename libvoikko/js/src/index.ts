@@ -87,7 +87,7 @@ export class Voikko {
   }
 
   /** Throw if this instance has been terminated. */
-  private ensureActive(): asserts this is { '#handle': WasmVoikko } {
+  private ensureActive(): void {
     if (this.#terminated) {
       throw new Error('Cannot use Voikko instance after terminate() has been called');
     }

@@ -48,11 +48,9 @@ const voikko = await Voikko.init();
 voikko.spell('koira'); // true
 ```
 
-For production, serve files yourself to avoid CDN dependency:
-
 ### Browser (self-hosted)
 
-For production, you can serve the files yourself:
+For production, serve files yourself to avoid CDN dependency:
 
 ```typescript
 const voikko = await Voikko.init('fi', {
@@ -94,7 +92,7 @@ Returns analysis objects with fields: `BASEFORM`, `CLASS`, `STRUCTURE`, `SIJAMUO
 
 ### Grammar checking
 
-- `voikko.grammarErrors(text, language?)` — `GrammarError[]`
+- `voikko.grammarErrors(text)` — `GrammarError[]`
 
 ### Tokenization
 
@@ -152,7 +150,7 @@ voikko.spell('koira'); // Error: Cannot use Voikko instance after terminate()
 
 | Component | Size | Notes |
 |-----------|------|-------|
-| JS wrapper | 10 KB | `dist/index.mjs` |
+| JS wrapper | 14 KB | `dist/index.mjs` |
 | WASM binary | 189 KB | Rust compiled, wasm-opt applied |
 | Dictionary | 3.8 MB | Finnish morphology (`mor.vfst`) |
 

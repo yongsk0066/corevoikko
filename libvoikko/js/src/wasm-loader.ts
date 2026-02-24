@@ -120,7 +120,10 @@ export async function loadDict(
   const cached = cachedDicts.get(cacheKey);
   if (cached) return cached;
 
-  const promise = loadDictImpl(options);
+  const promise = loadDictImpl(options).catch((e) => {
+    cachedDicts.delete(cacheKey);
+    throw e;
+  });
   cachedDicts.set(cacheKey, promise);
   return promise;
 }
