@@ -30,7 +30,6 @@ graph TD
     ffi -->|P/Invoke| cs["cs/"]
     ffi -->|CFFI| cl[cl/]
 
-    legacy[legacy/<br/>C++ source] -.->|reference only| fi
     doc[doc/] -.-> ffi
     data[data/<br/>gchelp.xml] -.-> fi
 ```
