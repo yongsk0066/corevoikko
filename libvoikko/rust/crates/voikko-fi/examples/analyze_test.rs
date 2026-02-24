@@ -1,6 +1,8 @@
 // Full pipeline test: load mor.vfst → FinnishVfstAnalyzer → tag parsing → Analysis
 use std::fs;
-use voikko_core::analysis::{ATTR_BASEFORM, ATTR_CLASS, ATTR_NUMBER, ATTR_SIJAMUOTO, ATTR_STRUCTURE};
+use voikko_core::analysis::{
+    ATTR_BASEFORM, ATTR_CLASS, ATTR_NUMBER, ATTR_SIJAMUOTO, ATTR_STRUCTURE,
+};
 
 fn main() {
     let dict_path = std::env::args()
@@ -14,11 +16,20 @@ fn main() {
         .expect("Failed to create analyzer");
 
     let test_words = [
-        "koira", "Koira", "KOIRA",
-        "kissa", "Helsinki", "juoksen",
-        "talo", "koiran", "kissalle",
-        "juoksee", "talon", "koiranruoka",
-        "hyvä", "suurempi",
+        "koira",
+        "Koira",
+        "KOIRA",
+        "kissa",
+        "Helsinki",
+        "juoksen",
+        "talo",
+        "koiran",
+        "kissalle",
+        "juoksee",
+        "talon",
+        "koiranruoka",
+        "hyvä",
+        "suurempi",
         "asdfxyz",
     ];
 

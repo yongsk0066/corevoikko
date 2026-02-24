@@ -11,8 +11,8 @@ const FINNISH_VOWELS: &[char] = &['a', 'e', 'i', 'o', 'u', 'y', '\u{00E4}', '\u{
 
 /// Finnish consonants (lowercase): b c d f g h j k l m n p q r s t v w x z š ž
 const FINNISH_CONSONANTS: &[char] = &[
-    'b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'q', 'r', 's', 't', 'v', 'w',
-    'x', 'z', '\u{0161}', '\u{017E}',
+    'b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'q', 'r', 's', 't', 'v', 'w', 'x',
+    'z', '\u{0161}', '\u{017E}',
 ];
 
 // ---------------------------------------------------------------------------
@@ -47,7 +47,8 @@ pub fn get_char_type(c: char) -> CharType {
         || (0x0400..=0x0481).contains(&cp)   // Cyrillic Ѐ-ҁ
         || (0x048A..=0x0527).contains(&cp)   // Cyrillic extended Ҋ-ԧ
         || (0x1400..=0x15C3).contains(&cp)   // Canadian syllabics ᐀-ᗃ
-        || (0xFB00..=0xFB04).contains(&cp)   // Alphabetic presentation forms
+        || (0xFB00..=0xFB04).contains(&cp)
+    // Alphabetic presentation forms
     {
         return CharType::Letter;
     }
@@ -111,7 +112,7 @@ pub fn is_finnish_quotation_mark(c: char) -> bool {
     matches!(
         c,
         '"' | '\u{00BB}' // » RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK
-            | '\u{201D}'  // RIGHT DOUBLE QUOTATION MARK
+            | '\u{201D}' // RIGHT DOUBLE QUOTATION MARK
     )
 }
 

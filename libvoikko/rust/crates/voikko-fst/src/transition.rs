@@ -103,8 +103,7 @@ pub fn unweighted_max_tc(transitions: &[Transition], state_index: u32) -> u32 {
     let max_tc = state_head.more_transitions() as u32;
     if max_tc == 255 {
         // The next slot is an overflow cell
-        let overflow_bytes =
-            bytemuck::bytes_of(&transitions[state_index as usize + 1]);
+        let overflow_bytes = bytemuck::bytes_of(&transitions[state_index as usize + 1]);
         let oc: &OverflowCell = bytemuck::from_bytes(overflow_bytes);
         oc.more_transitions + 1
     } else {
@@ -120,8 +119,7 @@ pub fn weighted_max_tc(transitions: &[WeightedTransition], state_index: u32) -> 
     let state_head = &transitions[state_index as usize];
     let max_tc = state_head.more_transitions as u32;
     if max_tc == 255 {
-        let overflow_bytes =
-            bytemuck::bytes_of(&transitions[state_index as usize + 1]);
+        let overflow_bytes = bytemuck::bytes_of(&transitions[state_index as usize + 1]);
         let oc: &WeightedOverflowCell = bytemuck::from_bytes(overflow_bytes);
         oc.more_transitions + 1
     } else {

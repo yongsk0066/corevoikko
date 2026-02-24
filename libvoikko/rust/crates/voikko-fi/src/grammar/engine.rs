@@ -8,13 +8,12 @@
 use voikko_core::grammar_error::GrammarError;
 use voikko_fst::unweighted::UnweightedTransducer;
 
+use super::autocorrect::gc_autocorrect;
 use super::checks::{
-    GrammarOptions, GrammarParagraph,
-    gc_capitalization, gc_compound_verb, gc_end_punctuation, gc_local_punctuation,
-    gc_missing_verb, gc_negative_verb_mismatch, gc_punctuation_of_quotations,
+    GrammarOptions, GrammarParagraph, gc_capitalization, gc_compound_verb, gc_end_punctuation,
+    gc_local_punctuation, gc_missing_verb, gc_negative_verb_mismatch, gc_punctuation_of_quotations,
     gc_repeating_words, gc_sidesana,
 };
-use super::autocorrect::gc_autocorrect;
 
 /// Finnish rule engine that orchestrates all grammar checks on a paragraph.
 ///
@@ -156,12 +155,15 @@ mod tests {
     #[test]
     fn engine_detects_extra_whitespace() {
         let s = sentence(
-            vec![word("Koira", 0), ws("  ", 5), word("kissa", 7), punct(".", 12)],
+            vec![
+                word("Koira", 0),
+                ws("  ", 5),
+                word("kissa", 7),
+                punct(".", 12),
+            ],
             0,
         );
-        let p = GrammarParagraph {
-            sentences: vec![s],
-        };
+        let p = GrammarParagraph { sentences: vec![s] };
         let engine = FinnishRuleEngine::new(GrammarOptions::default(), None);
         let errs = engine.check(&p);
         assert!(errs.iter().any(|e| e.error_code == GCERR_EXTRA_WHITESPACE));
@@ -178,9 +180,7 @@ mod tests {
             ],
             0,
         );
-        let p = GrammarParagraph {
-            sentences: vec![s],
-        };
+        let p = GrammarParagraph { sentences: vec![s] };
         let engine = FinnishRuleEngine::new(GrammarOptions::default(), None);
         let errs = engine.check(&p);
         assert!(errs.iter().any(|e| e.error_code == GCERR_REPEATING_WORD));
@@ -189,7 +189,12 @@ mod tests {
     #[test]
     fn engine_detects_missing_end_punctuation() {
         let s1 = sentence(
-            vec![word("Koira", 0), ws(" ", 5), word("juoksee", 6), punct(".", 13)],
+            vec![
+                word("Koira", 0),
+                ws(" ", 5),
+                word("juoksee", 6),
+                punct(".", 13),
+            ],
             0,
         );
         let s2 = sentence(vec![word("Kissa", 15), ws(" ", 20), word("nukkuu", 21)], 15);
@@ -198,9 +203,10 @@ mod tests {
         };
         let engine = FinnishRuleEngine::new(GrammarOptions::default(), None);
         let errs = engine.check(&p);
-        assert!(errs
-            .iter()
-            .any(|e| e.error_code == GCERR_TERMINATING_PUNCTUATION_MISSING));
+        assert!(
+            errs.iter()
+                .any(|e| e.error_code == GCERR_TERMINATING_PUNCTUATION_MISSING)
+        );
     }
 
     #[test]
@@ -209,21 +215,18 @@ mod tests {
         w1.is_valid_word = true;
         w1.first_letter_lcase = true;
         let s = sentence(vec![w1, punct(".", 5)], 0);
-        let p = GrammarParagraph {
-            sentences: vec![s],
-        };
+        let p = GrammarParagraph { sentences: vec![s] };
         let engine = FinnishRuleEngine::new(GrammarOptions::default(), None);
         let errs = engine.check(&p);
-        assert!(errs
-            .iter()
-            .any(|e| e.error_code == GCERR_WRITE_FIRST_UPPERCASE));
+        assert!(
+            errs.iter()
+                .any(|e| e.error_code == GCERR_WRITE_FIRST_UPPERCASE)
+        );
     }
 
     #[test]
     fn engine_empty_paragraph_no_errors() {
-        let p = GrammarParagraph {
-            sentences: vec![],
-        };
+        let p = GrammarParagraph { sentences: vec![] };
         let engine = FinnishRuleEngine::new(GrammarOptions::default(), None);
         let errs = engine.check(&p);
         assert!(errs.is_empty());
@@ -232,34 +235,31 @@ mod tests {
     #[test]
     fn engine_options_suppress_end_punctuation() {
         let s = sentence(vec![word("Otsikko", 0)], 0);
-        let p = GrammarParagraph {
-            sentences: vec![s],
-        };
+        let p = GrammarParagraph { sentences: vec![s] };
         let opts = GrammarOptions {
             accept_titles_in_gc: true,
             ..Default::default()
         };
         let engine = FinnishRuleEngine::new(opts, None);
         let errs = engine.check(&p);
-        assert!(!errs
-            .iter()
-            .any(|e| e.error_code == GCERR_TERMINATING_PUNCTUATION_MISSING));
+        assert!(
+            !errs
+                .iter()
+                .any(|e| e.error_code == GCERR_TERMINATING_PUNCTUATION_MISSING)
+        );
     }
 
     #[test]
     fn engine_no_autocorrect_without_transducer() {
-        let s = sentence(
-            vec![word("Koira", 0), punct(".", 5)],
-            0,
-        );
-        let p = GrammarParagraph {
-            sentences: vec![s],
-        };
+        let s = sentence(vec![word("Koira", 0), punct(".", 5)], 0);
+        let p = GrammarParagraph { sentences: vec![s] };
         let engine = FinnishRuleEngine::new(GrammarOptions::default(), None);
         let errs = engine.check(&p);
         // No GCERR_INVALID_SPELLING expected without a transducer
-        assert!(!errs
-            .iter()
-            .any(|e| e.error_code == voikko_core::grammar_error::GCERR_INVALID_SPELLING));
+        assert!(
+            !errs
+                .iter()
+                .any(|e| e.error_code == voikko_core::grammar_error::GCERR_INVALID_SPELLING)
+        );
     }
 }

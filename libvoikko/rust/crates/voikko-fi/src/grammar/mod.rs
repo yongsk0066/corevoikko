@@ -2,19 +2,19 @@
 // Origin: grammar/
 
 #[allow(dead_code)]
+pub mod autocorrect;
+#[allow(dead_code)]
 pub mod cache;
 #[allow(dead_code)]
-pub mod paragraph;
-#[allow(dead_code)]
-pub mod finnish_analysis;
+pub mod checker;
 #[allow(dead_code)]
 pub mod checks;
 #[allow(dead_code)]
-pub mod autocorrect;
-#[allow(dead_code)]
 pub mod engine;
 #[allow(dead_code)]
-pub mod checker;
+pub mod finnish_analysis;
+#[allow(dead_code)]
+pub mod paragraph;
 
 use voikko_core::grammar_error::GrammarError;
 

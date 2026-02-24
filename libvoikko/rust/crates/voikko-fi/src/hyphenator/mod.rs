@@ -6,7 +6,7 @@
 // 2. Applying Finnish syllable rules within each morpheme component
 // 3. Intersecting (or union-ing) compound boundaries with syllable rules
 
-use voikko_core::analysis::{Analysis, ATTR_STRUCTURE};
+use voikko_core::analysis::{ATTR_STRUCTURE, Analysis};
 use voikko_core::character::{is_consonant, is_vowel, simple_lower};
 
 use crate::morphology::Analyzer;
@@ -26,10 +26,10 @@ const LONG_CONSONANTS: &[&[char]] = &[
     //   L"tsh" -> 't','s','h' (3 chars)
     //   L"t\u0161" -> 't','š' (2 chars)
     //   L"zh" -> 'z','h' (2 chars)
-    &['s', 'h', 't', 's', 'h'],     // shtsh
-    &['t', 's', 'h'],               // tsh
-    &['t', '\u{0161}'],             // tš
-    &['z', 'h'],                    // zh
+    &['s', 'h', 't', 's', 'h'], // shtsh
+    &['t', 's', 'h'],           // tsh
+    &['t', '\u{0161}'],         // tš
+    &['z', 'h'],                // zh
 ];
 
 /// Vowel pair patterns after which a following vowel may be split (VV-V rule).
@@ -1293,7 +1293,7 @@ mod tests {
         // The compound one should be removed.
         let mut buffers = vec![
             vec![b' ', b' ', b' ', b' ', b' '], // 1 part
-            vec![b' ', b' ', b'-', b' ', b' '],  // 2 parts
+            vec![b' ', b' ', b'-', b' ', b' '], // 2 parts
         ];
         remove_extra_hyphenations(&mut buffers, 5);
         assert_eq!(buffers.len(), 1);
@@ -1305,7 +1305,7 @@ mod tests {
         // Both analyses have compound boundaries -> min_parts > 1, keep all
         let mut buffers = vec![
             vec![b' ', b' ', b'-', b' ', b' '], // 2 parts
-            vec![b' ', b'-', b' ', b' ', b' '],  // 2 parts
+            vec![b' ', b'-', b' ', b' ', b' '], // 2 parts
         ];
         remove_extra_hyphenations(&mut buffers, 5);
         assert_eq!(buffers.len(), 2);

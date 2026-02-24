@@ -26,14 +26,16 @@ use voikko_core::token::{Sentence, Token};
 
 use crate::grammar::checker::FinnishGrammarChecker;
 use crate::grammar::checks::GrammarOptions;
-use crate::hyphenator::{FinnishHyphenator, HyphenatorOptions, Hyphenator};
+use crate::hyphenator::{FinnishHyphenator, Hyphenator, HyphenatorOptions};
 use crate::morphology::{Analyzer, FinnishVfstAnalyzer};
 use crate::speller::adapter::AnalyzerToSpellerAdapter;
 use crate::speller::cache::SpellerCache;
 use crate::speller::finnish::{FinnishSpellerOptions, FinnishSpellerTweaksWrapper};
-use crate::speller::pipeline::{spell_check, SpellOptions};
-use crate::suggestion::strategy::{default_ocr_strategy, default_typing_strategy, SuggestionStrategy};
+use crate::speller::pipeline::{SpellOptions, spell_check};
 use crate::suggestion::status::SuggestionStatus;
+use crate::suggestion::strategy::{
+    SuggestionStrategy, default_ocr_strategy, default_typing_strategy,
+};
 use crate::tokenizer;
 
 /// Error type for VoikkoHandle construction failures.
@@ -75,7 +77,6 @@ pub struct VoikkoHandle {
     ocr_strategy: SuggestionStrategy,
 
     // -- Options --
-
     /// Spell checker options.
     spell_options: SpellOptions,
 
@@ -158,11 +159,8 @@ impl VoikkoHandle {
     pub fn spell(&self, word: &str) -> bool {
         let word_chars: Vec<char> = word.chars().collect();
         let adapter = AnalyzerToSpellerAdapter::new(&self.analyzer);
-        let tweaks = FinnishSpellerTweaksWrapper::new(
-            &adapter,
-            &self.analyzer,
-            self.finnish_spell_options,
-        );
+        let tweaks =
+            FinnishSpellerTweaksWrapper::new(&adapter, &self.analyzer, self.finnish_spell_options);
         spell_check(
             &word_chars,
             &tweaks,
@@ -179,11 +177,8 @@ impl VoikkoHandle {
     pub fn suggest(&self, word: &str) -> Vec<String> {
         let word_chars: Vec<char> = word.chars().collect();
         let adapter = AnalyzerToSpellerAdapter::new(&self.analyzer);
-        let tweaks = FinnishSpellerTweaksWrapper::new(
-            &adapter,
-            &self.analyzer,
-            self.finnish_spell_options,
-        );
+        let tweaks =
+            FinnishSpellerTweaksWrapper::new(&adapter, &self.analyzer, self.finnish_spell_options);
 
         // Collect 3x candidates (matching C++ MAX_SUGGESTIONS * 3), sort, then truncate.
         let mut status = SuggestionStatus::new(&word_chars, self.max_suggestions * 3);
@@ -352,13 +347,15 @@ impl VoikkoHandle {
     /// Set whether to accept incomplete sentences in titles (grammar checking).
     pub fn set_accept_titles_in_gc(&mut self, value: bool) {
         self.grammar_options.accept_titles_in_gc = value;
-        self.grammar_checker.set_options(self.grammar_options.clone());
+        self.grammar_checker
+            .set_options(self.grammar_options.clone());
     }
 
     /// Set whether to accept incomplete sentences at end of paragraph (grammar checking).
     pub fn set_accept_unfinished_paragraphs_in_gc(&mut self, value: bool) {
         self.grammar_options.accept_unfinished_paragraphs_in_gc = value;
-        self.grammar_checker.set_options(self.grammar_options.clone());
+        self.grammar_checker
+            .set_options(self.grammar_options.clone());
     }
 
     /// Set whether to hyphenate unknown words.
@@ -369,7 +366,8 @@ impl VoikkoHandle {
     /// Set whether to accept bulleted list paragraphs in grammar checking.
     pub fn set_accept_bulleted_lists_in_gc(&mut self, value: bool) {
         self.grammar_options.accept_bulleted_lists_in_gc = value;
-        self.grammar_checker.set_options(self.grammar_options.clone());
+        self.grammar_checker
+            .set_options(self.grammar_options.clone());
     }
 
     /// Set the minimum word length for hyphenation.
@@ -395,7 +393,12 @@ impl VoikkoHandle {
     ///   `'-'` (in which case it is preserved to avoid a double hyphen)
     ///
     /// Origin: Voikko.hyphenate() in libvoikko/js/src/index.ts
-    pub fn insert_hyphens(&self, word: &str, separator: &str, allow_context_changes: bool) -> String {
+    pub fn insert_hyphens(
+        &self,
+        word: &str,
+        separator: &str,
+        allow_context_changes: bool,
+    ) -> String {
         let pattern = self.hyphenate(word);
         let word_chars: Vec<char> = word.chars().collect();
         let pat_chars: Vec<char> = pattern.chars().collect();
@@ -431,29 +434,66 @@ impl VoikkoHandle {
     pub fn attribute_values(attribute_name: &str) -> Option<&'static [&'static str]> {
         match attribute_name {
             "CLASS" => Some(&[
-                "nimisana", "laatusana", "nimisana_laatusana", "teonsana", "seikkasana",
-                "asemosana", "suhdesana", "huudahdussana", "sidesana", "etuliite",
-                "lukusana", "lyhenne", "kieltosana", "etunimi", "sukunimi", "paikannimi", "nimi",
+                "nimisana",
+                "laatusana",
+                "nimisana_laatusana",
+                "teonsana",
+                "seikkasana",
+                "asemosana",
+                "suhdesana",
+                "huudahdussana",
+                "sidesana",
+                "etuliite",
+                "lukusana",
+                "lyhenne",
+                "kieltosana",
+                "etunimi",
+                "sukunimi",
+                "paikannimi",
+                "nimi",
             ]),
             "NUMBER" => Some(&["singular", "plural"]),
             "PERSON" => Some(&["1", "2", "3", "4"]),
             "MOOD" => Some(&[
-                "indicative", "conditional", "potential", "imperative",
-                "A-infinitive", "E-infinitive", "MA-infinitive", "MINEN-infinitive",
+                "indicative",
+                "conditional",
+                "potential",
+                "imperative",
+                "A-infinitive",
+                "E-infinitive",
+                "MA-infinitive",
+                "MINEN-infinitive",
                 "MAINEN-infinitive",
             ]),
             "TENSE" => Some(&["present_simple", "past_imperfective"]),
             "COMPARISON" => Some(&["positive", "comparative", "superlative"]),
             "NEGATIVE" => Some(&["false", "true", "both"]),
             "PARTICIPLE" => Some(&[
-                "present_active", "present_passive", "past_active", "past_passive",
-                "agent", "negation",
+                "present_active",
+                "present_passive",
+                "past_active",
+                "past_passive",
+                "agent",
+                "negation",
             ]),
             "POSSESSIVE" => Some(&["1s", "2s", "1p", "2p", "3"]),
             "SIJAMUOTO" => Some(&[
-                "nimento", "omanto", "osanto", "olento", "tulento", "kohdanto",
-                "sisaolento", "sisaeronto", "sisatulento", "ulkoolento", "ulkoeronto",
-                "ulkotulento", "vajanto", "seuranto", "keinonto", "kerrontosti",
+                "nimento",
+                "omanto",
+                "osanto",
+                "olento",
+                "tulento",
+                "kohdanto",
+                "sisaolento",
+                "sisaeronto",
+                "sisatulento",
+                "ulkoolento",
+                "ulkoeronto",
+                "ulkotulento",
+                "vajanto",
+                "seuranto",
+                "keinonto",
+                "kerrontosti",
             ]),
             "FOCUS" => Some(&["läs", "kAAn", "kin", "hAn", "pA", "s"]),
             "KYSYMYSLIITE" => Some(&["true"]),
@@ -493,9 +533,9 @@ impl VoikkoHandle {
             if para_end > pos {
                 let para = &text_chars[pos..para_end];
                 let para_len = para.len();
-                let mut errors = self
-                    .grammar_checker
-                    .check_with_analyzer(para, para_len, &self.analyzer);
+                let mut errors =
+                    self.grammar_checker
+                        .check_with_analyzer(para, para_len, &self.analyzer);
 
                 // Adjust start_pos to be relative to the full text
                 for error in &mut errors {
@@ -701,8 +741,17 @@ mod tests {
     #[test]
     fn attribute_values_all_known_names() {
         let names = [
-            "CLASS", "NUMBER", "PERSON", "MOOD", "TENSE", "COMPARISON",
-            "NEGATIVE", "PARTICIPLE", "POSSESSIVE", "SIJAMUOTO", "FOCUS",
+            "CLASS",
+            "NUMBER",
+            "PERSON",
+            "MOOD",
+            "TENSE",
+            "COMPARISON",
+            "NEGATIVE",
+            "PARTICIPLE",
+            "POSSESSIVE",
+            "SIJAMUOTO",
+            "FOCUS",
             "KYSYMYSLIITE",
         ];
         for name in &names {
@@ -824,12 +873,8 @@ mod tests {
                 .unwrap_or_else(|_| "../../test-data/autocorr.vfst".into()),
         )
         .ok();
-        let handle = VoikkoHandle::from_bytes(
-            &mor_data,
-            autocorr_data.as_deref(),
-            "fi",
-        )
-        .expect("failed to create handle");
+        let handle = VoikkoHandle::from_bytes(&mor_data, autocorr_data.as_deref(), "fi")
+            .expect("failed to create handle");
 
         // Test with multi-line text: positions should be adjusted
         let text = "Ensimmäinen rivi.\nToinen rivi.";

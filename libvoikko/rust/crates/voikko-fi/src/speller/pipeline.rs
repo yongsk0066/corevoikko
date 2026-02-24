@@ -1,12 +1,12 @@
 // Top-level spell check pipeline
 // Origin: spellchecker/spell.cpp
 
-use voikko_core::case::{detect_case, CaseType};
+use voikko_core::case::{CaseType, detect_case};
 use voikko_core::character::{is_upper, simple_lower};
-use voikko_core::enums::{SpellResult, MAX_WORD_CHARS};
+use voikko_core::enums::{MAX_WORD_CHARS, SpellResult};
 
-use crate::speller::cache::SpellerCache;
 use crate::speller::Speller;
+use crate::speller::cache::SpellerCache;
 
 /// Public API spell result values.
 ///
@@ -512,7 +512,7 @@ fn map_spell_result(sres: SpellResult, caps: CaseType, options: &SpellOptions) -
 #[cfg(test)]
 mod tests {
     use super::*;
-    use voikko_core::analysis::{Analysis, ATTR_STRUCTURE};
+    use voikko_core::analysis::{ATTR_STRUCTURE, Analysis};
 
     use crate::morphology::Analyzer;
     use crate::speller::adapter::AnalyzerToSpellerAdapter;
@@ -903,7 +903,10 @@ mod tests {
     #[test]
     fn word_exceeding_max_length_fails() {
         let long_word: String = "a".repeat(MAX_WORD_CHARS + 1);
-        assert_eq!(spell_word(&long_word, &default_options()), VOIKKO_SPELL_FAILED);
+        assert_eq!(
+            spell_word(&long_word, &default_options()),
+            VOIKKO_SPELL_FAILED
+        );
     }
 
     #[test]

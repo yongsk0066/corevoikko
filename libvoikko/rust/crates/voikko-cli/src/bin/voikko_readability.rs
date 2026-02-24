@@ -64,8 +64,8 @@ fn main() {
         return;
     }
 
-    let mut handle = voikko_cli::load_handle(dict_path.as_deref())
-        .unwrap_or_else(|e| voikko_cli::fatal(&e));
+    let mut handle =
+        voikko_cli::load_handle(dict_path.as_deref()).unwrap_or_else(|e| voikko_cli::fatal(&e));
 
     // Match the Python tool: no_ugly=false, hyphenate_unknown=true
     handle.set_no_ugly_hyphenation(false);
@@ -156,10 +156,7 @@ fn main() {
         character_count + punctuation_count
     );
     let _ = writeln!(out, "Flesch Reading Ease: {flesch_reading_ease:.1}");
-    let _ = writeln!(
-        out,
-        "Flesch-Kincaid Grade Level: {flesch_kincaid_grade:.1}"
-    );
+    let _ = writeln!(out, "Flesch-Kincaid Grade Level: {flesch_kincaid_grade:.1}");
     let _ = writeln!(
         out,
         "Wiion yksinkertainen luokkataso (1-12): {wiio_simple:.1}"

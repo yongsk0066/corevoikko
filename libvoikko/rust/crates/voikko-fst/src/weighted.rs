@@ -5,7 +5,7 @@ use crate::config::WeightedConfig;
 use crate::flags::{self, FlagCheckResult};
 use crate::format::{self, HEADER_SIZE};
 use crate::symbols::{self, SymbolTable};
-use crate::transition::{WeightedTransition, WEIGHTED_FINAL_SYM, weighted_max_tc};
+use crate::transition::{WEIGHTED_FINAL_SYM, WeightedTransition, weighted_max_tc};
 use crate::{MAX_LOOP_COUNT, Transducer, VfstError};
 
 /// Weighted VFST transducer.
@@ -96,10 +96,8 @@ impl WeightedTransducer {
             };
             transition_count
         ];
-        let dst_bytes =
-            bytemuck::cast_slice_mut::<WeightedTransition, u8>(&mut transitions);
-        dst_bytes
-            .copy_from_slice(&remaining[..transition_count * size_of::<WeightedTransition>()]);
+        let dst_bytes = bytemuck::cast_slice_mut::<WeightedTransition, u8>(&mut transitions);
+        dst_bytes.copy_from_slice(&remaining[..transition_count * size_of::<WeightedTransition>()]);
 
         Ok(Self {
             transitions,
@@ -179,9 +177,8 @@ impl WeightedTransducer {
                         // Compute total weight
                         let mut total_weight = ct.weight;
                         for i in 0..config.stack_depth {
-                            total_weight += transitions
-                                [config.current_transition_stack[i] as usize]
-                                .weight;
+                            total_weight +=
+                                transitions[config.current_transition_stack[i] as usize].weight;
                         }
                         result.weight = total_weight;
                         return true;
@@ -189,8 +186,7 @@ impl WeightedTransducer {
                 } else if input_sym == 0 && ct.sym_in >= first_normal {
                     // Only normal transitions left but input is exhausted
                     break;
-                } else if (config.input_depth < config.input_length
-                    && input_sym == ct.sym_in)
+                } else if (config.input_depth < config.input_length && input_sym == ct.sym_in)
                     || (ct.sym_in < first_normal
                         && self.flag_diacritic_check(config, ct.sym_in as u16))
                 {
@@ -199,17 +195,15 @@ impl WeightedTransducer {
                         return false;
                     }
 
-                    config.output_symbol_stack[config.stack_depth] =
-                        if ct.sym_out >= first_normal {
-                            ct.sym_out
-                        } else {
-                            0
-                        };
+                    config.output_symbol_stack[config.stack_depth] = if ct.sym_out >= first_normal {
+                        ct.sym_out
+                    } else {
+                        0
+                    };
                     config.current_transition_stack[config.stack_depth] = trans_idx;
                     config.stack_depth += 1;
                     config.state_index_stack[config.stack_depth] = ct.target_state;
-                    config.current_transition_stack[config.stack_depth] =
-                        ct.target_state;
+                    config.current_transition_stack[config.stack_depth] = ct.target_state;
                     if ct.sym_in >= first_normal {
                         config.input_depth += 1;
                         if result.first_not_reached_position < config.input_depth {
@@ -525,20 +519,12 @@ mod tests {
 
         // State 2: final, weight=5
         data.extend_from_slice(bytemuck::bytes_of(&make_weighted_transition(
-            0xFFFFFFFF,
-            0,
-            0,
-            5,
-            0,
+            0xFFFFFFFF, 0, 0, 5, 0,
         )));
 
         // State 3: final, weight=5
         data.extend_from_slice(bytemuck::bytes_of(&make_weighted_transition(
-            0xFFFFFFFF,
-            0,
-            0,
-            5,
-            0,
+            0xFFFFFFFF, 0, 0, 5, 0,
         )));
 
         let t = WeightedTransducer::from_bytes(&data).unwrap();
@@ -582,31 +568,19 @@ mod tests {
         }
 
         // State 0: 'a'(1) -> state 1, weight=0
-        data.extend_from_slice(bytemuck::bytes_of(&make_weighted_transition(
-            1, 1, 1, 0, 0,
-        )));
+        data.extend_from_slice(bytemuck::bytes_of(&make_weighted_transition(1, 1, 1, 0, 0)));
 
         // State 1: 2 transitions (more=1)
         //   final (0xFFFFFFFF), weight=0
         //   'b'(2) -> state 2, weight=0 (should not be reached)
         data.extend_from_slice(bytemuck::bytes_of(&make_weighted_transition(
-            0xFFFFFFFF,
-            0,
-            0,
-            0,
-            1,
+            0xFFFFFFFF, 0, 0, 0, 1,
         )));
-        data.extend_from_slice(bytemuck::bytes_of(&make_weighted_transition(
-            2, 2, 2, 0, 0,
-        )));
+        data.extend_from_slice(bytemuck::bytes_of(&make_weighted_transition(2, 2, 2, 0, 0)));
 
         // State 2 (should never reach): final
         data.extend_from_slice(bytemuck::bytes_of(&make_weighted_transition(
-            0xFFFFFFFF,
-            0,
-            0,
-            0,
-            0,
+            0xFFFFFFFF, 0, 0, 0, 0,
         )));
 
         let t = WeightedTransducer::from_bytes(&data).unwrap();

@@ -225,9 +225,7 @@ impl Paragraph {
 ///
 /// Origin: FinnishAnalysis.cpp:225 — `wcschr(L".:\u2026\u2013\u2014", tstr[0])`
 const SENTENCE_SEPARATING_PUNCTUATION: &[char] = &[
-    '.',
-    ':',
-    '\u{2026}', // horizontal ellipsis
+    '.', ':', '\u{2026}', // horizontal ellipsis
     '\u{2013}', // en dash
     '\u{2014}', // em dash
 ];
@@ -344,11 +342,8 @@ where
         let mut sentence_len: usize = 0;
         let mut st;
         loop {
-            let (stype, slen) = tokenizer::next_sentence(
-                text,
-                remaining_total,
-                sentence_start + sentence_len,
-            );
+            let (stype, slen) =
+                tokenizer::next_sentence(text, remaining_total, sentence_start + sentence_len);
             sentence_len += slen;
             st = stype;
             if st != SentenceType::Possible {
@@ -461,7 +456,10 @@ mod tests {
     #[test]
     fn following_verb_type_equality() {
         assert_eq!(FollowingVerbType::None, FollowingVerbType::None);
-        assert_ne!(FollowingVerbType::AInfinitive, FollowingVerbType::MaInfinitive);
+        assert_ne!(
+            FollowingVerbType::AInfinitive,
+            FollowingVerbType::MaInfinitive
+        );
     }
 
     // -- strip_soft_hyphens tests --
@@ -614,12 +612,9 @@ mod tests {
         // "kissa" should have possible_sentence_start = true because ":" is
         // a sentence-separating punctuation.
         let first_sentence = &result.sentences[0];
-        let kissa_token = first_sentence
-            .tokens
-            .iter()
-            .find(|t| {
-                t.token_type == TokenType::Word && t.text.iter().collect::<String>() == "kissa"
-            });
+        let kissa_token = first_sentence.tokens.iter().find(|t| {
+            t.token_type == TokenType::Word && t.text.iter().collect::<String>() == "kissa"
+        });
 
         // The colon is a sentence-separating punctuation, so possible_sentence_start
         // should be set on the word following it.

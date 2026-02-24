@@ -8,9 +8,9 @@
 //
 // Origin: spellchecker/VfstSuggestion.cpp, VfstSuggestion.hpp
 
+use std::cmp::Reverse;
 use std::collections::BinaryHeap;
 use std::collections::HashMap;
-use std::cmp::Reverse;
 
 use voikko_fst::Transducer;
 use voikko_fst::weighted::{WeightedResult, WeightedTransducer};
@@ -105,7 +105,10 @@ impl VfstSuggestion {
         };
 
         // Origin: VfstSuggestion.cpp:68
-        if self.error_model.prepare(&mut error_model_conf, &word[..wlen]) {
+        if self
+            .error_model
+            .prepare(&mut error_model_conf, &word[..wlen])
+        {
             // Origin: VfstSuggestion.cpp:69
             while !status.should_abort()
                 && self.error_model.next_weighted(
@@ -128,7 +131,8 @@ impl VfstSuggestion {
                         // Accepted: combine weights.
                         // Origin: VfstSuggestion.cpp:73-80
                         // Use i32 for combined weight to avoid i16 overflow
-                        let weight = acceptor_result.weight as i32 + error_model_result.weight as i32;
+                        let weight =
+                            acceptor_result.weight as i32 + error_model_result.weight as i32;
                         suggestion_weights
                             .entry(error_model_output.clone())
                             .and_modify(|existing| *existing = (*existing).min(weight))
@@ -285,7 +289,7 @@ mod tests {
         let acc_data = build_vfst(acc_symbols, &acc_transitions);
         let acceptor = WeightedTransducer::from_bytes(&acc_data).unwrap();
 
-        let sg =VfstSuggestion::new(error_model, acceptor);
+        let sg = VfstSuggestion::new(error_model, acceptor);
 
         let word: Vec<char> = "x".chars().collect();
         let mut status = SuggestionStatus::new(&word, 10);
@@ -339,7 +343,7 @@ mod tests {
         let acc_data = build_vfst(acc_symbols, &acc_transitions);
         let acceptor = WeightedTransducer::from_bytes(&acc_data).unwrap();
 
-        let sg =VfstSuggestion::new(error_model, acceptor);
+        let sg = VfstSuggestion::new(error_model, acceptor);
 
         let word: Vec<char> = "x".chars().collect();
         let mut status = SuggestionStatus::new(&word, 10);
@@ -379,7 +383,7 @@ mod tests {
         let acc_data = build_vfst(acc_symbols, &acc_transitions);
         let acceptor = WeightedTransducer::from_bytes(&acc_data).unwrap();
 
-        let sg =VfstSuggestion::new(error_model, acceptor);
+        let sg = VfstSuggestion::new(error_model, acceptor);
 
         let word: Vec<char> = "x".chars().collect();
         let mut status = SuggestionStatus::new(&word, 10);
@@ -405,7 +409,7 @@ mod tests {
         let acc_data = err_data.clone();
         let acceptor = WeightedTransducer::from_bytes(&acc_data).unwrap();
 
-        let sg =VfstSuggestion::new(error_model, acceptor);
+        let sg = VfstSuggestion::new(error_model, acceptor);
 
         // Input "z" is unknown to the error model
         let word: Vec<char> = "z".chars().collect();
@@ -437,7 +441,7 @@ mod tests {
         let acc_data = build_vfst(acc_symbols, &acc_transitions);
         let acceptor = WeightedTransducer::from_bytes(&acc_data).unwrap();
 
-        let sg =VfstSuggestion::new(error_model, acceptor);
+        let sg = VfstSuggestion::new(error_model, acceptor);
 
         // max_suggestions=0 means already full -> should abort immediately
         let word: Vec<char> = "x".chars().collect();
@@ -479,7 +483,7 @@ mod tests {
         let acc_data = build_vfst(acc_symbols, &acc_transitions);
         let acceptor = WeightedTransducer::from_bytes(&acc_data).unwrap();
 
-        let sg =VfstSuggestion::new(error_model, acceptor);
+        let sg = VfstSuggestion::new(error_model, acceptor);
 
         let word: Vec<char> = "x".chars().collect();
         let mut status = SuggestionStatus::new(&word, 10);

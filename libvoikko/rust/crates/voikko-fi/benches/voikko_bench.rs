@@ -31,8 +31,8 @@ fn find_mor_vfst() -> Option<std::path::PathBuf> {
 }
 
 fn load_wordlist() -> Vec<String> {
-    let path =
-        std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../tests/differential/wordlist.txt");
+    let path = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .join("../../tests/differential/wordlist.txt");
     std::fs::read_to_string(&path)
         .unwrap_or_default()
         .lines()
@@ -103,13 +103,55 @@ fn bench_fst_traverse(c: &mut Criterion) {
 
     // 50 common Finnish words for raw FST traversal benchmarking.
     let common_words: Vec<Vec<char>> = [
-        "koira", "kissa", "talo", "auto", "vesi", "metsä", "järvi", "puu",
-        "kukka", "meri", "joki", "saari", "vuori", "ruoho", "kasvi", "eläin",
-        "lapsi", "nainen", "mies", "poika", "tyttö", "äiti", "isä", "perhe",
-        "koulu", "kauppa", "pankki", "kirjasto", "sairaala", "hotelli",
-        "ravintola", "museo", "teatteri", "musiikki", "taide", "historia",
-        "fysiikka", "kemia", "biologia", "talous", "politiikka", "luonto",
-        "ympäristö", "matka", "lento", "juna", "bussi", "laiva", "tennis",
+        "koira",
+        "kissa",
+        "talo",
+        "auto",
+        "vesi",
+        "metsä",
+        "järvi",
+        "puu",
+        "kukka",
+        "meri",
+        "joki",
+        "saari",
+        "vuori",
+        "ruoho",
+        "kasvi",
+        "eläin",
+        "lapsi",
+        "nainen",
+        "mies",
+        "poika",
+        "tyttö",
+        "äiti",
+        "isä",
+        "perhe",
+        "koulu",
+        "kauppa",
+        "pankki",
+        "kirjasto",
+        "sairaala",
+        "hotelli",
+        "ravintola",
+        "museo",
+        "teatteri",
+        "musiikki",
+        "taide",
+        "historia",
+        "fysiikka",
+        "kemia",
+        "biologia",
+        "talous",
+        "politiikka",
+        "luonto",
+        "ympäristö",
+        "matka",
+        "lento",
+        "juna",
+        "bussi",
+        "laiva",
+        "tennis",
         "golf",
     ]
     .iter()

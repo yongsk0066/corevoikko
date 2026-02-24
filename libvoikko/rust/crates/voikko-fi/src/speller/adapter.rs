@@ -5,8 +5,8 @@ use voikko_core::analysis::ATTR_STRUCTURE;
 use voikko_core::enums::SpellResult;
 
 use crate::morphology::Analyzer;
-use crate::speller::utils::match_word_and_analysis;
 use crate::speller::Speller;
+use crate::speller::utils::match_word_and_analysis;
 
 /// Adapts an `Analyzer` to the `Speller` trait by performing morphological
 /// analysis and then validating case via the STRUCTURE attribute.

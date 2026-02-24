@@ -55,14 +55,16 @@ fn main() {
         }
     }
 
-    let mut handle = voikko_cli::load_handle(dict_path.as_deref())
-        .unwrap_or_else(|e| voikko_cli::fatal(&e));
+    let mut handle =
+        voikko_cli::load_handle(dict_path.as_deref()).unwrap_or_else(|e| voikko_cli::fatal(&e));
     handle.set_max_suggestions(max_suggestions);
 
     let stdout = io::stdout();
     let mut out = io::BufWriter::new(stdout.lock());
 
-    let suggest_word = |word: &str, handle: &voikko_fi::handle::VoikkoHandle, out: &mut io::BufWriter<io::StdoutLock<'_>>| {
+    let suggest_word = |word: &str,
+                        handle: &voikko_fi::handle::VoikkoHandle,
+                        out: &mut io::BufWriter<io::StdoutLock<'_>>| {
         if handle.spell(word) {
             let _ = writeln!(out, "{word} (correct)");
         } else {

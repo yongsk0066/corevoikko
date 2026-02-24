@@ -107,8 +107,7 @@ impl<'a> FinnishGrammarChecker<'a> {
         let mut para_pos: usize = 0;
 
         while para_pos < text_len {
-            let (sentence_type, sentence_len) =
-                tokenizer::next_sentence(text, text_len, para_pos);
+            let (sentence_type, sentence_len) = tokenizer::next_sentence(text, text_len, para_pos);
 
             if sentence_type == voikko_core::enums::SentenceType::None && sentence_len == 0 {
                 break;
@@ -120,8 +119,7 @@ impl<'a> FinnishGrammarChecker<'a> {
             let mut tok_pos = para_pos;
 
             while tok_pos < sentence_end {
-                let (token_type, token_len) =
-                    tokenizer::next_token(text, text_len, tok_pos);
+                let (token_type, token_len) = tokenizer::next_token(text, text_len, tok_pos);
 
                 if token_type == TokenType::None || token_len == 0 {
                     break;
@@ -150,8 +148,7 @@ impl<'a> FinnishGrammarChecker<'a> {
             let mut tokens = Vec::new();
             let mut tok_pos = 0;
             while tok_pos < text_len {
-                let (token_type, token_len) =
-                    tokenizer::next_token(text, text_len, tok_pos);
+                let (token_type, token_len) = tokenizer::next_token(text, text_len, tok_pos);
                 if token_type == TokenType::None || token_len == 0 {
                     break;
                 }
@@ -255,18 +252,20 @@ mod tests {
     fn checker_detects_extra_whitespace() {
         // "Koira  kissa." has extra whitespace between words
         let errs = check_text("Koira  kissa.");
-        assert!(errs
-            .iter()
-            .any(|e| e.error_code == voikko_core::grammar_error::GCERR_EXTRA_WHITESPACE));
+        assert!(
+            errs.iter()
+                .any(|e| e.error_code == voikko_core::grammar_error::GCERR_EXTRA_WHITESPACE)
+        );
     }
 
     #[test]
     fn checker_detects_repeating_word() {
         // "Koira koira juoksee." has a repeating word
         let errs = check_text("Koira koira juoksee.");
-        assert!(errs
-            .iter()
-            .any(|e| e.error_code == voikko_core::grammar_error::GCERR_REPEATING_WORD));
+        assert!(
+            errs.iter()
+                .any(|e| e.error_code == voikko_core::grammar_error::GCERR_REPEATING_WORD)
+        );
     }
 
     #[test]
@@ -276,12 +275,16 @@ mod tests {
         // because is_valid_word defaults to false (treating words as unrecognized).
         let errs = check_text("Koira juoksee.");
         // Should not have extra whitespace or repeating word errors
-        assert!(!errs
-            .iter()
-            .any(|e| e.error_code == voikko_core::grammar_error::GCERR_EXTRA_WHITESPACE));
-        assert!(!errs
-            .iter()
-            .any(|e| e.error_code == voikko_core::grammar_error::GCERR_REPEATING_WORD));
+        assert!(
+            !errs
+                .iter()
+                .any(|e| e.error_code == voikko_core::grammar_error::GCERR_EXTRA_WHITESPACE)
+        );
+        assert!(
+            !errs
+                .iter()
+                .any(|e| e.error_code == voikko_core::grammar_error::GCERR_REPEATING_WORD)
+        );
     }
 
     #[test]
@@ -368,8 +371,7 @@ mod tests {
             ])],
         );
 
-        let checker =
-            FinnishGrammarChecker::new(GrammarOptions::default(), None, Some(&analyzer));
+        let checker = FinnishGrammarChecker::new(GrammarOptions::default(), None, Some(&analyzer));
         let text = "Koira juoksee.";
         let chars: Vec<char> = text.chars().collect();
         let paragraph = checker.build_paragraph(&chars, chars.len());

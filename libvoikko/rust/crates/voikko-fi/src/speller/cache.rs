@@ -151,7 +151,12 @@ impl SpellerCache {
     /// On a cache miss, the speller is invoked and the result is stored.
     ///
     /// Origin: spell.cpp:89-103 (voikko_cached_spell)
-    pub fn spell_with_cache(&mut self, word: &[char], wlen: usize, speller: &dyn Speller) -> SpellResult {
+    pub fn spell_with_cache(
+        &mut self,
+        word: &[char],
+        wlen: usize,
+        speller: &dyn Speller,
+    ) -> SpellResult {
         if self.is_in_cache(word, wlen) {
             return self.get_spell_result(word, wlen);
         }

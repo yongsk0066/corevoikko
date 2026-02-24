@@ -7,25 +7,24 @@
 //
 // Origin: FinnishVfstAnalyzer.cpp (~1,179 lines)
 
-use voikko_core::analysis::{
-    Analysis, ATTR_BASEFORM, ATTR_CLASS, ATTR_COMPARISON, ATTR_FOCUS, ATTR_FSTOUTPUT,
-    ATTR_KYSYMYSLIITE, ATTR_MALAGA_VAPAA_JALKIOSA, ATTR_MOOD, ATTR_NEGATIVE, ATTR_NUMBER,
-    ATTR_PARTICIPLE, ATTR_PERSON, ATTR_POSSIBLE_GEOGRAPHICAL_NAME,
-    ATTR_REQUIRE_FOLLOWING_VERB, ATTR_SIJAMUOTO, ATTR_STRUCTURE, ATTR_TENSE,
-    ATTR_POSSESSIVE, ATTR_WORDBASES, ATTR_WORDIDS,
-};
 use std::cell::RefCell;
+use voikko_core::analysis::{
+    ATTR_BASEFORM, ATTR_CLASS, ATTR_COMPARISON, ATTR_FOCUS, ATTR_FSTOUTPUT, ATTR_KYSYMYSLIITE,
+    ATTR_MALAGA_VAPAA_JALKIOSA, ATTR_MOOD, ATTR_NEGATIVE, ATTR_NUMBER, ATTR_PARTICIPLE,
+    ATTR_PERSON, ATTR_POSSESSIVE, ATTR_POSSIBLE_GEOGRAPHICAL_NAME, ATTR_REQUIRE_FOLLOWING_VERB,
+    ATTR_SIJAMUOTO, ATTR_STRUCTURE, ATTR_TENSE, ATTR_WORDBASES, ATTR_WORDIDS, Analysis,
+};
 
 use voikko_core::case::CaseType;
 use voikko_core::enums::MAX_WORD_CHARS;
 use voikko_fst::Transducer;
-use voikko_fst::unweighted::UnweightedTransducer;
 use voikko_fst::config::UnweightedConfig;
+use voikko_fst::unweighted::UnweightedTransducer;
 
 use super::Analyzer;
 use super::tag_parser::{
-    parse_basic_attributes, parse_baseform, parse_debug_attributes, parse_structure,
-    fix_structure, is_valid_analysis, starts_with, BasicAttributes, BUFFER_SIZE, MAX_ANALYSIS_COUNT,
+    BUFFER_SIZE, BasicAttributes, MAX_ANALYSIS_COUNT, fix_structure, is_valid_analysis,
+    parse_baseform, parse_basic_attributes, parse_debug_attributes, parse_structure, starts_with,
 };
 
 /// Finnish morphological analyzer using the VFST (Voikko Finite State Transducer) backend.
@@ -49,10 +48,7 @@ impl FinnishVfstAnalyzer {
     pub fn from_bytes(data: &[u8]) -> Result<Self, voikko_fst::VfstError> {
         let transducer = UnweightedTransducer::from_bytes(data)?;
         let config = RefCell::new(transducer.new_config(BUFFER_SIZE));
-        Ok(Self {
-            transducer,
-            config,
-        })
+        Ok(Self { transducer, config })
     }
 
     /// Analyze a word with full or partial morphology.
@@ -96,8 +92,7 @@ impl FinnishVfstAnalyzer {
             }
 
             let mut analysis = Analysis::new();
-            let mut structure: Vec<char> =
-                parse_structure(&fst_output, word_len).chars().collect();
+            let mut structure: Vec<char> = parse_structure(&fst_output, word_len).chars().collect();
 
             // Parse basic attributes (backward scan of tags)
             let basic = parse_basic_attributes(&fst_output);
@@ -234,9 +229,7 @@ fn post_process_attributes(analysis: &mut Analysis) {
     }
 
     // 2. Past passive participle forces class to "laatusana"
-    if participle.as_deref() == Some("past_passive")
-        && wclass.as_deref() != Some("laatusana")
-    {
+    if participle.as_deref() == Some("past_passive") && wclass.as_deref() != Some("laatusana") {
         analysis.remove(ATTR_CLASS);
         analysis.set(ATTR_CLASS, "laatusana");
     }

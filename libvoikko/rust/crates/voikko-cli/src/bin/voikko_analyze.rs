@@ -30,15 +30,21 @@ fn main() {
         return;
     }
 
-    let words: Vec<String> = args.iter().filter(|a| !a.starts_with('-')).cloned().collect();
+    let words: Vec<String> = args
+        .iter()
+        .filter(|a| !a.starts_with('-'))
+        .cloned()
+        .collect();
 
-    let handle = voikko_cli::load_handle(dict_path.as_deref())
-        .unwrap_or_else(|e| voikko_cli::fatal(&e));
+    let handle =
+        voikko_cli::load_handle(dict_path.as_deref()).unwrap_or_else(|e| voikko_cli::fatal(&e));
 
     let stdout = io::stdout();
     let mut out = io::BufWriter::new(stdout.lock());
 
-    let analyze_word = |word: &str, handle: &voikko_fi::handle::VoikkoHandle, out: &mut io::BufWriter<io::StdoutLock<'_>>| {
+    let analyze_word = |word: &str,
+                        handle: &voikko_fi::handle::VoikkoHandle,
+                        out: &mut io::BufWriter<io::StdoutLock<'_>>| {
         let analyses = handle.analyze(word);
         if analyses.is_empty() {
             let _ = writeln!(out, "{word}: (no analysis)");

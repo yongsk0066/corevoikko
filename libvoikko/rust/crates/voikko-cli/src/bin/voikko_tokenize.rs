@@ -38,8 +38,8 @@ fn main() {
 
     let show_sentences = args.iter().any(|a| a == "--sentences");
 
-    let handle = voikko_cli::load_handle(dict_path.as_deref())
-        .unwrap_or_else(|e| voikko_cli::fatal(&e));
+    let handle =
+        voikko_cli::load_handle(dict_path.as_deref()).unwrap_or_else(|e| voikko_cli::fatal(&e));
 
     let mut input = String::new();
     io::stdin()
@@ -59,8 +59,17 @@ fn main() {
             TokenType::Unknown => "UNKNOWN",
             TokenType::None => "NONE",
         };
-        let display_text = token.text.replace('\n', "\\n").replace('\r', "\\r").replace('\t', "\\t");
-        let _ = writeln!(out, "{type_str:13} [{:>4}..{:>4}]: {display_text}", token.pos, token.pos + token.token_len);
+        let display_text = token
+            .text
+            .replace('\n', "\\n")
+            .replace('\r', "\\r")
+            .replace('\t', "\\t");
+        let _ = writeln!(
+            out,
+            "{type_str:13} [{:>4}..{:>4}]: {display_text}",
+            token.pos,
+            token.pos + token.token_len
+        );
     }
 
     // Print sentences if requested
@@ -77,10 +86,7 @@ fn main() {
                 .collect();
             let snippet = snippet.replace('\n', "\\n");
             let type_str = format!("{:?}", sentence.sentence_type);
-            let _ = writeln!(
-                out,
-                "{type_str:8} [{offset:>4}..{end:>4}]: {snippet}"
-            );
+            let _ = writeln!(out, "{type_str:8} [{offset:>4}..{end:>4}]: {snippet}");
             offset = end;
         }
     }

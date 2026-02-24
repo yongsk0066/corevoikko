@@ -191,10 +191,10 @@ mod tests {
     fn append_error_maintains_sorted_order() {
         let mut cache = GcCache::new();
         let text = chars("Koira juoksi.");
-        cache.store_cache(&text, vec![
-            GrammarError::new(1, 0, 5),
-            GrammarError::new(3, 10, 3),
-        ]);
+        cache.store_cache(
+            &text,
+            vec![GrammarError::new(1, 0, 5), GrammarError::new(3, 10, 3)],
+        );
 
         // Insert in the middle.
         cache.append_error(GrammarError::new(2, 6, 4));

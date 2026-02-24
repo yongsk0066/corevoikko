@@ -7,7 +7,7 @@ use voikko_core::analysis::{
 };
 use voikko_core::enums::TokenType;
 
-use crate::grammar::paragraph::{strip_soft_hyphens, FollowingVerbType, GrammarToken};
+use crate::grammar::paragraph::{FollowingVerbType, GrammarToken, strip_soft_hyphens};
 use crate::morphology::Analyzer;
 
 // ---------------------------------------------------------------------------
@@ -76,9 +76,7 @@ pub(crate) fn analyse_token(token: &mut GrammarToken, analyzer: &dyn Analyzer) {
 
         // Origin: FinnishAnalysis.cpp:94-103 — first_letter_lcase / geographical name
         let structure_chars: Vec<char> = structure.chars().collect();
-        if structure_chars.len() < 2
-            || (structure_chars[1] != 'p' && structure_chars[1] != 'q')
-        {
+        if structure_chars.len() < 2 || (structure_chars[1] != 'p' && structure_chars[1] != 'q') {
             // Word may start with a capital letter anywhere.
             token.first_letter_lcase = false;
 
@@ -195,9 +193,7 @@ pub(crate) fn analyse_token(token: &mut GrammarToken, analyzer: &dyn Analyzer) {
                 } else if token.verb_follower_type != follower_type {
                     token.verb_follower_type = FollowingVerbType::None;
                 }
-            } else if participle == Some("agent")
-                && sijamuoto == Some("vajanto")
-            {
+            } else if participle == Some("agent") && sijamuoto == Some("vajanto") {
                 // Agent participle in abessive case: not a verb follower.
                 // Origin: FinnishAnalysis.cpp:179-181
                 token.verb_follower_type = FollowingVerbType::None;
@@ -314,11 +310,14 @@ mod tests {
     #[test]
     fn noun_analysis() {
         let mut analyzer = MockAnalyzer::new();
-        analyzer.add("koira", vec![make_analysis(&[
-            (ATTR_STRUCTURE, "=ppppp"),
-            (ATTR_CLASS, "nimisana"),
-            (ATTR_SIJAMUOTO, "nimento"),
-        ])]);
+        analyzer.add(
+            "koira",
+            vec![make_analysis(&[
+                (ATTR_STRUCTURE, "=ppppp"),
+                (ATTR_CLASS, "nimisana"),
+                (ATTR_SIJAMUOTO, "nimento"),
+            ])],
+        );
 
         let mut token = word_token("koira");
         analyse_token(&mut token, &analyzer);
@@ -336,11 +335,14 @@ mod tests {
     #[test]
     fn proper_noun_not_first_letter_lcase() {
         let mut analyzer = MockAnalyzer::new();
-        analyzer.add("Helsinki", vec![make_analysis(&[
-            (ATTR_STRUCTURE, "=ipppppppp"),
-            (ATTR_CLASS, "paikannimi"),
-            (ATTR_SIJAMUOTO, "nimento"),
-        ])]);
+        analyzer.add(
+            "Helsinki",
+            vec![make_analysis(&[
+                (ATTR_STRUCTURE, "=ipppppppp"),
+                (ATTR_CLASS, "paikannimi"),
+                (ATTR_SIJAMUOTO, "nimento"),
+            ])],
+        );
 
         let mut token = word_token("Helsinki");
         analyse_token(&mut token, &analyzer);
@@ -355,11 +357,14 @@ mod tests {
     #[test]
     fn geographical_name_in_genitive() {
         let mut analyzer = MockAnalyzer::new();
-        analyzer.add("Helsingin", vec![make_analysis(&[
-            (ATTR_STRUCTURE, "=ipppppppppp"),
-            (ATTR_CLASS, "paikannimi"),
-            (ATTR_SIJAMUOTO, "omanto"),
-        ])]);
+        analyzer.add(
+            "Helsingin",
+            vec![make_analysis(&[
+                (ATTR_STRUCTURE, "=ipppppppppp"),
+                (ATTR_CLASS, "paikannimi"),
+                (ATTR_SIJAMUOTO, "omanto"),
+            ])],
+        );
 
         let mut token = word_token("Helsingin");
         analyse_token(&mut token, &analyzer);
@@ -373,10 +378,13 @@ mod tests {
     #[test]
     fn conjunction_analysis() {
         let mut analyzer = MockAnalyzer::new();
-        analyzer.add("ja", vec![make_analysis(&[
-            (ATTR_STRUCTURE, "=pp"),
-            (ATTR_CLASS, "sidesana"),
-        ])]);
+        analyzer.add(
+            "ja",
+            vec![make_analysis(&[
+                (ATTR_STRUCTURE, "=pp"),
+                (ATTR_CLASS, "sidesana"),
+            ])],
+        );
 
         let mut token = word_token("ja");
         analyse_token(&mut token, &analyzer);
@@ -392,16 +400,13 @@ mod tests {
         // is_conjunction should be false (not all analyses agree),
         // but possible_conjunction should be true.
         let mut analyzer = MockAnalyzer::new();
-        analyzer.add("ja", vec![
-            make_analysis(&[
-                (ATTR_STRUCTURE, "=pp"),
-                (ATTR_CLASS, "sidesana"),
-            ]),
-            make_analysis(&[
-                (ATTR_STRUCTURE, "=pp"),
-                (ATTR_CLASS, "nimisana"),
-            ]),
-        ]);
+        analyzer.add(
+            "ja",
+            vec![
+                make_analysis(&[(ATTR_STRUCTURE, "=pp"), (ATTR_CLASS, "sidesana")]),
+                make_analysis(&[(ATTR_STRUCTURE, "=pp"), (ATTR_CLASS, "nimisana")]),
+            ],
+        );
 
         let mut token = word_token("ja");
         analyse_token(&mut token, &analyzer);
@@ -417,10 +422,13 @@ mod tests {
     fn negative_verb_ending_in_a_umlaut_is_possible_conjunction() {
         let mut analyzer = MockAnalyzer::new();
         let text = "eik\u{00E4}"; // "eikä"
-        analyzer.add(text, vec![make_analysis(&[
-            (ATTR_STRUCTURE, "=pppp"),
-            (ATTR_CLASS, "kieltosana"),
-        ])]);
+        analyzer.add(
+            text,
+            vec![make_analysis(&[
+                (ATTR_STRUCTURE, "=pppp"),
+                (ATTR_CLASS, "kieltosana"),
+            ])],
+        );
 
         let mut token = word_token(text);
         analyse_token(&mut token, &analyzer);
@@ -434,13 +442,16 @@ mod tests {
     #[test]
     fn indicative_verb_is_main_verb() {
         let mut analyzer = MockAnalyzer::new();
-        analyzer.add("juoksi", vec![make_analysis(&[
-            (ATTR_STRUCTURE, "=pppppp"),
-            (ATTR_CLASS, "teonsana"),
-            (ATTR_MOOD, "indicative"),
-            (ATTR_NEGATIVE, "false"),
-            (ATTR_PERSON, "1"),
-        ])]);
+        analyzer.add(
+            "juoksi",
+            vec![make_analysis(&[
+                (ATTR_STRUCTURE, "=pppppp"),
+                (ATTR_CLASS, "teonsana"),
+                (ATTR_MOOD, "indicative"),
+                (ATTR_NEGATIVE, "false"),
+                (ATTR_PERSON, "1"),
+            ])],
+        );
 
         let mut token = word_token("juoksi");
         analyse_token(&mut token, &analyzer);
@@ -455,11 +466,14 @@ mod tests {
     #[test]
     fn a_infinitive_not_main_verb() {
         let mut analyzer = MockAnalyzer::new();
-        analyzer.add("juosta", vec![make_analysis(&[
-            (ATTR_STRUCTURE, "=pppppp"),
-            (ATTR_CLASS, "teonsana"),
-            (ATTR_MOOD, "A-infinitive"),
-        ])]);
+        analyzer.add(
+            "juosta",
+            vec![make_analysis(&[
+                (ATTR_STRUCTURE, "=pppppp"),
+                (ATTR_CLASS, "teonsana"),
+                (ATTR_MOOD, "A-infinitive"),
+            ])],
+        );
 
         let mut token = word_token("juosta");
         analyse_token(&mut token, &analyzer);
@@ -473,11 +487,14 @@ mod tests {
     #[test]
     fn ma_infinitive_follower_type() {
         let mut analyzer = MockAnalyzer::new();
-        analyzer.add("juoksemaan", vec![make_analysis(&[
-            (ATTR_STRUCTURE, "=pppppppppp"),
-            (ATTR_CLASS, "teonsana"),
-            (ATTR_MOOD, "MA-infinitive"),
-        ])]);
+        analyzer.add(
+            "juoksemaan",
+            vec![make_analysis(&[
+                (ATTR_STRUCTURE, "=pppppppppp"),
+                (ATTR_CLASS, "teonsana"),
+                (ATTR_MOOD, "MA-infinitive"),
+            ])],
+        );
 
         let mut token = word_token("juoksemaan");
         analyse_token(&mut token, &analyzer);
@@ -488,10 +505,13 @@ mod tests {
     #[test]
     fn negative_verb_form() {
         let mut analyzer = MockAnalyzer::new();
-        analyzer.add("ei", vec![make_analysis(&[
-            (ATTR_STRUCTURE, "=pp"),
-            (ATTR_CLASS, "kieltosana"),
-        ])]);
+        analyzer.add(
+            "ei",
+            vec![make_analysis(&[
+                (ATTR_STRUCTURE, "=pp"),
+                (ATTR_CLASS, "kieltosana"),
+            ])],
+        );
 
         let mut token = word_token("ei");
         analyse_token(&mut token, &analyzer);
@@ -507,14 +527,17 @@ mod tests {
     #[test]
     fn require_following_verb_a_infinitive() {
         let mut analyzer = MockAnalyzer::new();
-        analyzer.add("haluan", vec![make_analysis(&[
-            (ATTR_STRUCTURE, "=pppppp"),
-            (ATTR_CLASS, "teonsana"),
-            (ATTR_MOOD, "indicative"),
-            (ATTR_NEGATIVE, "false"),
-            (ATTR_PERSON, "1"),
-            (ATTR_REQUIRE_FOLLOWING_VERB, "A-infinitive"),
-        ])]);
+        analyzer.add(
+            "haluan",
+            vec![make_analysis(&[
+                (ATTR_STRUCTURE, "=pppppp"),
+                (ATTR_CLASS, "teonsana"),
+                (ATTR_MOOD, "indicative"),
+                (ATTR_NEGATIVE, "false"),
+                (ATTR_PERSON, "1"),
+                (ATTR_REQUIRE_FOLLOWING_VERB, "A-infinitive"),
+            ])],
+        );
 
         let mut token = word_token("haluan");
         analyse_token(&mut token, &analyzer);
@@ -525,14 +548,17 @@ mod tests {
     #[test]
     fn require_following_verb_ma_infinitive() {
         let mut analyzer = MockAnalyzer::new();
-        analyzer.add("alkaa", vec![make_analysis(&[
-            (ATTR_STRUCTURE, "=ppppp"),
-            (ATTR_CLASS, "teonsana"),
-            (ATTR_MOOD, "indicative"),
-            (ATTR_NEGATIVE, "false"),
-            (ATTR_PERSON, "3"),
-            (ATTR_REQUIRE_FOLLOWING_VERB, "MA-infinitive"),
-        ])]);
+        analyzer.add(
+            "alkaa",
+            vec![make_analysis(&[
+                (ATTR_STRUCTURE, "=ppppp"),
+                (ATTR_CLASS, "teonsana"),
+                (ATTR_MOOD, "indicative"),
+                (ATTR_NEGATIVE, "false"),
+                (ATTR_PERSON, "3"),
+                (ATTR_REQUIRE_FOLLOWING_VERB, "MA-infinitive"),
+            ])],
+        );
 
         let mut token = word_token("alkaa");
         analyse_token(&mut token, &analyzer);
@@ -541,27 +567,33 @@ mod tests {
         // mood is not conditional, so... actually the condition in the C++
         // sets is_positive_verb=false when the whole big condition is true.
         // For this test we focus on require_following_verb.
-        assert_eq!(token.require_following_verb, FollowingVerbType::MaInfinitive);
+        assert_eq!(
+            token.require_following_verb,
+            FollowingVerbType::MaInfinitive
+        );
     }
 
     #[test]
     fn conflicting_require_following_verb_resolves_to_none() {
         // Two analyses with different require_following_verb values.
         let mut analyzer = MockAnalyzer::new();
-        analyzer.add("verb", vec![
-            make_analysis(&[
-                (ATTR_STRUCTURE, "=pppp"),
-                (ATTR_CLASS, "teonsana"),
-                (ATTR_MOOD, "indicative"),
-                (ATTR_REQUIRE_FOLLOWING_VERB, "A-infinitive"),
-            ]),
-            make_analysis(&[
-                (ATTR_STRUCTURE, "=pppp"),
-                (ATTR_CLASS, "teonsana"),
-                (ATTR_MOOD, "indicative"),
-                (ATTR_REQUIRE_FOLLOWING_VERB, "MA-infinitive"),
-            ]),
-        ]);
+        analyzer.add(
+            "verb",
+            vec![
+                make_analysis(&[
+                    (ATTR_STRUCTURE, "=pppp"),
+                    (ATTR_CLASS, "teonsana"),
+                    (ATTR_MOOD, "indicative"),
+                    (ATTR_REQUIRE_FOLLOWING_VERB, "A-infinitive"),
+                ]),
+                make_analysis(&[
+                    (ATTR_STRUCTURE, "=pppp"),
+                    (ATTR_CLASS, "teonsana"),
+                    (ATTR_MOOD, "indicative"),
+                    (ATTR_REQUIRE_FOLLOWING_VERB, "MA-infinitive"),
+                ]),
+            ],
+        );
 
         let mut token = word_token("verb");
         analyse_token(&mut token, &analyzer);
@@ -574,18 +606,21 @@ mod tests {
     #[test]
     fn conflicting_verb_follower_type_resolves_to_none() {
         let mut analyzer = MockAnalyzer::new();
-        analyzer.add("verb", vec![
-            make_analysis(&[
-                (ATTR_STRUCTURE, "=pppp"),
-                (ATTR_CLASS, "teonsana"),
-                (ATTR_MOOD, "A-infinitive"),
-            ]),
-            make_analysis(&[
-                (ATTR_STRUCTURE, "=pppp"),
-                (ATTR_CLASS, "teonsana"),
-                (ATTR_MOOD, "MA-infinitive"),
-            ]),
-        ]);
+        analyzer.add(
+            "verb",
+            vec![
+                make_analysis(&[
+                    (ATTR_STRUCTURE, "=pppp"),
+                    (ATTR_CLASS, "teonsana"),
+                    (ATTR_MOOD, "A-infinitive"),
+                ]),
+                make_analysis(&[
+                    (ATTR_STRUCTURE, "=pppp"),
+                    (ATTR_CLASS, "teonsana"),
+                    (ATTR_MOOD, "MA-infinitive"),
+                ]),
+            ],
+        );
 
         let mut token = word_token("verb");
         analyse_token(&mut token, &analyzer);
@@ -598,12 +633,15 @@ mod tests {
     #[test]
     fn agent_participle_abessive_not_verb_follower() {
         let mut analyzer = MockAnalyzer::new();
-        analyzer.add("lukematta", vec![make_analysis(&[
-            (ATTR_STRUCTURE, "=ppppppppp"),
-            (ATTR_CLASS, "teonsana"),
-            (ATTR_PARTICIPLE, "agent"),
-            (ATTR_SIJAMUOTO, "vajanto"),
-        ])]);
+        analyzer.add(
+            "lukematta",
+            vec![make_analysis(&[
+                (ATTR_STRUCTURE, "=ppppppppp"),
+                (ATTR_CLASS, "teonsana"),
+                (ATTR_PARTICIPLE, "agent"),
+                (ATTR_SIJAMUOTO, "vajanto"),
+            ])],
+        );
 
         let mut token = word_token("lukematta");
         analyse_token(&mut token, &analyzer);
@@ -616,11 +654,14 @@ mod tests {
     #[test]
     fn possible_geographical_name_flag() {
         let mut analyzer = MockAnalyzer::new();
-        analyzer.add("Turku", vec![make_analysis(&[
-            (ATTR_STRUCTURE, "=ipppp"),
-            (ATTR_CLASS, "paikannimi"),
-            (ATTR_POSSIBLE_GEOGRAPHICAL_NAME, "true"),
-        ])]);
+        analyzer.add(
+            "Turku",
+            vec![make_analysis(&[
+                (ATTR_STRUCTURE, "=ipppp"),
+                (ATTR_CLASS, "paikannimi"),
+                (ATTR_POSSIBLE_GEOGRAPHICAL_NAME, "true"),
+            ])],
+        );
 
         let mut token = word_token("Turku");
         analyse_token(&mut token, &analyzer);
@@ -634,10 +675,13 @@ mod tests {
     fn soft_hyphens_stripped_before_analysis() {
         let mut analyzer = MockAnalyzer::new();
         // The analyzer receives the word without soft hyphens.
-        analyzer.add("koira", vec![make_analysis(&[
-            (ATTR_STRUCTURE, "=ppppp"),
-            (ATTR_CLASS, "nimisana"),
-        ])]);
+        analyzer.add(
+            "koira",
+            vec![make_analysis(&[
+                (ATTR_STRUCTURE, "=ppppp"),
+                (ATTR_CLASS, "nimisana"),
+            ])],
+        );
 
         // Token text includes a soft hyphen.
         let mut token = word_token("koi\u{00AD}ra");
@@ -651,17 +695,17 @@ mod tests {
     #[test]
     fn all_analyses_must_agree_for_is_main_verb() {
         let mut analyzer = MockAnalyzer::new();
-        analyzer.add("word", vec![
-            make_analysis(&[
-                (ATTR_STRUCTURE, "=pppp"),
-                (ATTR_CLASS, "teonsana"),
-                (ATTR_MOOD, "indicative"),
-            ]),
-            make_analysis(&[
-                (ATTR_STRUCTURE, "=pppp"),
-                (ATTR_CLASS, "nimisana"),
-            ]),
-        ]);
+        analyzer.add(
+            "word",
+            vec![
+                make_analysis(&[
+                    (ATTR_STRUCTURE, "=pppp"),
+                    (ATTR_CLASS, "teonsana"),
+                    (ATTR_MOOD, "indicative"),
+                ]),
+                make_analysis(&[(ATTR_STRUCTURE, "=pppp"), (ATTR_CLASS, "nimisana")]),
+            ],
+        );
 
         let mut token = word_token("word");
         analyse_token(&mut token, &analyzer);
@@ -675,9 +719,7 @@ mod tests {
     fn no_class_sets_possible_main_verb() {
         // Analysis without CLASS attribute.
         let mut analyzer = MockAnalyzer::new();
-        analyzer.add("thing", vec![make_analysis(&[
-            (ATTR_STRUCTURE, "=ppppp"),
-        ])]);
+        analyzer.add("thing", vec![make_analysis(&[(ATTR_STRUCTURE, "=ppppp")])]);
 
         let mut token = word_token("thing");
         analyse_token(&mut token, &analyzer);
@@ -694,10 +736,13 @@ mod tests {
     #[test]
     fn structure_p_means_lowercase() {
         let mut analyzer = MockAnalyzer::new();
-        analyzer.add("koira", vec![make_analysis(&[
-            (ATTR_STRUCTURE, "=ppppp"),
-            (ATTR_CLASS, "nimisana"),
-        ])]);
+        analyzer.add(
+            "koira",
+            vec![make_analysis(&[
+                (ATTR_STRUCTURE, "=ppppp"),
+                (ATTR_CLASS, "nimisana"),
+            ])],
+        );
 
         let mut token = word_token("koira");
         analyse_token(&mut token, &analyzer);
@@ -708,10 +753,13 @@ mod tests {
     #[test]
     fn structure_i_means_not_lowercase() {
         let mut analyzer = MockAnalyzer::new();
-        analyzer.add("Helsinki", vec![make_analysis(&[
-            (ATTR_STRUCTURE, "=ipppppppp"),
-            (ATTR_CLASS, "paikannimi"),
-        ])]);
+        analyzer.add(
+            "Helsinki",
+            vec![make_analysis(&[
+                (ATTR_STRUCTURE, "=ipppppppp"),
+                (ATTR_CLASS, "paikannimi"),
+            ])],
+        );
 
         let mut token = word_token("Helsinki");
         analyse_token(&mut token, &analyzer);
@@ -723,10 +771,13 @@ mod tests {
     fn structure_q_means_lowercase() {
         // STRUCTURE with 'q' at position 1 means lowercase abbreviation.
         let mut analyzer = MockAnalyzer::new();
-        analyzer.add("esim", vec![make_analysis(&[
-            (ATTR_STRUCTURE, "=qqqq"),
-            (ATTR_CLASS, "lyhenne"),
-        ])]);
+        analyzer.add(
+            "esim",
+            vec![make_analysis(&[
+                (ATTR_STRUCTURE, "=qqqq"),
+                (ATTR_CLASS, "lyhenne"),
+            ])],
+        );
 
         let mut token = word_token("esim");
         analyse_token(&mut token, &analyzer);

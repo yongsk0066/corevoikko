@@ -1,12 +1,12 @@
 // Morphological analysis module
 // Origin: morphology/
 
-mod vfst;
 mod finnish;
 mod tag_parser;
+mod vfst;
 
-pub use vfst::VfstAnalyzer;
 pub use finnish::FinnishVfstAnalyzer;
+pub use vfst::VfstAnalyzer;
 
 use voikko_core::analysis::Analysis;
 

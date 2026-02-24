@@ -178,8 +178,7 @@ mod tests {
 
     #[test]
     fn parse_with_flags_and_multi_chars() {
-        let data =
-            make_symbol_table(&["", "@P.CASE.NOM@", "@C.NUM@", "a", "b", "[Ln]", "[Bc]"]);
+        let data = make_symbol_table(&["", "@P.CASE.NOM@", "@C.NUM@", "a", "b", "[Ln]", "[Bc]"]);
         let (table, _) = parse_symbol_table(&data, 0).unwrap();
 
         assert_eq!(table.symbol_strings.len(), 7);

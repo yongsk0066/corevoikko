@@ -31,21 +31,17 @@ pub fn load_handle(dict_path: Option<&str>) -> Result<VoikkoHandle, String> {
                 .map_err(|e| format!("failed to read {}: {}", mor_path.display(), e))?;
 
             let autocorr_path = dir.join(AUTOCORR_VFST);
-            let autocorr_data = if autocorr_path.is_file() {
-                Some(
-                    std::fs::read(&autocorr_path)
-                        .map_err(|e| format!("failed to read {}: {}", autocorr_path.display(), e))?,
-                )
-            } else {
-                None
-            };
+            let autocorr_data =
+                if autocorr_path.is_file() {
+                    Some(std::fs::read(&autocorr_path).map_err(|e| {
+                        format!("failed to read {}: {}", autocorr_path.display(), e)
+                    })?)
+                } else {
+                    None
+                };
 
-            return VoikkoHandle::from_bytes(
-                &mor_data,
-                autocorr_data.as_deref(),
-                "fi",
-            )
-            .map_err(|e: VoikkoError| format!("failed to create VoikkoHandle: {e}"));
+            return VoikkoHandle::from_bytes(&mor_data, autocorr_data.as_deref(), "fi")
+                .map_err(|e: VoikkoError| format!("failed to create VoikkoHandle: {e}"));
         }
     }
 
@@ -104,9 +100,7 @@ fn build_search_paths(dict_path: Option<&str>) -> Vec<PathBuf> {
 
 /// Get the user's home directory.
 fn home_dir() -> Option<PathBuf> {
-    std::env::var("HOME")
-        .ok()
-        .map(PathBuf::from)
+    std::env::var("HOME").ok().map(PathBuf::from)
 }
 
 /// Parse a `--dict-path=PATH` or `-d PATH` argument from command line args.

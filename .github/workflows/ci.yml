@@ -8,7 +8,7 @@ on:
 
 jobs:
   rust:
-    name: Rust (test + clippy)
+    name: Rust (test + clippy + fmt + audit)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -16,11 +16,15 @@ jobs:
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          components: clippy
+          components: clippy, rustfmt
 
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: libvoikko/rust
+
+      - name: Check formatting
+        working-directory: libvoikko/rust
+        run: cargo fmt --all --check
 
       - name: Run tests
         working-directory: libvoikko/rust
@@ -29,6 +33,13 @@ jobs:
       - name: Clippy
         working-directory: libvoikko/rust
         run: cargo clippy --all-features -- -D warnings
+
+      - name: Install cargo-audit
+        run: cargo install cargo-audit --locked
+
+      - name: Audit dependencies
+        working-directory: libvoikko/rust
+        run: cargo audit
 
   js:
     name: JS/WASM (build + test)

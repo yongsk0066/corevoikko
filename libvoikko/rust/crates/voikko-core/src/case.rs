@@ -166,7 +166,10 @@ mod tests {
 
     #[test]
     fn detect_finnish_chars() {
-        assert_eq!(detect_case(&chars("k\u{00E4}vel\u{00F6}")), CaseType::AllLower); // kävelö
+        assert_eq!(
+            detect_case(&chars("k\u{00E4}vel\u{00F6}")),
+            CaseType::AllLower
+        ); // kävelö
         assert_eq!(detect_case(&chars("\u{00C4}iti")), CaseType::FirstUpper); // Äiti
         assert_eq!(detect_case(&chars("\u{00C4}\u{00D6}")), CaseType::AllUpper); // ÄÖ
     }

@@ -41,8 +41,7 @@ fn find_mor_vfst() -> Option<PathBuf> {
     }
 
     // Fall back to ../../test-data/mor.vfst (relative to crate root)
-    let fallback = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-        .join("../../test-data/mor.vfst");
+    let fallback = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../test-data/mor.vfst");
     if fallback.exists() {
         return Some(fallback);
     }
@@ -217,11 +216,7 @@ fn differential_spell() {
     }
 
     if !mismatches.is_empty() {
-        eprintln!(
-            "\n=== SPELL MISMATCHES: {}/{} ===",
-            mismatches.len(),
-            total
-        );
+        eprintln!("\n=== SPELL MISMATCHES: {}/{} ===", mismatches.len(), total);
         for m in &mismatches {
             eprintln!("{}", m);
         }
@@ -244,7 +239,9 @@ fn differential_analyze() {
     };
 
     let golden = load_golden("analyze.json");
-    let golden_map = golden.as_object().expect("analyze.json should be an object");
+    let golden_map = golden
+        .as_object()
+        .expect("analyze.json should be an object");
 
     let mut mismatches = Vec::new();
     let mut total = 0;

@@ -21,7 +21,7 @@ pub mod vfst;
 pub use generators::SuggestionGenerator;
 pub use status::{Suggestion, SuggestionStatus};
 pub use strategy::{
-    default_ocr_strategy, default_typing_strategy, ocr_strategy, typing_strategy,
-    SuggestionStrategy,
+    SuggestionStrategy, default_ocr_strategy, default_typing_strategy, ocr_strategy,
+    typing_strategy,
 };
 pub use vfst::VfstSuggestion;

@@ -58,7 +58,11 @@ impl UnweightedTransducer {
 
         // Align to 8-byte boundary (sizeof(Transition))
         let partial = sym_end % 8;
-        let transition_offset = if partial > 0 { sym_end + (8 - partial) } else { sym_end };
+        let transition_offset = if partial > 0 {
+            sym_end + (8 - partial)
+        } else {
+            sym_end
+        };
 
         if transition_offset > data.len() {
             return Err(VfstError::TooShort {
@@ -79,7 +83,14 @@ impl UnweightedTransducer {
 
         // Copy transition data into an aligned Vec<Transition> for safety.
         // The source slice may not be properly aligned for zero-copy cast.
-        let mut transitions = vec![Transition { sym_in: 0, sym_out: 0, trans_info: 0 }; transition_count];
+        let mut transitions = vec![
+            Transition {
+                sym_in: 0,
+                sym_out: 0,
+                trans_info: 0
+            };
+            transition_count
+        ];
         let dst_bytes = bytemuck::cast_slice_mut::<Transition, u8>(&mut transitions);
         dst_bytes.copy_from_slice(&remaining[..transition_count * size_of::<Transition>()]);
 
@@ -188,13 +199,12 @@ impl UnweightedTransducer {
                         return false;
                     }
 
-                    config.output_symbol_stack[config.stack_depth] = if current_transition.sym_out
-                        >= first_normal
-                    {
-                        current_transition.sym_out
-                    } else {
-                        0
-                    };
+                    config.output_symbol_stack[config.stack_depth] =
+                        if current_transition.sym_out >= first_normal {
+                            current_transition.sym_out
+                        } else {
+                            0
+                        };
                     config.current_transition_stack[config.stack_depth] = trans_idx;
                     config.stack_depth += 1;
                     config.state_index_stack[config.stack_depth] =
@@ -225,8 +235,7 @@ impl UnweightedTransducer {
                 config.input_depth -= 1;
             } else if flag_feature_count > 0 && previous_sym_in != 0 {
                 config.flag_depth -= 1;
-                let undo_feature =
-                    config.flag_undo_feature[config.flag_depth] as usize;
+                let undo_feature = config.flag_undo_feature[config.flag_depth] as usize;
                 let undo_value = config.flag_undo_value[config.flag_depth];
                 config.current_flag_values[undo_feature] = undo_value;
             }
@@ -296,8 +305,7 @@ impl Transducer for UnweightedTransducer {
                     config.input_symbol_stack[config.input_length] = sym_idx;
                 }
                 None => {
-                    config.input_symbol_stack[config.input_length] =
-                        self.unknown_symbol_ordinal;
+                    config.input_symbol_stack[config.input_length] = self.unknown_symbol_ordinal;
                     all_known = false;
                 }
             }

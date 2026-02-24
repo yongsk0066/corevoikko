@@ -8,8 +8,8 @@ use voikko_core::enums::SpellResult;
 #[cfg(feature = "hyphenate")]
 use crate::hyphenator::{FinnishHyphenator, Hyphenator, HyphenatorOptions};
 use crate::morphology::Analyzer;
-use crate::speller::utils::match_word_and_analysis;
 use crate::speller::Speller;
+use crate::speller::utils::match_word_and_analysis;
 
 /// Options controlling Finnish spelling tweaks.
 #[derive(Debug, Clone, Copy, Default)]
@@ -136,8 +136,7 @@ impl<'a> FinnishSpellerTweaksWrapper<'a> {
                 && simple_lower(word[leading_len + 2]) == vc2
             {
                 let spres = self.inner.spell(&buffer, buffer.len());
-                if spres != SpellResult::Failed
-                    && (result == SpellResult::Failed || result > spres)
+                if spres != SpellResult::Failed && (result == SpellResult::Failed || result > spres)
                 {
                     return spres;
                 }

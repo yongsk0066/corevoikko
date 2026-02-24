@@ -43,8 +43,8 @@ fn main() {
     let ignore_dot = args.iter().any(|a| a == "--ignore-dot");
     let ignore_numbers = args.iter().any(|a| a == "--ignore-numbers");
 
-    let mut handle = voikko_cli::load_handle(dict_path.as_deref())
-        .unwrap_or_else(|e| voikko_cli::fatal(&e));
+    let mut handle =
+        voikko_cli::load_handle(dict_path.as_deref()).unwrap_or_else(|e| voikko_cli::fatal(&e));
 
     if ignore_dot {
         handle.set_ignore_dot(true);

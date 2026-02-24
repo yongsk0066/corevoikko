@@ -8,7 +8,7 @@
 
 use voikko_core::character::{is_upper, simple_lower, simple_upper};
 use voikko_core::enums::TokenType;
-use voikko_core::grammar_error::{GrammarError, GCERR_INVALID_SPELLING};
+use voikko_core::grammar_error::{GCERR_INVALID_SPELLING, GrammarError};
 use voikko_fst::Transducer;
 use voikko_fst::unweighted::UnweightedTransducer;
 
@@ -98,8 +98,7 @@ fn gc_autocorrect_inner(
             }
             input_buffer.push(' ');
             sentence_length_utf += 1;
-            ucs_normalized_positions
-                .push(ucs_normalized_positions[token_idx] + 1);
+            ucs_normalized_positions.push(ucs_normalized_positions[token_idx] + 1);
         } else {
             let mut skipped_chars: usize = 0;
 
@@ -146,7 +145,6 @@ fn gc_autocorrect_inner(
     let mut config = transducer.new_config(BUFFER_SIZE);
 
     for (&position, &ucs_position) in lookup_positions_utf.iter().zip(lookup_positions_ucs.iter()) {
-
         if lower_first && position > 0 {
             break;
         }
@@ -157,8 +155,7 @@ fn gc_autocorrect_inner(
         let mut output = String::new();
         let mut prefix_length: usize = 0;
 
-        if transducer.next_prefix(&mut config, &mut output, &mut prefix_length)
-            && prefix_length > 0
+        if transducer.next_prefix(&mut config, &mut output, &mut prefix_length) && prefix_length > 0
         {
             // Check that the match ends at a word boundary
             let end_at_boundary = ucs_normalized_positions
@@ -224,8 +221,8 @@ fn gc_autocorrect_inner(
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use super::super::paragraph::{GrammarSentence, GrammarToken};
+    use super::*;
     use voikko_core::enums::TokenType;
 
     fn word(text: &str, pos: usize) -> GrammarToken {
@@ -259,10 +256,7 @@ mod tests {
 
     #[test]
     fn no_match_no_error() {
-        let s = sentence(
-            vec![word("koira", 0), ws(" ", 5), word("kissa", 6)],
-            0,
-        );
+        let s = sentence(vec![word("koira", 0), ws(" ", 5), word("kissa", 6)], 0);
         let data = build_minimal_vfst();
         let t = UnweightedTransducer::from_bytes(&data).unwrap();
         let errs = gc_autocorrect(&s, &t);
@@ -441,10 +435,7 @@ mod tests {
         // Sentence: "zz ab" — first word "zz" has no match, second word "ab" matches.
         // Transducer maps "ab" -> "xy".
         // Expected: one error at position 3 (after "zz ").
-        let s = sentence(
-            vec![word("zz", 0), ws(" ", 2), word("ab", 3)],
-            0,
-        );
+        let s = sentence(vec![word("zz", 0), ws(" ", 2), word("ab", 3)], 0);
         let data = build_ab_to_xy_vfst();
         let t = UnweightedTransducer::from_bytes(&data).unwrap();
         let errs = gc_autocorrect(&s, &t);
@@ -474,10 +465,7 @@ mod tests {
         // Sentence: "ab cd" — two word tokens.
         // Transducer maps "ab cd" -> "ef gh" (spans word boundary including space).
         // The prefix "ab cd" is 5 chars and ends at the boundary after "cd".
-        let s = sentence(
-            vec![word("ab", 0), ws(" ", 2), word("cd", 3)],
-            0,
-        );
+        let s = sentence(vec![word("ab", 0), ws(" ", 2), word("cd", 3)], 0);
         let data = build_ab_cd_to_ef_gh_vfst();
         let t = UnweightedTransducer::from_bytes(&data).unwrap();
         let errs = gc_autocorrect(&s, &t);

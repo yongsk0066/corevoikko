@@ -3,7 +3,7 @@ name: Release & Publish
 on:
   push:
     tags:
-      - 'v*'  # v0.1.0, v1.0.0 등
+      - 'v*'
 
 jobs:
   test:
@@ -14,18 +14,23 @@ jobs:
 
       - uses: dtolnay/rust-toolchain@stable
         with:
-          components: clippy
+          components: clippy, rustfmt
           targets: wasm32-unknown-unknown
 
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: libvoikko/rust
 
-      - name: Rust tests + clippy
+      - name: Rust checks
         working-directory: libvoikko/rust
         run: |
+          cargo fmt --all --check
           cargo test --all-features
           cargo clippy --all-features -- -D warnings
+
+      - name: Audit dependencies
+        run: cargo install cargo-audit --locked && cargo audit
+        working-directory: libvoikko/rust
 
       - name: Build WASM
         working-directory: libvoikko/rust
@@ -58,6 +63,7 @@ jobs:
             libvoikko/js/dist/
             libvoikko/js/wasm/
             libvoikko/js/package.json
+            libvoikko/js/README.md
 
   publish-npm:
     name: Publish to npm

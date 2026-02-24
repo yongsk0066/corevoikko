@@ -38,8 +38,8 @@ fn main() {
         return;
     }
 
-    let handle = voikko_cli::load_handle(dict_path.as_deref())
-        .unwrap_or_else(|e| voikko_cli::fatal(&e));
+    let handle =
+        voikko_cli::load_handle(dict_path.as_deref()).unwrap_or_else(|e| voikko_cli::fatal(&e));
 
     let stdin = io::stdin();
     let mut known_freqs: HashMap<String, f64> = HashMap::new();
@@ -70,9 +70,7 @@ fn main() {
             } else {
                 let weight = 1.0 / analyses.len() as f64;
                 for analysis in &analyses {
-                    let baseform = analysis
-                        .get("BASEFORM")
-                        .unwrap_or(word.as_str());
+                    let baseform = analysis.get("BASEFORM").unwrap_or(word.as_str());
                     *known_freqs.entry(baseform.to_string()).or_insert(0.0) += weight;
                 }
             }

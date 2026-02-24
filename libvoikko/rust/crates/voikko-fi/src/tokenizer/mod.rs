@@ -1,7 +1,7 @@
 // Tokenizer and sentence detection module
 // Origin: tokenizer/Tokenizer.cpp, sentence/Sentence.cpp
 
-use voikko_core::character::{get_char_type, is_finnish_quotation_mark, CharType};
+use voikko_core::character::{CharType, get_char_type, is_finnish_quotation_mark};
 use voikko_core::enums::{SentenceType, TokenType};
 
 /// Callback type for spell-checking a word (used in sentence detection for
@@ -20,7 +20,10 @@ type SpellCheckFn<'a> = Option<&'a dyn Fn(&[char]) -> bool>;
 ///
 /// Origin: Tokenizer.cpp:59 — `wcschr(L"#$%*+=^_`|~", text[i])`
 fn is_email_unknown_char(c: char) -> bool {
-    matches!(c, '#' | '$' | '%' | '*' | '+' | '=' | '^' | '_' | '`' | '|' | '~')
+    matches!(
+        c,
+        '#' | '$' | '%' | '*' | '+' | '=' | '^' | '_' | '`' | '|' | '~'
+    )
 }
 
 /// Check whether a punctuation character is allowed in email addresses.
@@ -71,8 +74,7 @@ fn find_url_or_email(text: &[char]) -> usize {
                 // A dot at end-of-text or before whitespace terminates the URL
                 // (the dot is not part of the URL).
                 if text[i] == '.'
-                    && (i + 1 == textlen
-                        || get_char_type(text[i + 1]) == CharType::Whitespace)
+                    && (i + 1 == textlen || get_char_type(text[i + 1]) == CharType::Whitespace)
                 {
                     return i;
                 }
@@ -246,9 +248,7 @@ fn word_length(text: &[char], ignore_dot: bool) -> usize {
                                 }
                                 wlen += 1;
                             }
-                            CharType::Whitespace
-                            | CharType::Unknown
-                            | CharType::Punctuation => {
+                            CharType::Whitespace | CharType::Unknown | CharType::Punctuation => {
                                 return wlen + adot;
                             }
                         }
@@ -489,8 +489,7 @@ pub fn next_sentence_with_spell_check(
                 // Sentence boundary found. Determine type.
                 let stype = if end_dotword
                     || possible_end_punctuation
-                    || (previous_token_type != TokenType::Whitespace
-                        && token == TokenType::Word)
+                    || (previous_token_type != TokenType::Whitespace && token == TokenType::Word)
                 {
                     SentenceType::Possible
                 } else {
@@ -514,10 +513,7 @@ pub fn next_sentence_with_spell_check(
                 end_found = true;
                 if slen != 0
                     && previous_token_type == TokenType::Word
-                    && dot_part_of_word(
-                        &slice[previous_token_start..slen + 1],
-                        spell_check,
-                    )
+                    && dot_part_of_word(&slice[previous_token_start..slen + 1], spell_check)
                 {
                     end_dotword = true;
                 }
@@ -526,10 +522,7 @@ pub fn next_sentence_with_spell_check(
                 possible_end_punctuation = true;
             } else if is_finnish_quotation_mark(punct) || punct == '\u{201C}' {
                 in_quotation = !in_quotation;
-                if !in_quotation
-                    && slen + 1 < remaining
-                    && slice[slen + 1] == ','
-                {
+                if !in_quotation && slen + 1 < remaining && slice[slen + 1] == ',' {
                     // Comma immediately after ending quote suggests the
                     // sentence most likely did not end here.
                     end_found = false;
@@ -761,10 +754,7 @@ mod tests {
         // Hyphen followed by a Finnish quotation mark: hyphen included in word.
         let tokens = tokenize_all("koira-\u{201D}");
         assert_eq!(tokens[0], (TokenType::Word, "koira-".to_string()));
-        assert_eq!(
-            tokens[1],
-            (TokenType::Punctuation, "\u{201D}".to_string())
-        );
+        assert_eq!(tokens[1], (TokenType::Punctuation, "\u{201D}".to_string()));
     }
 
     // -- Apostrophe and colon in words ---
@@ -911,10 +901,7 @@ mod tests {
     #[test]
     fn http_url_with_path() {
         // "http://example.com/path" is 23 characters.
-        assert_eq!(
-            tok("http://example.com/path"),
-            (TokenType::Word, 23)
-        );
+        assert_eq!(tok("http://example.com/path"), (TokenType::Word, 23));
     }
 
     #[test]
@@ -970,20 +957,14 @@ mod tests {
         let tokens = tokenize_all("send foo@bar.com mail");
         assert_eq!(tokens[0], (TokenType::Word, "send".to_string()));
         assert_eq!(tokens[1], (TokenType::Whitespace, " ".to_string()));
-        assert_eq!(
-            tokens[2],
-            (TokenType::Word, "foo@bar.com".to_string())
-        );
+        assert_eq!(tokens[2], (TokenType::Word, "foo@bar.com".to_string()));
     }
 
     #[test]
     fn email_ending_with_dot_before_space() {
         // "foo@bar.com. " — trailing dot is not part of email.
         let tokens = tokenize_all("foo@bar.com. next");
-        assert_eq!(
-            tokens[0],
-            (TokenType::Word, "foo@bar.com".to_string())
-        );
+        assert_eq!(tokens[0], (TokenType::Word, "foo@bar.com".to_string()));
         assert_eq!(tokens[1], (TokenType::Punctuation, ".".to_string()));
     }
 
@@ -1407,8 +1388,7 @@ mod tests {
         let s = "koira. kissa.";
         let chars: Vec<char> = s.chars().collect();
         let check_fn = |_word: &[char]| -> bool { false };
-        let (stype, slen) =
-            next_sentence_with_spell_check(&chars, chars.len(), 0, Some(&check_fn));
+        let (stype, slen) = next_sentence_with_spell_check(&chars, chars.len(), 0, Some(&check_fn));
         assert_eq!(stype, SentenceType::Probable);
         let first_text: String = chars[..slen].iter().collect();
         assert_eq!(first_text, "koira. ");
@@ -1438,8 +1418,7 @@ mod tests {
         let chars: Vec<char> = s.chars().collect();
 
         // With speller: "esim." recognized => dotword => Possible
-        let (stype, _) =
-            next_sentence_with_speller(&chars, chars.len(), 0, &speller);
+        let (stype, _) = next_sentence_with_speller(&chars, chars.len(), 0, &speller);
         assert_eq!(stype, SentenceType::Possible);
 
         // Compare with no speller: "esim." not recognized => Probable
@@ -1465,8 +1444,7 @@ mod tests {
         let chars: Vec<char> = s.chars().collect();
 
         // Normal sentence boundary behavior should still work
-        let (stype, slen) =
-            next_sentence_with_speller(&chars, chars.len(), 0, &speller);
+        let (stype, slen) = next_sentence_with_speller(&chars, chars.len(), 0, &speller);
         assert_eq!(stype, SentenceType::Probable);
         let first_text: String = chars[..slen].iter().collect();
         assert_eq!(first_text, "Koira juoksi. ");

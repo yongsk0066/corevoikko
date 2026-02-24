@@ -6,7 +6,7 @@
 //
 // Origin: VfstAnalyzer.cpp (~120 lines)
 
-use voikko_core::analysis::{Analysis, ATTR_FSTOUTPUT, ATTR_WEIGHT};
+use voikko_core::analysis::{ATTR_FSTOUTPUT, ATTR_WEIGHT, Analysis};
 use voikko_core::case::CaseType;
 use voikko_core::enums::MAX_WORD_CHARS;
 use voikko_fst::Transducer;
@@ -38,10 +38,7 @@ impl VfstAnalyzer {
     pub fn from_bytes(data: &[u8]) -> Result<Self, voikko_fst::VfstError> {
         let transducer = WeightedTransducer::from_bytes(data)?;
         let config = transducer.new_config(BUFFER_SIZE);
-        Ok(Self {
-            transducer,
-            config,
-        })
+        Ok(Self { transducer, config })
     }
 
     /// Analyze a word with optional full morphology.

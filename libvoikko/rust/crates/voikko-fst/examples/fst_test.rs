@@ -21,8 +21,15 @@ fn main() {
     );
 
     let test_words = [
-        "koira", "kissa", "helsinki", "juoksen", "talo",
-        "koiran", "kissalle", "juoksee", "talon",
+        "koira",
+        "kissa",
+        "helsinki",
+        "juoksen",
+        "talo",
+        "koiran",
+        "kissalle",
+        "juoksee",
+        "talon",
         "koiranruoka",
         "asdfxyz",
     ];

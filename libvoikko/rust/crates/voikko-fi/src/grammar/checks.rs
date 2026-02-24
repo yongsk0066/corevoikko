@@ -16,16 +16,16 @@ use voikko_core::character::{
 };
 use voikko_core::enums::TokenType;
 use voikko_core::grammar_error::{
-    GrammarError, GCERR_A_INFINITIVE_REQUIRED, GCERR_EXTRA_COMMA, GCERR_EXTRA_MAIN_VERB,
-    GCERR_EXTRA_WHITESPACE, GCERR_FOREIGN_QUOTATION_MARK,
-    GCERR_INVALID_PUNCTUATION_AT_END_OF_QUOTATION, GCERR_INVALID_SENTENCE_STARTER,
-    GCERR_MA_INFINITIVE_REQUIRED, GCERR_MISPLACED_CLOSING_PARENTHESIS, GCERR_MISPLACED_SIDESANA,
-    GCERR_MISSING_MAIN_VERB, GCERR_NEGATIVE_VERB_MISMATCH, GCERR_REPEATING_WORD,
-    GCERR_SPACE_BEFORE_PUNCTUATION, GCERR_TERMINATING_PUNCTUATION_MISSING,
-    GCERR_WRITE_FIRST_LOWERCASE, GCERR_WRITE_FIRST_UPPERCASE,
+    GCERR_A_INFINITIVE_REQUIRED, GCERR_EXTRA_COMMA, GCERR_EXTRA_MAIN_VERB, GCERR_EXTRA_WHITESPACE,
+    GCERR_FOREIGN_QUOTATION_MARK, GCERR_INVALID_PUNCTUATION_AT_END_OF_QUOTATION,
+    GCERR_INVALID_SENTENCE_STARTER, GCERR_MA_INFINITIVE_REQUIRED,
+    GCERR_MISPLACED_CLOSING_PARENTHESIS, GCERR_MISPLACED_SIDESANA, GCERR_MISSING_MAIN_VERB,
+    GCERR_NEGATIVE_VERB_MISMATCH, GCERR_REPEATING_WORD, GCERR_SPACE_BEFORE_PUNCTUATION,
+    GCERR_TERMINATING_PUNCTUATION_MISSING, GCERR_WRITE_FIRST_LOWERCASE,
+    GCERR_WRITE_FIRST_UPPERCASE, GrammarError,
 };
 
-use voikko_core::case::{detect_case, CaseType};
+use voikko_core::case::{CaseType, detect_case};
 
 // Re-export types from paragraph module for use by other grammar submodules.
 pub(crate) use super::paragraph::{FollowingVerbType, GrammarSentence, GrammarToken, Paragraph};
@@ -42,8 +42,7 @@ pub(crate) type GrammarParagraph = Paragraph;
 /// Grammar checker options relevant to individual checks.
 ///
 /// Origin: setup/setup.hpp (VoikkoHandle boolean options)
-#[derive(Debug, Clone)]
-#[derive(Default)]
+#[derive(Debug, Clone, Default)]
 pub(crate) struct GrammarOptions {
     /// Accept incomplete sentences in titles. Default: false.
     /// Origin: voikko_defines.h:117
@@ -57,8 +56,6 @@ pub(crate) struct GrammarOptions {
     /// Origin: voikko_defines.h:131
     pub accept_bulleted_lists_in_gc: bool,
 }
-
-
 
 // ============================================================================
 // Punctuation checks
@@ -120,17 +117,15 @@ pub(crate) fn gc_local_punctuation(sentence: &GrammarSentence) -> Vec<GrammarErr
                 if i == 0 {
                     // Invalid sentence starter
                     let ch = t.text.first().copied().unwrap_or('\0');
-                    if matches!(ch, '(' | ')' | '\'' | '-' | '\u{201C}' | '\u{2013}' | '\u{2014}')
-                        || is_finnish_quotation_mark(ch)
+                    if matches!(
+                        ch,
+                        '(' | ')' | '\'' | '-' | '\u{201C}' | '\u{2013}' | '\u{2014}'
+                    ) || is_finnish_quotation_mark(ch)
                     {
                         i += 1;
                         continue;
                     }
-                    let (start_pos, error_len) = if t.pos == 0 {
-                        (0, 1)
-                    } else {
-                        (t.pos - 1, 2)
-                    };
+                    let (start_pos, error_len) = if t.pos == 0 { (0, 1) } else { (t.pos - 1, 2) };
                     errors.push(GrammarError::new(
                         GCERR_INVALID_SENTENCE_STARTER,
                         start_pos,
@@ -142,7 +137,9 @@ pub(crate) fn gc_local_punctuation(sentence: &GrammarSentence) -> Vec<GrammarErr
                 // Consecutive commas
                 if t.text.first().copied() == Some(',') && i + 1 < count {
                     let t2 = &tokens[i + 1];
-                    if t2.token_type == TokenType::Punctuation && t2.text.first().copied() == Some(',') {
+                    if t2.token_type == TokenType::Punctuation
+                        && t2.text.first().copied() == Some(',')
+                    {
                         errors.push(GrammarError::with_suggestions(
                             GCERR_EXTRA_COMMA,
                             t.pos,
@@ -684,9 +681,7 @@ fn get_token_and_advance<'a>(ctx: &mut CapitalizationContext<'a>) -> Option<&'a 
 /// to the last non-word token before it.
 ///
 /// Origin: CapitalizationCheck.cpp:114-131
-fn get_tokens_until_next_word<'a>(
-    ctx: &mut CapitalizationContext<'a>,
-) -> Vec<&'a GrammarToken> {
+fn get_tokens_until_next_word<'a>(ctx: &mut CapitalizationContext<'a>) -> Vec<&'a GrammarToken> {
     let mut tokens = Vec::new();
     ctx.token_before_next_word = ctx.next_word;
     loop {
@@ -739,10 +734,7 @@ fn place_name_in_institution_name(word: &GrammarToken, separators: &[&GrammarTok
 /// or roman numeral) followed by a closing parenthesis.
 ///
 /// Origin: CapitalizationCheck.cpp:220-228
-fn is_list_item_and_closing_parenthesis(
-    word: &GrammarToken,
-    separators: &[&GrammarToken],
-) -> bool {
+fn is_list_item_and_closing_parenthesis(word: &GrammarToken, separators: &[&GrammarToken]) -> bool {
     if separators.is_empty() || separators[0].text.first().copied() != Some(')') {
         return false;
     }
@@ -816,10 +808,7 @@ fn is_roman_numeral(word: &[char]) -> bool {
 /// Returns `true` if quote characters were found.
 ///
 /// Origin: CapitalizationCheck.cpp:161-202
-fn push_and_pop_quotes(
-    ctx: &mut CapitalizationContext<'_>,
-    tokens: &[&GrammarToken],
-) -> bool {
+fn push_and_pop_quotes(ctx: &mut CapitalizationContext<'_>, tokens: &[&GrammarToken]) -> bool {
     let mut has_quotes = false;
     for t in tokens {
         if t.token_type == TokenType::Punctuation {
@@ -845,9 +834,7 @@ fn push_and_pop_quotes(
                         t.pos,
                         1,
                     ));
-                } else if ctx.quotes.last() == Some(&'(')
-                    || ctx.quotes.last() == Some(&'[')
-                {
+                } else if ctx.quotes.last() == Some(&'(') || ctx.quotes.last() == Some(&'[') {
                     ctx.quotes.pop();
                 }
             } else if matches!(ch, '.' | '!' | '?') {
@@ -915,9 +902,7 @@ fn in_upper(ctx: &mut CapitalizationContext<'_>) -> CapState {
     if !ctx.quotes.is_empty() {
         return CapState::Quoted;
     }
-    if contains_token_text(&separators, "\t")
-        || place_name_in_institution_name(word, &separators)
-    {
+    if contains_token_text(&separators, "\t") || place_name_in_institution_name(word, &separators) {
         return CapState::DontCare;
     }
     if ctx.options.accept_titles_in_gc && is_chapter_number(&word.text) {
@@ -981,9 +966,7 @@ fn in_lower(ctx: &mut CapitalizationContext<'_>) -> CapState {
     if !ctx.quotes.is_empty() {
         return CapState::Quoted;
     }
-    if contains_token_text(&separators, "\t")
-        || place_name_in_institution_name(word, &separators)
-    {
+    if contains_token_text(&separators, "\t") || place_name_in_institution_name(word, &separators) {
         return CapState::DontCare;
     }
     if last_punctuation_ends_sentence(&separators) {
@@ -1140,14 +1123,7 @@ mod tests {
 
     #[test]
     fn extra_whitespace() {
-        let s = sentence(
-            vec![
-                word("koira", 0),
-                ws("  ", 5),
-                word("kissa", 7),
-            ],
-            0,
-        );
+        let s = sentence(vec![word("koira", 0), ws("  ", 5), word("kissa", 7)], 0);
         let errs = gc_local_punctuation(&s);
         assert_eq!(errs.len(), 1);
         assert_eq!(errs[0].error_code, GCERR_EXTRA_WHITESPACE);
@@ -1158,14 +1134,7 @@ mod tests {
 
     #[test]
     fn space_before_comma() {
-        let s = sentence(
-            vec![
-                word("koira", 0),
-                ws(" ", 5),
-                punct(",", 6),
-            ],
-            0,
-        );
+        let s = sentence(vec![word("koira", 0), ws(" ", 5), punct(",", 6)], 0);
         let errs = gc_local_punctuation(&s);
         assert_eq!(errs.len(), 1);
         assert_eq!(errs[0].error_code, GCERR_SPACE_BEFORE_PUNCTUATION);
@@ -1175,14 +1144,7 @@ mod tests {
 
     #[test]
     fn extra_comma() {
-        let s = sentence(
-            vec![
-                word("koira", 0),
-                punct(",", 5),
-                punct(",", 6),
-            ],
-            0,
-        );
+        let s = sentence(vec![word("koira", 0), punct(",", 5), punct(",", 6)], 0);
         let errs = gc_local_punctuation(&s);
         assert_eq!(errs.len(), 1);
         assert_eq!(errs[0].error_code, GCERR_EXTRA_COMMA);
@@ -1190,14 +1152,7 @@ mod tests {
 
     #[test]
     fn invalid_sentence_starter_comma() {
-        let s = sentence(
-            vec![
-                punct(",", 5),
-                ws(" ", 6),
-                word("koira", 7),
-            ],
-            5,
-        );
+        let s = sentence(vec![punct(",", 5), ws(" ", 6), word("koira", 7)], 5);
         let errs = gc_local_punctuation(&s);
         assert_eq!(errs.len(), 1);
         assert_eq!(errs[0].error_code, GCERR_INVALID_SENTENCE_STARTER);
@@ -1205,14 +1160,7 @@ mod tests {
 
     #[test]
     fn valid_sentence_starter_open_paren() {
-        let s = sentence(
-            vec![
-                punct("(", 0),
-                word("koira", 1),
-                punct(")", 6),
-            ],
-            0,
-        );
+        let s = sentence(vec![punct("(", 0), word("koira", 1), punct(")", 6)], 0);
         let errs = gc_local_punctuation(&s);
         assert!(errs.is_empty());
     }
@@ -1253,11 +1201,7 @@ mod tests {
     #[test]
     fn foreign_quotation_mark() {
         let s = sentence(
-            vec![
-                punct("\u{201C}", 0),
-                word("koira", 1),
-                punct("\u{201D}", 6),
-            ],
+            vec![punct("\u{201C}", 0), word("koira", 1), punct("\u{201D}", 6)],
             0,
         );
         let errs = gc_punctuation_of_quotations(&s);
@@ -1311,14 +1255,7 @@ mod tests {
 
     #[test]
     fn repeating_word_detected() {
-        let s = sentence(
-            vec![
-                word("koira", 0),
-                ws(" ", 5),
-                word("koira", 6),
-            ],
-            0,
-        );
+        let s = sentence(vec![word("koira", 0), ws(" ", 5), word("koira", 6)], 0);
         let errs = gc_repeating_words(&s);
         assert_eq!(errs.len(), 1);
         assert_eq!(errs[0].error_code, GCERR_REPEATING_WORD);
@@ -1329,28 +1266,14 @@ mod tests {
 
     #[test]
     fn repeating_word_case_insensitive() {
-        let s = sentence(
-            vec![
-                word("Koira", 0),
-                ws(" ", 5),
-                word("koira", 6),
-            ],
-            0,
-        );
+        let s = sentence(vec![word("Koira", 0), ws(" ", 5), word("koira", 6)], 0);
         let errs = gc_repeating_words(&s);
         assert_eq!(errs.len(), 1);
     }
 
     #[test]
     fn repeating_word_exception_ollut() {
-        let s = sentence(
-            vec![
-                word("ollut", 0),
-                ws(" ", 5),
-                word("ollut", 6),
-            ],
-            0,
-        );
+        let s = sentence(vec![word("ollut", 0), ws(" ", 5), word("ollut", 6)], 0);
         let errs = gc_repeating_words(&s);
         assert!(errs.is_empty());
     }
@@ -1358,11 +1281,7 @@ mod tests {
     #[test]
     fn repeating_word_exception_silla() {
         let s = sentence(
-            vec![
-                word("sill\u{00e4}", 0),
-                ws(" ", 6),
-                word("sill\u{00e4}", 7),
-            ],
+            vec![word("sill\u{00e4}", 0), ws(" ", 6), word("sill\u{00e4}", 7)],
             0,
         );
         let errs = gc_repeating_words(&s);
@@ -1371,20 +1290,14 @@ mod tests {
 
     #[test]
     fn repeating_digit_word_not_flagged() {
-        let s = sentence(
-            vec![word("123", 0), ws(" ", 3), word("123", 4)],
-            0,
-        );
+        let s = sentence(vec![word("123", 0), ws(" ", 3), word("123", 4)], 0);
         let errs = gc_repeating_words(&s);
         assert!(errs.is_empty());
     }
 
     #[test]
     fn different_words_not_flagged() {
-        let s = sentence(
-            vec![word("koira", 0), ws(" ", 5), word("kissa", 6)],
-            0,
-        );
+        let s = sentence(vec![word("koira", 0), ws(" ", 5), word("kissa", 6)], 0);
         let errs = gc_repeating_words(&s);
         assert!(errs.is_empty());
     }
@@ -1404,13 +1317,8 @@ mod tests {
 
     #[test]
     fn end_punctuation_present() {
-        let s = sentence(
-            vec![word("koira", 0), punct(".", 5)],
-            0,
-        );
-        let p = GrammarParagraph {
-            sentences: vec![s],
-        };
+        let s = sentence(vec![word("koira", 0), punct(".", 5)], 0);
+        let p = GrammarParagraph { sentences: vec![s] };
         let errs = gc_end_punctuation(&p, &default_opts());
         assert!(errs.is_empty());
     }
@@ -1418,9 +1326,7 @@ mod tests {
     #[test]
     fn end_punctuation_accept_titles() {
         let s = sentence(vec![word("Otsikko", 0)], 0);
-        let p = GrammarParagraph {
-            sentences: vec![s],
-        };
+        let p = GrammarParagraph { sentences: vec![s] };
         let opts = GrammarOptions {
             accept_titles_in_gc: true,
             ..Default::default()
@@ -1452,10 +1358,7 @@ mod tests {
         w1.is_valid_word = true;
         let mut w2 = word("suuri", 6);
         w2.is_valid_word = true;
-        let s = sentence(
-            vec![w1, ws(" ", 5), w2, punct(".", 11)],
-            0,
-        );
+        let s = sentence(vec![w1, ws(" ", 5), w2, punct(".", 11)], 0);
         let errs = gc_missing_verb(&s, &default_opts());
         assert_eq!(errs.len(), 1);
         assert_eq!(errs[0].error_code, GCERR_MISSING_MAIN_VERB);
@@ -1468,10 +1371,7 @@ mod tests {
         let mut w2 = word("juoksee", 6);
         w2.is_valid_word = true;
         w2.possible_main_verb = true;
-        let s = sentence(
-            vec![w1, ws(" ", 5), w2, punct(".", 13)],
-            0,
-        );
+        let s = sentence(vec![w1, ws(" ", 5), w2, punct(".", 13)], 0);
         let errs = gc_missing_verb(&s, &default_opts());
         assert!(errs.is_empty());
     }
@@ -1489,10 +1389,7 @@ mod tests {
     fn no_missing_verb_unrecognized_word() {
         let w1 = word("Koira", 0); // is_valid_word = false
         let w2 = word("xyz", 6);
-        let s = sentence(
-            vec![w1, ws(" ", 5), w2, punct(".", 9)],
-            0,
-        );
+        let s = sentence(vec![w1, ws(" ", 5), w2, punct(".", 9)], 0);
         let errs = gc_missing_verb(&s, &default_opts());
         assert!(errs.is_empty());
     }
@@ -1505,10 +1402,7 @@ mod tests {
         let mut w2 = word("juoksee", 6);
         w2.is_valid_word = true;
         w2.is_main_verb = true;
-        let s = sentence(
-            vec![w1, ws(" ", 5), w2, punct(".", 13)],
-            0,
-        );
+        let s = sentence(vec![w1, ws(" ", 5), w2, punct(".", 13)], 0);
         let errs = gc_missing_verb(&s, &default_opts());
         assert!(errs.iter().any(|e| e.error_code == GCERR_EXTRA_MAIN_VERB));
     }
@@ -1582,10 +1476,7 @@ mod tests {
         w1.is_valid_word = true;
         let mut conj = word("ja", 6);
         conj.is_conjunction = true;
-        let s = sentence(
-            vec![w1, ws(" ", 5), conj, punct(".", 8)],
-            0,
-        );
+        let s = sentence(vec![w1, ws(" ", 5), conj, punct(".", 8)], 0);
         let errs = gc_sidesana(&s);
         assert_eq!(errs.len(), 1);
         assert_eq!(errs[0].error_code, GCERR_MISPLACED_SIDESANA);
@@ -1604,10 +1495,7 @@ mod tests {
     fn conjunction_not_at_end_ok() {
         let mut conj = word("ja", 0);
         conj.is_conjunction = true;
-        let s = sentence(
-            vec![conj, ws(" ", 2), word("koira", 3), punct(".", 8)],
-            0,
-        );
+        let s = sentence(vec![conj, ws(" ", 2), word("koira", 3), punct(".", 8)], 0);
         let errs = gc_sidesana(&s);
         assert!(errs.is_empty());
     }
@@ -1659,11 +1547,12 @@ mod tests {
         w1.is_valid_word = true;
         w1.first_letter_lcase = true;
         let s = sentence(vec![w1, punct(".", 5)], 0);
-        let p = GrammarParagraph {
-            sentences: vec![s],
-        };
+        let p = GrammarParagraph { sentences: vec![s] };
         let errs = gc_capitalization(&p, &default_opts());
-        assert!(errs.iter().any(|e| e.error_code == GCERR_WRITE_FIRST_UPPERCASE));
+        assert!(
+            errs.iter()
+                .any(|e| e.error_code == GCERR_WRITE_FIRST_UPPERCASE)
+        );
     }
 
     #[test]
@@ -1674,17 +1563,13 @@ mod tests {
         let mut w2 = word("juoksee", 6);
         w2.is_valid_word = true;
         w2.first_letter_lcase = true;
-        let s = sentence(
-            vec![w1, ws(" ", 5), w2, punct(".", 13)],
-            0,
-        );
-        let p = GrammarParagraph {
-            sentences: vec![s],
-        };
+        let s = sentence(vec![w1, ws(" ", 5), w2, punct(".", 13)], 0);
+        let p = GrammarParagraph { sentences: vec![s] };
         let errs = gc_capitalization(&p, &default_opts());
-        assert!(errs
-            .iter()
-            .all(|e| e.error_code != GCERR_WRITE_FIRST_UPPERCASE));
+        assert!(
+            errs.iter()
+                .all(|e| e.error_code != GCERR_WRITE_FIRST_UPPERCASE)
+        );
     }
 
     #[test]
@@ -1697,17 +1582,13 @@ mod tests {
         w2.is_valid_word = true;
         w2.first_letter_lcase = true;
         // token_len() returns text.len(), which is already 7 for "Juoksee"
-        let s = sentence(
-            vec![w1, ws(" ", 5), w2, punct(".", 13)],
-            0,
-        );
-        let p = GrammarParagraph {
-            sentences: vec![s],
-        };
+        let s = sentence(vec![w1, ws(" ", 5), w2, punct(".", 13)], 0);
+        let p = GrammarParagraph { sentences: vec![s] };
         let errs = gc_capitalization(&p, &default_opts());
-        assert!(errs
-            .iter()
-            .any(|e| e.error_code == GCERR_WRITE_FIRST_LOWERCASE));
+        assert!(
+            errs.iter()
+                .any(|e| e.error_code == GCERR_WRITE_FIRST_LOWERCASE)
+        );
     }
 
     #[test]
@@ -1722,12 +1603,11 @@ mod tests {
             ],
             0,
         );
-        let p = GrammarParagraph {
-            sentences: vec![s],
-        };
+        let p = GrammarParagraph { sentences: vec![s] };
         let errs = gc_capitalization(&p, &default_opts());
-        assert!(errs
-            .iter()
-            .any(|e| e.error_code == GCERR_MISPLACED_CLOSING_PARENTHESIS));
+        assert!(
+            errs.iter()
+                .any(|e| e.error_code == GCERR_MISPLACED_CLOSING_PARENTHESIS)
+        );
     }
 }

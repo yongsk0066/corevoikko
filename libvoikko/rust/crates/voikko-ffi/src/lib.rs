@@ -129,10 +129,17 @@ pub unsafe extern "C" fn voikko_analyze(
     handle: *const VoikkoHandle,
     word: *const c_char,
 ) -> VoikkoAnalysisArray {
-    let empty = VoikkoAnalysisArray { analyses: ptr::null_mut(), count: 0 };
+    let empty = VoikkoAnalysisArray {
+        analyses: ptr::null_mut(),
+        count: 0,
+    };
 
-    let Some(handle) = (unsafe { handle.as_ref() }) else { return empty; };
-    let Some(word) = cstr_to_str(word) else { return empty; };
+    let Some(handle) = (unsafe { handle.as_ref() }) else {
+        return empty;
+    };
+    let Some(word) = cstr_to_str(word) else {
+        return empty;
+    };
 
     let analyses = handle.analyze(word);
     let count = analyses.len();
@@ -142,7 +149,11 @@ pub unsafe extern "C" fn voikko_analyze(
 
     let mut c_analyses: Vec<VoikkoAnalysis> = Vec::with_capacity(count);
     for a in &analyses {
-        let attrs: Vec<(&str, &str)> = a.attributes().iter().map(|(k, v)| (k.as_str(), v.as_str())).collect();
+        let attrs: Vec<(&str, &str)> = a
+            .attributes()
+            .iter()
+            .map(|(k, v)| (k.as_str(), v.as_str()))
+            .collect();
         let mut keys: Vec<*mut c_char> = Vec::with_capacity(attrs.len() + 1);
         let mut values: Vec<*mut c_char> = Vec::with_capacity(attrs.len() + 1);
         for (k, v) in &attrs {
@@ -157,13 +168,19 @@ pub unsafe extern "C" fn voikko_analyze(
         std::mem::forget(keys);
         std::mem::forget(values);
 
-        c_analyses.push(VoikkoAnalysis { keys: keys_ptr, values: values_ptr });
+        c_analyses.push(VoikkoAnalysis {
+            keys: keys_ptr,
+            values: values_ptr,
+        });
     }
 
     let analyses_ptr = c_analyses.as_mut_ptr();
     std::mem::forget(c_analyses);
 
-    VoikkoAnalysisArray { analyses: analyses_ptr, count }
+    VoikkoAnalysisArray {
+        analyses: analyses_ptr,
+        count,
+    }
 }
 
 /// Free an analysis array returned by `voikko_analyze`.
@@ -189,8 +206,12 @@ pub unsafe extern "C" fn voikko_hyphenate(
     handle: *const VoikkoHandle,
     word: *const c_char,
 ) -> *mut c_char {
-    let Some(handle) = (unsafe { handle.as_ref() }) else { return ptr::null_mut(); };
-    let Some(word) = cstr_to_str(word) else { return ptr::null_mut(); };
+    let Some(handle) = (unsafe { handle.as_ref() }) else {
+        return ptr::null_mut();
+    };
+    let Some(word) = cstr_to_str(word) else {
+        return ptr::null_mut();
+    };
     str_to_c(&handle.hyphenate(word))
 }
 
@@ -204,9 +225,15 @@ pub unsafe extern "C" fn voikko_insert_hyphens(
     separator: *const c_char,
     allow_context_changes: c_int,
 ) -> *mut c_char {
-    let Some(handle) = (unsafe { handle.as_ref() }) else { return ptr::null_mut(); };
-    let Some(word) = cstr_to_str(word) else { return ptr::null_mut(); };
-    let Some(sep) = cstr_to_str(separator) else { return ptr::null_mut(); };
+    let Some(handle) = (unsafe { handle.as_ref() }) else {
+        return ptr::null_mut();
+    };
+    let Some(word) = cstr_to_str(word) else {
+        return ptr::null_mut();
+    };
+    let Some(sep) = cstr_to_str(separator) else {
+        return ptr::null_mut();
+    };
     str_to_c(&handle.insert_hyphens(word, sep, allow_context_changes != 0))
 }
 
@@ -238,10 +265,17 @@ pub unsafe extern "C" fn voikko_grammar_errors(
     text: *const c_char,
     language: *const c_char,
 ) -> VoikkoGrammarErrorArray {
-    let empty = VoikkoGrammarErrorArray { errors: ptr::null_mut(), count: 0 };
+    let empty = VoikkoGrammarErrorArray {
+        errors: ptr::null_mut(),
+        count: 0,
+    };
 
-    let Some(handle) = (unsafe { handle.as_ref() }) else { return empty; };
-    let Some(text) = cstr_to_str(text) else { return empty; };
+    let Some(handle) = (unsafe { handle.as_ref() }) else {
+        return empty;
+    };
+    let Some(text) = cstr_to_str(text) else {
+        return empty;
+    };
     let lang = cstr_to_str(language).unwrap_or("fi");
 
     let errors = handle.grammar_errors_from_text(text);
@@ -307,10 +341,17 @@ pub unsafe extern "C" fn voikko_tokens(
     handle: *const VoikkoHandle,
     text: *const c_char,
 ) -> VoikkoTokenArray {
-    let empty = VoikkoTokenArray { tokens: ptr::null_mut(), count: 0 };
+    let empty = VoikkoTokenArray {
+        tokens: ptr::null_mut(),
+        count: 0,
+    };
 
-    let Some(handle) = (unsafe { handle.as_ref() }) else { return empty; };
-    let Some(text) = cstr_to_str(text) else { return empty; };
+    let Some(handle) = (unsafe { handle.as_ref() }) else {
+        return empty;
+    };
+    let Some(text) = cstr_to_str(text) else {
+        return empty;
+    };
 
     let tokens = handle.tokens(text);
     let count = tokens.len();
@@ -370,10 +411,17 @@ pub unsafe extern "C" fn voikko_sentences(
     handle: *const VoikkoHandle,
     text: *const c_char,
 ) -> VoikkoSentenceArray {
-    let empty = VoikkoSentenceArray { sentences: ptr::null_mut(), count: 0 };
+    let empty = VoikkoSentenceArray {
+        sentences: ptr::null_mut(),
+        count: 0,
+    };
 
-    let Some(handle) = (unsafe { handle.as_ref() }) else { return empty; };
-    let Some(text) = cstr_to_str(text) else { return empty; };
+    let Some(handle) = (unsafe { handle.as_ref() }) else {
+        return empty;
+    };
+    let Some(text) = cstr_to_str(text) else {
+        return empty;
+    };
 
     let sentences = handle.sentences(text);
     let count = sentences.len();
@@ -392,7 +440,10 @@ pub unsafe extern "C" fn voikko_sentences(
     let ptr = c_sentences.as_mut_ptr();
     std::mem::forget(c_sentences);
 
-    VoikkoSentenceArray { sentences: ptr, count }
+    VoikkoSentenceArray {
+        sentences: ptr,
+        count,
+    }
 }
 
 /// Free a sentence array.
@@ -421,16 +472,31 @@ bool_setter!(voikko_set_ignore_dot, set_ignore_dot);
 bool_setter!(voikko_set_ignore_numbers, set_ignore_numbers);
 bool_setter!(voikko_set_ignore_uppercase, set_ignore_uppercase);
 bool_setter!(voikko_set_no_ugly_hyphenation, set_no_ugly_hyphenation);
-bool_setter!(voikko_set_accept_first_uppercase, set_accept_first_uppercase);
+bool_setter!(
+    voikko_set_accept_first_uppercase,
+    set_accept_first_uppercase
+);
 bool_setter!(voikko_set_accept_all_uppercase, set_accept_all_uppercase);
 bool_setter!(voikko_set_ocr_suggestions, set_ocr_suggestions);
 bool_setter!(voikko_set_ignore_nonwords, set_ignore_nonwords);
 bool_setter!(voikko_set_accept_extra_hyphens, set_accept_extra_hyphens);
-bool_setter!(voikko_set_accept_missing_hyphens, set_accept_missing_hyphens);
+bool_setter!(
+    voikko_set_accept_missing_hyphens,
+    set_accept_missing_hyphens
+);
 bool_setter!(voikko_set_accept_titles_in_gc, set_accept_titles_in_gc);
-bool_setter!(voikko_set_accept_unfinished_paragraphs_in_gc, set_accept_unfinished_paragraphs_in_gc);
-bool_setter!(voikko_set_hyphenate_unknown_words, set_hyphenate_unknown_words);
-bool_setter!(voikko_set_accept_bulleted_lists_in_gc, set_accept_bulleted_lists_in_gc);
+bool_setter!(
+    voikko_set_accept_unfinished_paragraphs_in_gc,
+    set_accept_unfinished_paragraphs_in_gc
+);
+bool_setter!(
+    voikko_set_hyphenate_unknown_words,
+    set_hyphenate_unknown_words
+);
+bool_setter!(
+    voikko_set_accept_bulleted_lists_in_gc,
+    set_accept_bulleted_lists_in_gc
+);
 
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn voikko_set_min_hyphenated_word_length(
@@ -475,10 +541,10 @@ pub extern "C" fn voikko_version() -> *const c_char {
 /// static — do NOT free them.
 /// Returns NULL if the attribute is not recognized.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn voikko_attribute_values(
-    name: *const c_char,
-) -> *const *const c_char {
-    let Some(name) = cstr_to_str(name) else { return ptr::null(); };
+pub unsafe extern "C" fn voikko_attribute_values(name: *const c_char) -> *const *const c_char {
+    let Some(name) = cstr_to_str(name) else {
+        return ptr::null();
+    };
     // We use a static cache to avoid repeated allocation.
     // This is safe because attribute_values returns &'static data.
     let Some(values) = VoikkoHandle::attribute_values(name) else {
@@ -530,7 +596,9 @@ fn str_to_c(s: &str) -> *mut c_char {
 
 fn set_error(out: *mut *mut c_char, msg: &str) {
     if !out.is_null() {
-        unsafe { *out = str_to_c(msg); }
+        unsafe {
+            *out = str_to_c(msg);
+        }
     }
 }
 

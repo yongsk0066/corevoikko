@@ -103,12 +103,8 @@ impl WasmVoikko {
     /// - `autocorr_data`: contents of `autocorr.vfst` (autocorrect transducer, optional)
     #[wasm_bindgen(constructor)]
     pub fn new(mor_data: &[u8], autocorr_data: Option<Vec<u8>>) -> Result<WasmVoikko, JsError> {
-        let handle = VoikkoHandle::from_bytes(
-            mor_data,
-            autocorr_data.as_deref(),
-            "fi",
-        )
-        .map_err(voikko_error_to_js)?;
+        let handle = VoikkoHandle::from_bytes(mor_data, autocorr_data.as_deref(), "fi")
+            .map_err(voikko_error_to_js)?;
         Ok(WasmVoikko { handle })
     }
 
@@ -171,8 +167,7 @@ impl WasmVoikko {
                 short_description: e.short_description,
             })
             .collect();
-        serde_wasm_bindgen::to_value(&js_errors)
-            .map_err(|e| JsError::new(&e.to_string()))
+        serde_wasm_bindgen::to_value(&js_errors).map_err(|e| JsError::new(&e.to_string()))
     }
 
     /// Tokenize text into a list of tokens.
@@ -191,8 +186,7 @@ impl WasmVoikko {
                 pos: t.pos,
             })
             .collect();
-        serde_wasm_bindgen::to_value(&js_tokens)
-            .map_err(|e| JsError::new(&e.to_string()))
+        serde_wasm_bindgen::to_value(&js_tokens).map_err(|e| JsError::new(&e.to_string()))
     }
 
     /// Detect sentence boundaries in text.
@@ -208,8 +202,7 @@ impl WasmVoikko {
                 sentence_len: s.sentence_len,
             })
             .collect();
-        serde_wasm_bindgen::to_value(&js_sentences)
-            .map_err(|e| JsError::new(&e.to_string()))
+        serde_wasm_bindgen::to_value(&js_sentences).map_err(|e| JsError::new(&e.to_string()))
     }
 
     /// Hyphenate a word with the given separator inserted at hyphenation points.
@@ -217,8 +210,14 @@ impl WasmVoikko {
     /// - `separator`: string to insert at hyphenation points (e.g. "-", "\u{00AD}")
     /// - `allow_context_changes`: if true, handle compound-boundary replacements
     #[wasm_bindgen(js_name = "insertHyphens")]
-    pub fn insert_hyphens(&self, word: &str, separator: &str, allow_context_changes: bool) -> String {
-        self.handle.insert_hyphens(word, separator, allow_context_changes)
+    pub fn insert_hyphens(
+        &self,
+        word: &str,
+        separator: &str,
+        allow_context_changes: bool,
+    ) -> String {
+        self.handle
+            .insert_hyphens(word, separator, allow_context_changes)
     }
 
     /// Get possible values for an enumerated morphological attribute.
@@ -247,8 +246,7 @@ impl WasmVoikko {
                 short_description: e.short_description,
             })
             .collect();
-        serde_wasm_bindgen::to_value(&js_errors)
-            .map_err(|e| JsError::new(&e.to_string()))
+        serde_wasm_bindgen::to_value(&js_errors).map_err(|e| JsError::new(&e.to_string()))
     }
 
     /// Get the library version string.

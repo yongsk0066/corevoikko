@@ -130,22 +130,14 @@ pub fn error_code_description(code: i32) -> &'static str {
         GCERR_WRITE_FIRST_LOWERCASE => {
             "Harkitse sanan kirjoittamista pienell\u{00e4} alkukirjaimella."
         }
-        GCERR_WRITE_FIRST_UPPERCASE => {
-            "Sana on kirjoitettava isolla alkukirjaimella."
-        }
+        GCERR_WRITE_FIRST_UPPERCASE => "Sana on kirjoitettava isolla alkukirjaimella.",
         GCERR_REPEATING_WORD => "Sana on kirjoitettu kahteen kertaan.",
-        GCERR_TERMINATING_PUNCTUATION_MISSING => {
-            "V\u{00e4}limerkki puuttuu virkkeen lopusta."
-        }
+        GCERR_TERMINATING_PUNCTUATION_MISSING => "V\u{00e4}limerkki puuttuu virkkeen lopusta.",
         GCERR_INVALID_PUNCTUATION_AT_END_OF_QUOTATION => {
             "Virheelliset v\u{00e4}limerkit lainauksen lopussa"
         }
-        GCERR_FOREIGN_QUOTATION_MARK => {
-            "Suomenkieliseen tekstiin sopimaton lainausmerkki"
-        }
-        GCERR_MISPLACED_CLOSING_PARENTHESIS => {
-            "V\u{00e4}\u{00e4}rin sijoitettu sulkumerkki"
-        }
+        GCERR_FOREIGN_QUOTATION_MARK => "Suomenkieliseen tekstiin sopimaton lainausmerkki",
+        GCERR_MISPLACED_CLOSING_PARENTHESIS => "V\u{00e4}\u{00e4}rin sijoitettu sulkumerkki",
         GCERR_NEGATIVE_VERB_MISMATCH => {
             "Kieltoverbi ja p\u{00e4}\u{00e4}verbi eiv\u{00e4}t sovi yhteen."
         }
@@ -179,26 +171,16 @@ pub fn error_code_description_en(code: i32) -> &'static str {
         GCERR_SPACE_BEFORE_PUNCTUATION => "Extra space before punctuation",
         GCERR_EXTRA_COMMA => "Remove extra comma.",
         GCERR_INVALID_SENTENCE_STARTER => "Invalid character at the start of a sentence",
-        GCERR_WRITE_FIRST_LOWERCASE => {
-            "Consider writing the word in lowercase."
-        }
-        GCERR_WRITE_FIRST_UPPERCASE => {
-            "The word must be written with a capital letter."
-        }
+        GCERR_WRITE_FIRST_LOWERCASE => "Consider writing the word in lowercase.",
+        GCERR_WRITE_FIRST_UPPERCASE => "The word must be written with a capital letter.",
         GCERR_REPEATING_WORD => "The word appears twice.",
-        GCERR_TERMINATING_PUNCTUATION_MISSING => {
-            "Punctuation is missing at the end of a sentence."
-        }
+        GCERR_TERMINATING_PUNCTUATION_MISSING => "Punctuation is missing at the end of a sentence.",
         GCERR_INVALID_PUNCTUATION_AT_END_OF_QUOTATION => {
             "Invalid punctuation at the end of a quotation"
         }
-        GCERR_FOREIGN_QUOTATION_MARK => {
-            "Quotation mark not suitable for Finnish text"
-        }
+        GCERR_FOREIGN_QUOTATION_MARK => "Quotation mark not suitable for Finnish text",
         GCERR_MISPLACED_CLOSING_PARENTHESIS => "Misplaced closing parenthesis",
-        GCERR_NEGATIVE_VERB_MISMATCH => {
-            "Negative verb and main verb do not agree."
-        }
+        GCERR_NEGATIVE_VERB_MISMATCH => "Negative verb and main verb do not agree.",
         GCERR_A_INFINITIVE_REQUIRED => {
             "The latter verb should be in the a/\u{00e4} infinitive form."
         }
@@ -208,12 +190,8 @@ pub fn error_code_description_en(code: i32) -> &'static str {
         GCERR_MISPLACED_SIDESANA => {
             "A conjunction (ja, tai, mutta, ...) cannot be the last word of a sentence."
         }
-        GCERR_MISSING_MAIN_VERB => {
-            "Check whether a main verb is missing from the sentence."
-        }
-        GCERR_EXTRA_MAIN_VERB => {
-            "A comma may be missing, or there may be an extra verb."
-        }
+        GCERR_MISSING_MAIN_VERB => "Check whether a main verb is missing from the sentence.",
+        GCERR_EXTRA_MAIN_VERB => "A comma may be missing, or there may be an extra verb.",
         _ => "",
     }
 }
@@ -233,12 +211,8 @@ mod tests {
 
     #[test]
     fn error_with_suggestions() {
-        let err = GrammarError::with_suggestions(
-            GCERR_REPEATING_WORD,
-            10,
-            5,
-            vec!["word".to_string()],
-        );
+        let err =
+            GrammarError::with_suggestions(GCERR_REPEATING_WORD, 10, 5, vec!["word".to_string()]);
         assert_eq!(err.error_code, GCERR_REPEATING_WORD);
         assert_eq!(err.suggestions.len(), 1);
         assert_eq!(err.suggestions[0], "word");
@@ -255,12 +229,8 @@ mod tests {
 
     #[test]
     fn clone_is_independent() {
-        let err = GrammarError::with_suggestions(
-            GCERR_EXTRA_WHITESPACE,
-            0,
-            2,
-            vec!["fix".to_string()],
-        );
+        let err =
+            GrammarError::with_suggestions(GCERR_EXTRA_WHITESPACE, 0, 2, vec!["fix".to_string()]);
         let mut cloned = err.clone();
         cloned.suggestions.push("another".to_string());
         assert_eq!(err.suggestions.len(), 1);
@@ -279,7 +249,10 @@ mod tests {
     fn english_descriptions_all_nonempty() {
         for code in 1..=18 {
             let desc = error_code_description_en(code);
-            assert!(!desc.is_empty(), "empty English description for code {code}");
+            assert!(
+                !desc.is_empty(),
+                "empty English description for code {code}"
+            );
         }
     }
 
@@ -290,6 +263,9 @@ mod tests {
         assert_eq!(fi, "Virheellinen kirjoitusasu");
         assert_eq!(en, "Incorrect spelling of word(s)");
         // Unknown language falls back to English
-        assert_eq!(error_code_description_lang(GCERR_INVALID_SPELLING, "sv"), en);
+        assert_eq!(
+            error_code_description_lang(GCERR_INVALID_SPELLING, "sv"),
+            en
+        );
     }
 }

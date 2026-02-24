@@ -1,6 +1,6 @@
 {
   "name": "@yongsk0066/voikko",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Finnish NLP library — spell checking, morphological analysis, hyphenation, grammar checking, tokenization. Powered by Rust WASM.",
   "type": "module",
   "exports": {

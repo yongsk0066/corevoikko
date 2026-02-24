@@ -243,13 +243,13 @@ pub(crate) fn parse_structure(fst_output: &[char], wlen: usize) -> String {
                         &mut structure,
                         is_abbr,
                     );
-                    decrease_chars_missing(
-                        &mut chars_missing,
-                        chars_seen,
-                        chars_from_default,
-                    );
+                    decrease_chars_missing(&mut chars_missing, chars_seen, chars_from_default);
                 }
-                if i != 1 && i + 5 < output_len && !structure.is_empty() && *structure.last().unwrap() != '=' {
+                if i != 1
+                    && i + 5 < output_len
+                    && !structure.is_empty()
+                    && *structure.last().unwrap() != '='
+                {
                     structure.push('=');
                 }
                 i += 3; // C++ does i += 3 then for-loop i++; Rust while-loop i += 1 at end
@@ -257,10 +257,7 @@ pub(crate) fn parse_structure(fst_output: &[char], wlen: usize) -> String {
                 chars_from_default = 0;
             }
             // Check for [Xx] tags (4-char tags like [Xp], [Xr], [Xs], [Xj])
-            else if i + 3 < output_len
-                && fst_output[i + 1] == 'X'
-                && fst_output[i + 3] == ']'
-            {
+            else if i + 3 < output_len && fst_output[i + 1] == 'X' && fst_output[i + 3] == ']' {
                 if fst_output[i + 2] == 'r' {
                     // [Xr]...[X] -- explicit structure override
                     default_title_case = false;
@@ -302,8 +299,7 @@ pub(crate) fn parse_structure(fst_output: &[char], wlen: usize) -> String {
                     i += 3;
                 } else if fst_output[i + 2] == 'u'
                     && i + 5 < output_len
-                    && (fst_output[i + 3] == 'r'
-                        || fst_output[i + 4].is_ascii_digit())
+                    && (fst_output[i + 3] == 'r' || fst_output[i + 4].is_ascii_digit())
                 {
                     // [Lur] or [Lu] followed by digit -- numeral abbreviation
                     is_abbr = true;
@@ -400,11 +396,7 @@ fn create_default_structure(
 
 /// Safely decrease chars_missing accounting for chars already consumed by defaults.
 /// Origin: FinnishVfstAnalyzer.cpp:160-169 (decreaseCharsMissing)
-fn decrease_chars_missing(
-    chars_missing: &mut usize,
-    chars_seen: usize,
-    chars_from_default: usize,
-) {
+fn decrease_chars_missing(chars_missing: &mut usize, chars_seen: usize, chars_from_default: usize) {
     let consumed = chars_seen.saturating_sub(chars_from_default);
     if consumed <= *chars_missing {
         *chars_missing -= consumed;
@@ -519,8 +511,8 @@ pub(crate) fn is_valid_analysis(fst_output: &[char]) -> bool {
                     // beforeLastChar receives the lowered value on assignment below.
                     last_char = simple_lower(last_char);
                     let lc_next = simple_lower(fst_output[i]);
-                    let need_hyphen = (last_char == lc_next && is_vowel(last_char))
-                        || last_char.is_ascii_digit();
+                    let need_hyphen =
+                        (last_char == lc_next && is_vowel(last_char)) || last_char.is_ascii_digit();
                     if need_hyphen != hyphen_present {
                         return false;
                     }
@@ -618,16 +610,11 @@ pub(crate) fn parse_baseform(fst_output: &[char], structure: &[char]) -> Option<
                         }
                     }
                 }
-            } else if !class_tag_seen
-                && i + 6 < fst_len
-                && starts_with(fst_output, i + 1, "Lu]")
-            {
+            } else if !class_tag_seen && i + 6 < fst_len && starts_with(fst_output, i + 1, "Lu]") {
                 // [Lu] -- numeral class: try numeral baseform parsing
                 i += 3;
                 class_tag_seen = true;
-                if let Some(numeral_bf) =
-                    parse_numeral_baseform(&fst_output[i + 1..], &baseform)
-                {
+                if let Some(numeral_bf) = parse_numeral_baseform(&fst_output[i + 1..], &baseform) {
                     return Some(numeral_bf);
                 }
             } else if starts_with(fst_output, i + 1, "De]") {
@@ -639,8 +626,7 @@ pub(crate) fn parse_baseform(fst_output: &[char], structure: &[char]) -> Option<
                     is_de = false;
                     // ignore_next_de when NOT [Ll] or [Lnl]
                     ignore_next_de = i + 3 >= fst_len
-                        || (fst_output[i + 2] != 'l'
-                            && !starts_with(fst_output, i + 2, "nl"));
+                        || (fst_output[i + 2] != 'l' && !starts_with(fst_output, i + 2, "nl"));
                 }
                 is_in_tag = true;
             }
@@ -665,9 +651,7 @@ pub(crate) fn parse_baseform(fst_output: &[char], structure: &[char]) -> Option<
                     // Compound place name handling (e.g., "Isolla-Britannialla")
                     if is_de
                         && latest_xp_start_in_fst != 0
-                        && !(i >= 2
-                            && fst_output[i - 2] == 'i'
-                            && fst_output[i - 1] == 's')
+                        && !(i >= 2 && fst_output[i - 2] == 'i' && fst_output[i - 1] == 's')
                     {
                         // Look ahead for [Lep] to determine if base form replacement needed
                         let mut j = i;
@@ -759,8 +743,7 @@ fn parse_numeral_baseform(fst_output: &[char], prefix: &[char]) -> Option<String
                 return None;
             }
             if i + 6 < fst_len
-                && (starts_with(fst_output, i, "[Xp]")
-                    || starts_with(fst_output, i, "[Xj]"))
+                && (starts_with(fst_output, i, "[Xp]") || starts_with(fst_output, i, "[Xj]"))
             {
                 i += 3;
                 is_in_xp = true;
@@ -865,12 +848,8 @@ pub(crate) fn parse_basic_attributes(fst_output: &[char]) -> BasicAttributes {
                                 if code == "nl" {
                                     let comp = attrs.comparison;
                                     if convert_nimi_laatusana_to_laatusana
-                                        || matches!(
-                                            comp,
-                                            Some("comparative") | Some("superlative")
-                                        )
-                                        || (fst_len >= 4
-                                            && starts_with(fst_output, 0, "[Lu]"))
+                                        || matches!(comp, Some("comparative") | Some("superlative"))
+                                        || (fst_len >= 4 && starts_with(fst_output, 0, "[Lu]"))
                                     {
                                         attrs.class = Some("laatusana");
                                     } else {
@@ -885,10 +864,8 @@ pub(crate) fn parse_basic_attributes(fst_output: &[char]) -> BasicAttributes {
                         'N' => {
                             // NUMBER -- skip for etuliite and seikkasana
                             if attrs.number.is_none() {
-                                let skip = matches!(
-                                    attrs.class,
-                                    Some("etuliite") | Some("seikkasana")
-                                );
+                                let skip =
+                                    matches!(attrs.class, Some("etuliite") | Some("seikkasana"));
                                 if !skip {
                                     attrs.number = lookup_number(&code);
                                 }
@@ -902,10 +879,8 @@ pub(crate) fn parse_basic_attributes(fst_output: &[char]) -> BasicAttributes {
                         'S' => {
                             // SIJAMUOTO -- skip for etuliite and seikkasana
                             if attrs.sijamuoto.is_none() {
-                                let skip = matches!(
-                                    attrs.class,
-                                    Some("etuliite") | Some("seikkasana")
-                                );
+                                let skip =
+                                    matches!(attrs.class, Some("etuliite") | Some("seikkasana"));
                                 if !skip {
                                     attrs.sijamuoto = lookup_sijamuoto(&code);
                                     if code == "sti" {
@@ -969,12 +944,7 @@ pub(crate) fn parse_basic_attributes(fst_output: &[char]) -> BasicAttributes {
                                 if !class_set
                                     && attrs.class.is_none()
                                     && (fst_output[j - 1] == '-'
-                                        || (j >= 5
-                                            && starts_with(
-                                                fst_output,
-                                                j - 5,
-                                                "-[Bh]",
-                                            )))
+                                        || (j >= 5 && starts_with(fst_output, j - 5, "-[Bh]")))
                                 {
                                     attrs.class = Some("etuliite");
                                     class_set = true;
@@ -1016,10 +986,7 @@ fn add_info_flag(attrs: &mut BasicAttributes, code: &str, fst_output: &[char], t
         let suffix = &fst_output[tag_pos..];
         let has_bc = suffix.windows(4).any(|w| w == ['[', 'B', 'c', ']']);
         let has_ll = suffix.windows(4).any(|w| w == ['[', 'L', 'l', ']']);
-        if !has_bc
-            && !has_ll
-            && matches!(attrs.class, None | Some("nimisana"))
-        {
+        if !has_bc && !has_ll && matches!(attrs.class, None | Some("nimisana")) {
             attrs.possible_geographical_name = true;
         }
     } else if code == "ra" {
@@ -1028,9 +995,7 @@ fn add_info_flag(attrs: &mut BasicAttributes, code: &str, fst_output: &[char], t
             attrs.mood,
             Some("E-infinitive") | Some("MINEN-infinitive") | Some("MA-infinitive")
         );
-        if !dominated_by_infinitive
-            && matches!(attrs.class, None | Some("teonsana"))
-        {
+        if !dominated_by_infinitive && matches!(attrs.class, None | Some("teonsana")) {
             attrs.require_following_verb = Some("A-infinitive");
         }
     } else if code == "rm" {
@@ -1039,9 +1004,7 @@ fn add_info_flag(attrs: &mut BasicAttributes, code: &str, fst_output: &[char], t
             attrs.mood,
             Some("E-infinitive") | Some("MINEN-infinitive") | Some("MA-infinitive")
         );
-        if !dominated_by_infinitive
-            && matches!(attrs.class, None | Some("teonsana"))
-        {
+        if !dominated_by_infinitive && matches!(attrs.class, None | Some("teonsana")) {
             attrs.require_following_verb = Some("MA-infinitive");
         }
     }
@@ -1503,14 +1466,20 @@ mod tests {
         let debug = parse_debug_attributes(&fst);
         assert!(debug.wordbases.is_some());
         let wb = debug.wordbases.unwrap();
-        assert!(wb.contains("koira"), "wordbases should contain 'koira': {wb}");
+        assert!(
+            wb.contains("koira"),
+            "wordbases should contain 'koira': {wb}"
+        );
     }
 
     #[test]
     fn debug_attrs_with_xs() {
         let fst = chars("[Ln][Xs]DOG[X][Xp]koira[X]koira[Sn][Ny]");
         let debug = parse_debug_attributes(&fst);
-        assert!(debug.wordids.is_some(), "wordids should be set when [Xs] present");
+        assert!(
+            debug.wordids.is_some(),
+            "wordids should be set when [Xs] present"
+        );
         let wi = debug.wordids.unwrap();
         assert!(wi.contains("DOG"), "wordids should contain 'DOG': {wi}");
     }
@@ -1519,7 +1488,9 @@ mod tests {
     fn structure_three_part_compound_rautatieasema() {
         // "rautatieasema" = 13 chars: rauta(5) + tie(3) + asema(5)
         // FST: [Ln][Xp]rauta[X]raut[Sn][Ny]a[Bh][Bc][Ln][Ica][Xp]tie[X]tie[Sn][Ny][Bh][Bc][Ln][Xp]asema[X]asem[Sn][Ny]a
-        let fst = chars("[Ln][Xp]rauta[X]raut[Sn][Ny]a[Bh][Bc][Ln][Ica][Xp]tie[X]tie[Sn][Ny][Bh][Bc][Ln][Xp]asema[X]asem[Sn][Ny]a");
+        let fst = chars(
+            "[Ln][Xp]rauta[X]raut[Sn][Ny]a[Bh][Bc][Ln][Ica][Xp]tie[X]tie[Sn][Ny][Bh][Bc][Ln][Xp]asema[X]asem[Sn][Ny]a",
+        );
         let result = parse_structure(&fst, 13);
         assert_eq!(result, "=ppppp=ppp=ppppp");
     }
@@ -1528,7 +1499,9 @@ mod tests {
     fn structure_three_part_compound_elintarvikeliike() {
         // "elintarvikeliike" = 16 chars: elin(4) + tarvike(7) + liike(5)
         // FST: [Ln][Xp]elin[X]elin[Sn][Ny][Bh][Bc][Ln][Xp]tarvike[X]tarvik[Sn][Ny]e[Bh][Bc][Ln][Xp]liike[X]liik[Sn][Ny]e
-        let fst = chars("[Ln][Xp]elin[X]elin[Sn][Ny][Bh][Bc][Ln][Xp]tarvike[X]tarvik[Sn][Ny]e[Bh][Bc][Ln][Xp]liike[X]liik[Sn][Ny]e");
+        let fst = chars(
+            "[Ln][Xp]elin[X]elin[Sn][Ny][Bh][Bc][Ln][Xp]tarvike[X]tarvik[Sn][Ny]e[Bh][Bc][Ln][Xp]liike[X]liik[Sn][Ny]e",
+        );
         let result = parse_structure(&fst, 16);
         assert_eq!(result, "=pppp=ppppppp=ppppp");
     }

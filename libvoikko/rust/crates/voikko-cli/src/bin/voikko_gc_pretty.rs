@@ -69,8 +69,8 @@ fn main() {
 
     let empty_line_separates = args.iter().any(|a| a == "--empty-line");
 
-    let handle = voikko_cli::load_handle(dict_path.as_deref())
-        .unwrap_or_else(|e| voikko_cli::fatal(&e));
+    let handle =
+        voikko_cli::load_handle(dict_path.as_deref()).unwrap_or_else(|e| voikko_cli::fatal(&e));
 
     let stdin = io::stdin();
     let stdout = io::stdout();

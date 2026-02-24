@@ -14,10 +14,8 @@ pub(crate) const BACK_VOWELS: &[char] = &['a', 'o', 'u', 'A', 'O', 'U'];
 ///
 /// Origin: SuggestionGeneratorVowelChange.cpp:36, SuggestionGeneratorSwap.cpp:39
 #[allow(dead_code)]
-pub(crate) const FRONT_VOWELS: &[char] = &[
-    '\u{00E4}', '\u{00F6}', 'y',
-    '\u{00C4}', '\u{00D6}', 'Y',
-];
+pub(crate) const FRONT_VOWELS: &[char] =
+    &['\u{00E4}', '\u{00F6}', 'y', '\u{00C4}', '\u{00D6}', 'Y'];
 
 /// Vowel pairs that may be split by a hyphen in Finnish.
 /// These are vowel combinations that do NOT form diphthongs and can be separated.

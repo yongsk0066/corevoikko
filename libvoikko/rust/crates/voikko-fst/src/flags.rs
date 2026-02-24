@@ -191,7 +191,10 @@ impl FlagDiacriticParser {
 
         let feature = {
             let next_idx = self.features.len() as u16;
-            *self.features.entry(feature_str.to_string()).or_insert(next_idx)
+            *self
+                .features
+                .entry(feature_str.to_string())
+                .or_insert(next_idx)
         };
 
         let value = {

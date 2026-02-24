@@ -7,9 +7,9 @@ use voikko_core::analysis::ATTR_STRUCTURE;
 use voikko_core::character::{is_upper, simple_lower, simple_upper};
 use voikko_core::enums::SpellResult;
 
+use super::status::SuggestionStatus;
 use crate::morphology::Analyzer;
 use crate::speller::Speller;
-use super::status::SuggestionStatus;
 
 use crate::finnish::constants::{BACK_VOWELS, FRONT_VOWELS};
 
@@ -30,7 +30,12 @@ const SOFT_HYPHEN: char = '\u{00AD}';
 pub trait SuggestionGenerator {
     /// Generate suggestions for the word tracked by `status`, using `speller`
     /// to validate candidates.
-    fn generate(&self, speller: &dyn Speller, analyzer: Option<&dyn Analyzer>, status: &mut SuggestionStatus<'_>);
+    fn generate(
+        &self,
+        speller: &dyn Speller,
+        analyzer: Option<&dyn Analyzer>,
+        status: &mut SuggestionStatus<'_>,
+    );
 }
 
 // ---------------------------------------------------------------------------
@@ -199,20 +204,20 @@ fn priority_from_result(result: SpellResult) -> i32 {
 fn priority_from_noun_inflection(sijamuoto: Option<&str>) -> i32 {
     match sijamuoto {
         None => 4,
-        Some("nimento") => 2,          // nominative
-        Some("omanto") => 3,            // genitive
-        Some("osanto") => 5,            // partitive
-        Some("sisaolento") => 8,        // inessive
-        Some("sisaeronto") => 12,       // elative
-        Some("sisatulento") => 8,       // illative
-        Some("ulkoolento") => 12,       // adessive
-        Some("ulkoeronto") => 30,       // ablative
-        Some("ulkotulento") => 20,      // allative
-        Some("olento") => 20,           // essive
-        Some("tulento") => 20,          // translative
-        Some("vajanto") => 60,          // abessive
-        Some("seuranto") => 60,         // comitative
-        Some("keinonto") => 20,         // instructive
+        Some("nimento") => 2,      // nominative
+        Some("omanto") => 3,       // genitive
+        Some("osanto") => 5,       // partitive
+        Some("sisaolento") => 8,   // inessive
+        Some("sisaeronto") => 12,  // elative
+        Some("sisatulento") => 8,  // illative
+        Some("ulkoolento") => 12,  // adessive
+        Some("ulkoeronto") => 30,  // ablative
+        Some("ulkotulento") => 20, // allative
+        Some("olento") => 20,      // essive
+        Some("tulento") => 20,     // translative
+        Some("vajanto") => 60,     // abessive
+        Some("seuranto") => 60,    // comitative
+        Some("keinonto") => 20,    // instructive
         Some(_) => 4,
     }
 }
@@ -248,11 +253,7 @@ fn priority_from_word_class_and_inflection(
 ///
 /// Origin: SpellWithPriority.cpp:114-130 (getPriorityFromStructure)
 fn priority_from_structure(structure: &str) -> i32 {
-    let count_parts = structure
-        .chars()
-        .filter(|&c| c == '=')
-        .take(5)
-        .count();
+    let count_parts = structure.chars().filter(|&c| c == '=').take(5).count();
     if count_parts == 0 {
         return 1; // won't happen with a valid dictionary
     }
@@ -271,9 +272,7 @@ pub(crate) fn priority_from_analysis(
 ) -> i32 {
     let word_class = analysis.get(voikko_core::analysis::ATTR_CLASS);
     let sijamuoto = analysis.get(voikko_core::analysis::ATTR_SIJAMUOTO);
-    let structure = analysis
-        .get(ATTR_STRUCTURE)
-        .unwrap_or("=p");
+    let structure = analysis.get(ATTR_STRUCTURE).unwrap_or("=p");
 
     let class_prio = priority_from_word_class_and_inflection(word_class, sijamuoto);
     let struct_prio = priority_from_structure(structure);
@@ -321,7 +320,12 @@ pub struct CaseChange;
 
 impl SuggestionGenerator for CaseChange {
     /// Origin: SuggestionGeneratorCaseChange.cpp:45-47
-    fn generate(&self, speller: &dyn Speller, analyzer: Option<&dyn Analyzer>, status: &mut SuggestionStatus<'_>) {
+    fn generate(
+        &self,
+        speller: &dyn Speller,
+        analyzer: Option<&dyn Analyzer>,
+        status: &mut SuggestionStatus<'_>,
+    ) {
         let word = status.word().to_vec();
         let len = status.word_len();
         suggest_for_buffer_with_analyzer(speller, status, &word, len, analyzer);
@@ -342,7 +346,12 @@ pub struct SoftHyphens;
 
 impl SuggestionGenerator for SoftHyphens {
     /// Origin: SuggestionGeneratorSoftHyphens.cpp:41-57
-    fn generate(&self, speller: &dyn Speller, analyzer: Option<&dyn Analyzer>, status: &mut SuggestionStatus<'_>) {
+    fn generate(
+        &self,
+        speller: &dyn Speller,
+        analyzer: Option<&dyn Analyzer>,
+        status: &mut SuggestionStatus<'_>,
+    ) {
         let word = status.word().to_vec();
         if !word.contains(&SOFT_HYPHEN) {
             return;
@@ -368,7 +377,12 @@ pub struct Deletion;
 
 impl SuggestionGenerator for Deletion {
     /// Origin: SuggestionGeneratorDeletion.cpp:41-52
-    fn generate(&self, speller: &dyn Speller, analyzer: Option<&dyn Analyzer>, status: &mut SuggestionStatus<'_>) {
+    fn generate(
+        &self,
+        speller: &dyn Speller,
+        analyzer: Option<&dyn Analyzer>,
+        status: &mut SuggestionStatus<'_>,
+    ) {
         let word = status.word().to_vec();
         let wlen = status.word_len();
         if wlen < 2 {
@@ -410,7 +424,12 @@ pub struct Insertion {
 
 impl SuggestionGenerator for Insertion {
     /// Origin: SuggestionGeneratorInsertion.cpp:43-75
-    fn generate(&self, speller: &dyn Speller, analyzer: Option<&dyn Analyzer>, status: &mut SuggestionStatus<'_>) {
+    fn generate(
+        &self,
+        speller: &dyn Speller,
+        analyzer: Option<&dyn Analyzer>,
+        status: &mut SuggestionStatus<'_>,
+    ) {
         let word = status.word().to_vec();
         let wlen = status.word_len();
         if wlen == 0 {
@@ -473,7 +492,12 @@ pub struct InsertSpecial;
 
 impl SuggestionGenerator for InsertSpecial {
     /// Origin: SuggestionGeneratorInsertSpecial.cpp:38-69
-    fn generate(&self, speller: &dyn Speller, analyzer: Option<&dyn Analyzer>, status: &mut SuggestionStatus<'_>) {
+    fn generate(
+        &self,
+        speller: &dyn Speller,
+        analyzer: Option<&dyn Analyzer>,
+        status: &mut SuggestionStatus<'_>,
+    ) {
         let word = status.word().to_vec();
         let wlen = status.word_len();
         if wlen < 4 {
@@ -549,7 +573,12 @@ pub struct Replacement {
 
 impl SuggestionGenerator for Replacement {
     /// Origin: SuggestionGeneratorReplacement.cpp:42-74
-    fn generate(&self, speller: &dyn Speller, analyzer: Option<&dyn Analyzer>, status: &mut SuggestionStatus<'_>) {
+    fn generate(
+        &self,
+        speller: &dyn Speller,
+        analyzer: Option<&dyn Analyzer>,
+        status: &mut SuggestionStatus<'_>,
+    ) {
         let word = status.word().to_vec();
         let wlen = status.word_len();
         if self.replacements.len() < 2 {
@@ -614,7 +643,12 @@ pub struct ReplaceTwo {
 
 impl SuggestionGenerator for ReplaceTwo {
     /// Origin: SuggestionGeneratorReplaceTwo.cpp:42-76
-    fn generate(&self, speller: &dyn Speller, analyzer: Option<&dyn Analyzer>, status: &mut SuggestionStatus<'_>) {
+    fn generate(
+        &self,
+        speller: &dyn Speller,
+        analyzer: Option<&dyn Analyzer>,
+        status: &mut SuggestionStatus<'_>,
+    ) {
         let word = status.word().to_vec();
         let wlen = status.word_len();
         if wlen < 2 || self.replacements.len() < 2 {
@@ -713,10 +747,22 @@ impl MultiReplacement {
 
 impl SuggestionGenerator for MultiReplacement {
     /// Origin: SuggestionGeneratorMultiReplacement.cpp:42-48
-    fn generate(&self, speller: &dyn Speller, analyzer: Option<&dyn Analyzer>, status: &mut SuggestionStatus<'_>) {
+    fn generate(
+        &self,
+        speller: &dyn Speller,
+        analyzer: Option<&dyn Analyzer>,
+        status: &mut SuggestionStatus<'_>,
+    ) {
         let word = status.word().to_vec();
         let mut buffer: Vec<char> = word.to_vec();
-        self.do_generate(speller, analyzer, status, &mut buffer, 0, self.replace_count);
+        self.do_generate(
+            speller,
+            analyzer,
+            status,
+            &mut buffer,
+            0,
+            self.replace_count,
+        );
     }
 }
 
@@ -738,7 +784,12 @@ pub struct Swap;
 
 impl SuggestionGenerator for Swap {
     /// Origin: SuggestionGeneratorSwap.cpp:44-77
-    fn generate(&self, speller: &dyn Speller, analyzer: Option<&dyn Analyzer>, status: &mut SuggestionStatus<'_>) {
+    fn generate(
+        &self,
+        speller: &dyn Speller,
+        analyzer: Option<&dyn Analyzer>,
+        status: &mut SuggestionStatus<'_>,
+    ) {
         let word = status.word().to_vec();
         let wlen = status.word_len();
         if wlen < 2 {
@@ -832,7 +883,12 @@ impl SplitWord {
 
 impl SuggestionGenerator for SplitWord {
     /// Origin: SuggestionGeneratorSplitWord.cpp:68-103
-    fn generate(&self, speller: &dyn Speller, analyzer: Option<&dyn Analyzer>, status: &mut SuggestionStatus<'_>) {
+    fn generate(
+        &self,
+        speller: &dyn Speller,
+        analyzer: Option<&dyn Analyzer>,
+        status: &mut SuggestionStatus<'_>,
+    ) {
         let word = status.word().to_vec();
         let wlen = status.word_len();
         if wlen < 4 {
@@ -882,7 +938,8 @@ impl SuggestionGenerator for SplitWord {
                 }
                 let mut part2: Vec<char> = word[w2start..w2start + w2len].to_vec();
                 let (ok2, prio_part) = SplitWord::spell_ok(speller, analyzer, status, &mut part2);
-                let combined_prio = (prio_total.saturating_add(prio_part)).saturating_mul(1 + strip_lead2 as i32 * 5);
+                let combined_prio = (prio_total.saturating_add(prio_part))
+                    .saturating_mul(1 + strip_lead2 as i32 * 5);
 
                 if ok2 {
                     // Build "part1 part2" suggestion
@@ -931,7 +988,12 @@ impl VowelChange {
 
 impl SuggestionGenerator for VowelChange {
     /// Origin: SuggestionGeneratorVowelChange.cpp:41-85
-    fn generate(&self, speller: &dyn Speller, analyzer: Option<&dyn Analyzer>, status: &mut SuggestionStatus<'_>) {
+    fn generate(
+        &self,
+        speller: &dyn Speller,
+        analyzer: Option<&dyn Analyzer>,
+        status: &mut SuggestionStatus<'_>,
+    ) {
         let word = status.word().to_vec();
         let wlen = status.word_len();
 
@@ -962,8 +1024,7 @@ impl SuggestionGenerator for VowelChange {
                         // Flip the vowel
                         if let Some(pos) = BACK_VOWELS.iter().position(|&v| v == buffer[i]) {
                             buffer[i] = FRONT_VOWELS[pos];
-                        } else if let Some(pos) =
-                            FRONT_VOWELS.iter().position(|&v| v == buffer[i])
+                        } else if let Some(pos) = FRONT_VOWELS.iter().position(|&v| v == buffer[i])
                         {
                             buffer[i] = BACK_VOWELS[pos];
                         }
@@ -995,7 +1056,12 @@ pub struct DeleteTwo;
 
 impl SuggestionGenerator for DeleteTwo {
     /// Origin: SuggestionGeneratorDeleteTwo.cpp:43-62
-    fn generate(&self, speller: &dyn Speller, analyzer: Option<&dyn Analyzer>, status: &mut SuggestionStatus<'_>) {
+    fn generate(
+        &self,
+        speller: &dyn Speller,
+        analyzer: Option<&dyn Analyzer>,
+        status: &mut SuggestionStatus<'_>,
+    ) {
         let word = status.word().to_vec();
         let wlen = status.word_len();
         if wlen < 6 {
@@ -1126,7 +1192,7 @@ mod tests {
         let word = chars("kira"); // missing 'o'
         let mut status = SuggestionStatus::new(&word, 5);
         status.set_max_cost(200);
-        let sg =Insertion {
+        let sg = Insertion {
             characters: vec!['o'],
         };
         sg.generate(&speller, None, &mut status);
@@ -1142,7 +1208,7 @@ mod tests {
         let word = chars("koiru"); // 'u' instead of 'a'
         let mut status = SuggestionStatus::new(&word, 5);
         status.set_max_cost(100);
-        let sg =Replacement {
+        let sg = Replacement {
             replacements: vec!['u', 'a'],
         };
         sg.generate(&speller, None, &mut status);
@@ -1173,10 +1239,7 @@ mod tests {
         status.set_max_cost(200);
         SplitWord.generate(&speller, None, &mut status);
         assert!(status.suggestion_count() >= 1);
-        assert!(status
-            .suggestions()
-            .iter()
-            .any(|s| s.word == "koira kissa"));
+        assert!(status.suggestions().iter().any(|s| s.word == "koira kissa"));
     }
 
     // --- VowelChange ---
@@ -1223,7 +1286,7 @@ mod tests {
         let word = chars("kitta"); // 'tt' -> 'ss' with replacement table 't','s'
         let mut status = SuggestionStatus::new(&word, 5);
         status.set_max_cost(100);
-        let sg =ReplaceTwo {
+        let sg = ReplaceTwo {
             replacements: vec!['t', 's'],
         };
         sg.generate(&speller, None, &mut status);
@@ -1262,7 +1325,7 @@ mod tests {
         let word = chars("koiru");
         let mut status = SuggestionStatus::new(&word, 5);
         status.set_max_cost(100);
-        let sg =MultiReplacement {
+        let sg = MultiReplacement {
             replacements: vec!['u', 'a'],
             replace_count: 1,
         };
@@ -1277,7 +1340,7 @@ mod tests {
         let word = chars("loiru"); // 'l'->'k' and 'u'->'a'
         let mut status = SuggestionStatus::new(&word, 5);
         status.set_max_cost(500);
-        let sg =MultiReplacement {
+        let sg = MultiReplacement {
             replacements: vec!['l', 'k', 'u', 'a'],
             replace_count: 2,
         };
@@ -1421,13 +1484,7 @@ mod tests {
         let mut status = SuggestionStatus::new(&word, 5);
         status.set_max_cost(100);
 
-        suggest_for_buffer_with_analyzer(
-            &speller,
-            &mut status,
-            &word,
-            word.len(),
-            Some(&analyzer),
-        );
+        suggest_for_buffer_with_analyzer(&speller, &mut status, &word, word.len(), Some(&analyzer));
 
         assert_eq!(status.suggestion_count(), 1);
         assert_eq!(status.suggestions()[0].word, "Helsinki");
@@ -1457,13 +1514,7 @@ mod tests {
         let mut status = SuggestionStatus::new(&word, 5);
         status.set_max_cost(100);
 
-        suggest_for_buffer_with_analyzer(
-            &speller,
-            &mut status,
-            &word,
-            word.len(),
-            Some(&analyzer),
-        );
+        suggest_for_buffer_with_analyzer(&speller, &mut status, &word, word.len(), Some(&analyzer));
 
         assert_eq!(status.suggestion_count(), 0);
     }
@@ -1500,10 +1551,7 @@ mod tests {
             ("CLASS", "nimisana"),
             ("SIJAMUOTO", "nimento"),
         ]);
-        let verb = make_analysis(&[
-            (ATTR_STRUCTURE, "=pppppp"),
-            ("CLASS", "teonsana"),
-        ]);
+        let verb = make_analysis(&[(ATTR_STRUCTURE, "=pppppp"), ("CLASS", "teonsana")]);
         let noun_prio = priority_from_analysis(&noun, SpellResult::Ok);
         let verb_prio = priority_from_analysis(&verb, SpellResult::Ok);
         assert!(noun_prio < verb_prio);

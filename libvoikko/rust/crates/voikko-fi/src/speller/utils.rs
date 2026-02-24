@@ -82,10 +82,7 @@ mod tests {
     #[test]
     fn first_upper_matches_uppercase_first_structure() {
         let word: Vec<char> = "Helsinki".chars().collect();
-        assert_eq!(
-            match_word_and_analysis(&word, "=ippppppp"),
-            SpellResult::Ok
-        );
+        assert_eq!(match_word_and_analysis(&word, "=ippppppp"), SpellResult::Ok);
     }
 
     #[test]
@@ -187,9 +184,6 @@ mod tests {
     fn finnish_chars_case_detection() {
         // "Aaiti" with first upper expected
         let word: Vec<char> = "\u{00C4}iti".chars().collect(); // Aiti
-        assert_eq!(
-            match_word_and_analysis(&word, "=ippp"),
-            SpellResult::Ok
-        );
+        assert_eq!(match_word_and_analysis(&word, "=ippp"), SpellResult::Ok);
     }
 }
