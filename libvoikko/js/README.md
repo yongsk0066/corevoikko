@@ -39,7 +39,7 @@ voikko.terminate(); // release resources
 
 ### Browser (zero-config)
 
-WASM and dictionary files are automatically fetched from the unpkg CDN.
+WASM and dictionary files are automatically fetched from CDN. No setup needed.
 
 ```typescript
 import { Voikko } from '@yongsk0066/voikko';
@@ -47,6 +47,8 @@ import { Voikko } from '@yongsk0066/voikko';
 const voikko = await Voikko.init();
 voikko.spell('koira'); // true
 ```
+
+For production, serve files yourself to avoid CDN dependency:
 
 ### Browser (self-hosted)
 
@@ -120,6 +122,81 @@ Returns analysis objects with fields: `BASEFORM`, `CLASS`, `STRUCTURE`, `SIJAMUO
 ### Cleanup
 
 - `voikko.terminate()` — Release all resources. Instance must not be used after this call.
+
+## Error Handling
+
+The library provides typed errors for programmatic handling:
+
+```typescript
+import { Voikko, WasmLoadError, DictionaryLoadError } from '@yongsk0066/voikko';
+
+try {
+  const voikko = await Voikko.init();
+} catch (e) {
+  if (e instanceof WasmLoadError) {
+    console.error('WASM failed to load:', e.message);
+  } else if (e instanceof DictionaryLoadError) {
+    console.error('Dictionary file missing:', e.fileName);
+  }
+}
+```
+
+Calling methods on a terminated instance throws an error:
+
+```typescript
+voikko.terminate();
+voikko.spell('koira'); // Error: Cannot use Voikko instance after terminate()
+```
+
+## Bundle Size
+
+| Component | Size | Notes |
+|-----------|------|-------|
+| JS wrapper | 10 KB | `dist/index.mjs` |
+| WASM binary | 189 KB | Rust compiled, wasm-opt applied |
+| Dictionary | 3.8 MB | Finnish morphology (`mor.vfst`) |
+
+Node.js: All files are bundled in the package.
+Browser: WASM and dictionary are fetched from CDN by default (~4 MB total on first load, cached by browser).
+
+## Next.js / SSR
+
+Voikko uses WebAssembly and must be initialized on the client side:
+
+```typescript
+'use client';
+import { useState, useEffect } from 'react';
+import type { Voikko as VoikkoType } from '@yongsk0066/voikko';
+
+export function useVoikko() {
+  const [voikko, setVoikko] = useState<VoikkoType | null>(null);
+
+  useEffect(() => {
+    let instance: VoikkoType | null = null;
+    import('@yongsk0066/voikko').then(({ Voikko }) =>
+      Voikko.init().then((v) => { instance = v; setVoikko(v); })
+    );
+    return () => { instance?.terminate(); };
+  }, []);
+
+  return voikko;
+}
+```
+
+## Concurrency
+
+A single Voikko instance is safe to use across multiple async operations. One instance per process is recommended for Node.js servers:
+
+```typescript
+const voikko = await Voikko.init();
+
+app.get('/spell/:word', (req, res) => {
+  res.json({ correct: voikko.spell(req.params.word) });
+});
+
+// Call terminate() only on shutdown
+process.on('SIGTERM', () => voikko.terminate());
+```
 
 ## License
 

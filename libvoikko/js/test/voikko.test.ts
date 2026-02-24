@@ -62,7 +62,7 @@ describe.skipIf(!HAS_DICTIONARY)('Voikko integration', () => {
   // Grammar
 
   it('grammarErrorsAndExplanation', () => {
-    expect(voikko.grammarErrors('Minä olen joten kuten kaunis.', 'fi')).toEqual([{
+    expect(voikko.grammarErrors('Minä olen joten kuten kaunis.')).toEqual([{
       startPos: 10,
       errorLen: 11,
       suggestions: ['jotenkuten'],
@@ -72,25 +72,25 @@ describe.skipIf(!HAS_DICTIONARY)('Voikko integration', () => {
   });
 
   it('noGrammarErrorsInEmptyParagraph', () => {
-    expect(voikko.grammarErrors('Olen täi.\n\nOlen täi.', 'fi')).toEqual([]);
+    expect(voikko.grammarErrors('Olen täi.\n\nOlen täi.')).toEqual([]);
   });
 
   it('grammarErrorOffsetsInMultipleParagraphs', () => {
-    const errors = voikko.grammarErrors('Olen täi.\n\nOlen joten kuten.', 'fi');
+    const errors = voikko.grammarErrors('Olen täi.\n\nOlen joten kuten.');
     expect(errors).toHaveLength(1);
     expect(errors[0].startPos).toBe(16);
     expect(errors[0].errorLen).toBe(11);
   });
 
   it('grammarErrorWithWindowsParagraphSeparator', () => {
-    const errors = voikko.grammarErrors('Olen täi.\r\nOlen joten kuten.', 'fi');
+    const errors = voikko.grammarErrors('Olen täi.\r\nOlen joten kuten.');
     expect(errors).toHaveLength(1);
     expect(errors[0].startPos).toBe(16);
     expect(errors[0].errorLen).toBe(11);
   });
 
   it('grammarErrorWithMultipleWindowsParagraphSeparator', () => {
-    const errors = voikko.grammarErrors('Olen täi.\r\nOlen täi.\r\nOlen joten kuten.', 'fi');
+    const errors = voikko.grammarErrors('Olen täi.\r\nOlen täi.\r\nOlen joten kuten.');
     expect(errors).toHaveLength(1);
     expect(errors[0].startPos).toBe(27);
     expect(errors[0].errorLen).toBe(11);
@@ -276,23 +276,23 @@ describe.skipIf(!HAS_DICTIONARY)('Voikko option setters', () => {
 
   it('setAcceptTitlesInGc', () => {
     voikko.setAcceptTitlesInGc(false);
-    expect(voikko.grammarErrors('Kissa on eläin', 'fi')).toHaveLength(1);
+    expect(voikko.grammarErrors('Kissa on eläin')).toHaveLength(1);
     voikko.setAcceptTitlesInGc(true);
-    expect(voikko.grammarErrors('Kissa on eläin', 'fi')).toHaveLength(0);
+    expect(voikko.grammarErrors('Kissa on eläin')).toHaveLength(0);
   });
 
   it('setAcceptUnfinishedParagraphsInGc', () => {
     voikko.setAcceptUnfinishedParagraphsInGc(false);
-    expect(voikko.grammarErrors('Kissa on ', 'fi')).toHaveLength(1);
+    expect(voikko.grammarErrors('Kissa on ')).toHaveLength(1);
     voikko.setAcceptUnfinishedParagraphsInGc(true);
-    expect(voikko.grammarErrors('Kissa on ', 'fi')).toHaveLength(0);
+    expect(voikko.grammarErrors('Kissa on ')).toHaveLength(0);
   });
 
   it('setAcceptBulletedListsInGc', () => {
     voikko.setAcceptBulletedListsInGc(false);
-    expect(voikko.grammarErrors('kissa', 'fi').length).toBeGreaterThan(0);
+    expect(voikko.grammarErrors('kissa').length).toBeGreaterThan(0);
     voikko.setAcceptBulletedListsInGc(true);
-    expect(voikko.grammarErrors('kissa', 'fi')).toHaveLength(0);
+    expect(voikko.grammarErrors('kissa')).toHaveLength(0);
   });
 
   it('setNoUglyHyphenation', () => {
