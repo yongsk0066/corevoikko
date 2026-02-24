@@ -13,23 +13,13 @@ Cargo workspace containing 6 crates that implement Finnish NLP in Rust. This is 
 ## Crate dependency graph
 
 ```mermaid
-graph TD
-    CORE[voikko-core<br/>shared types]
-    FST[voikko-fst<br/>FST engine]
-    FI[voikko-fi<br/>Finnish NLP]
-    WASM[voikko-wasm<br/>WASM bindings]
-    FFI[voikko-ffi<br/>C FFI]
-    CLI[voikko-cli<br/>CLI tools]
-
-    FST --> CORE
-    FI --> CORE
-    FI --> FST
-    WASM --> CORE
-    WASM --> FI
-    FFI --> CORE
-    FFI --> FI
-    CLI --> CORE
-    CLI --> FI
+flowchart TD
+    CORE[voikko-core] --> FST[voikko-fst]
+    CORE --> FI[voikko-fi]
+    FST --> FI
+    FI --> WASM[voikko-wasm]
+    FI --> FFI[voikko-ffi]
+    FI --> CLI[voikko-cli]
 ```
 
 The three output crates (voikko-wasm, voikko-ffi, voikko-cli) are thin wrappers around `VoikkoHandle` from voikko-fi. You rarely need to touch them unless you are changing the public API surface.

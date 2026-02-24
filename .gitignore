@@ -20,3 +20,9 @@ voikko-fi/vvfst/index.txt
 voikko-fi/vvfst/taivutuskaavat.lexc
 
 .vscode/
+
+# docs build artifacts
+docs/node_modules/
+docs/package.json
+docs/package-lock.json
+docs/carbon-type.scss

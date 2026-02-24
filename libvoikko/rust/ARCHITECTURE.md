@@ -23,23 +23,16 @@ The three output crates (`voikko-wasm`, `voikko-ffi`, `voikko-cli`) are thin wra
 ## Crate dependency flow
 
 ```mermaid
-graph TD
-    CORE[voikko-core<br/>shared types, 68 tests]
-    FST[voikko-fst<br/>FST engine, 71 tests]
-    FI[voikko-fi<br/>Finnish NLP, 494 tests]
-    WASM[voikko-wasm<br/>WASM for JS]
-    FFI[voikko-ffi<br/>C FFI for Python/Java/C#/Lisp]
-    CLI[voikko-cli<br/>8 CLI tools]
-
-    FST --> CORE
-    FI --> CORE
-    FI --> FST
-    WASM --> FI
-    WASM --> CORE
-    FFI --> FI
-    FFI --> CORE
-    CLI --> FI
-    CLI --> CORE
+flowchart TD
+    CORE[voikko-core] --> FST[voikko-fst]
+    CORE --> FI[voikko-fi]
+    FST --> FI
+    FI --> WASM[voikko-wasm]
+    FI --> FFI[voikko-ffi]
+    FI --> CLI[voikko-cli]
+    CORE --> WASM
+    CORE --> FFI
+    CORE --> CLI
 ```
 
 Data flows downward at construction time: raw `.vfst` bytes go into `voikko-fst` to build a `Transducer`, which `voikko-fi` wraps into a `VoikkoHandle`. At query time, a method call on `VoikkoHandle` delegates to the appropriate module (speller, analyzer, etc.), which in turn calls `Transducer::next()` to walk the FST graph.
@@ -48,19 +41,19 @@ Data flows downward at construction time: raw `.vfst` bytes go into `voikko-fst`
 
 ```mermaid
 sequenceDiagram
-    participant Caller as Caller (WASM/FFI/CLI)
+    participant Caller
     participant Handle as VoikkoHandle
-    participant Module as Module (speller/analyzer/...)
+    participant Module as Speller
     participant FST as Transducer
 
-    Caller->>Handle: spell("kissoja")
-    Handle->>Module: create adapter, call spell_check()
-    Module->>FST: prepare(&['k','i','s','s','o','j','a'])
-    loop for each FST output path
-        Module->>FST: next(&mut output)
-        FST-->>Module: "[Ln][Xp]kissa[X]..."
+    Caller->>Handle: spell kissoja
+    Handle->>Module: spell_check
+    Module->>FST: prepare input
+    loop each FST path
+        Module->>FST: next
+        FST-->>Module: tag output
     end
-    Module-->>Handle: SpellResult::Ok
+    Module-->>Handle: Ok
     Handle-->>Caller: true
 ```
 
@@ -129,15 +122,6 @@ An FST is a directed graph where edges are labeled with input/output symbol pair
 For Voikko's use case: the input is a Finnish word (like "kissoja") and the output is a tag string describing its morphological structure (like "[Ln][Xp]kissa[X]kissoja[Spar][Nm]"). One input can have multiple valid paths, meaning a word can have multiple analyses.
 
 The `.vfst` binary format stores this graph compactly:
-
-```mermaid
-block-beta
-    columns 1
-    A["Header (16 bytes): magic + weighted flag + reserved"]
-    B["Symbol table: count (2 bytes) + null-terminated UTF-8 strings"]
-    C["Padding: aligned to 8B (unweighted) or 16B (weighted)"]
-    D["Transition table: array of fixed-size entries"]
-```
 
 - **Header** (16 bytes): 8-byte magic number, 1-byte weighted/unweighted flag, 7 reserved bytes
 - **Symbol table**: 2-byte count followed by null-terminated UTF-8 strings mapping indices to characters

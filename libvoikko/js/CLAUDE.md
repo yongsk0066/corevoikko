@@ -42,10 +42,10 @@ pnpm test      # 37 vitest
 ### Initialization Pipeline
 
 ```mermaid
-graph LR
+flowchart LR
     opts[options] --> lw[loadWasm cached]
     opts --> ld[loadDict cached]
-    lw --> init["new WasmVoikko(mor, autocorr)"]
+    lw --> init[new WasmVoikko]
     ld --> init
     init --> v[Voikko instance]
 ```

@@ -31,14 +31,14 @@ This is the core insight of the entire project: **spell checking = morphological
 
 ### How to learn
 
-```
+```plaintext
 What is an agglutinative language? How does it differ from isolating
 languages (like English or Chinese) and fusional languages (like
 Russian or Latin)? Give examples of each type. Why do agglutinative
 languages make dictionary-based spell checking impractical?
 ```
 
-```
+```plaintext
 How can morphological analysis be used as a spell checker? If I have a
 system that can decompose a word into root + suffixes according to
 grammar rules, how does that tell me whether the word is spelled
@@ -72,7 +72,7 @@ Now that you know *why* morphological analysis matters, here's *what* Finnish mo
 
 ### How to learn
 
-```
+```plaintext
 Explain Finnish noun inflection. Finnish has 15 grammatical cases —
 list them with their Finnish names (nimento, omanto, osanto, etc.),
 their linguistic names (nominative, genitive, partitive, etc.), and a
@@ -80,14 +80,14 @@ brief explanation of what each one expresses. Use "talo" (house) as the
 example word and show the inflected form for each case in singular.
 ```
 
-```
+```plaintext
 What are compound words in Finnish? How are they formed? Give 5 examples
 of compound words, break each one into its component parts, and explain
 the meaning. How would a spell checker need to handle compound words
 differently from simple words?
 ```
 
-```
+```plaintext
 Explain the difference between inflection and derivation in Finnish
 morphology. Give examples of both. How do they interact — can a word
 have both derivational and inflectional suffixes? In what order?
@@ -111,7 +111,7 @@ A **Finite State Transducer (FST)** extends the FSA by adding an *output* label 
 
 In Voikko:
 
-```
+```plaintext
 Input:  k-i-s-s-o-j-a
 Output: [Ln][Xp]kissa[X]kissoja[Spar][Nm]
 ```
@@ -124,27 +124,27 @@ The key property: an FST can encode millions of word forms in a compact graph (3
 
 ### How to learn
 
-```
+```plaintext
 Explain finite state automata (FSA) and finite state transducers (FST)
 in simple terms. How do they differ from regular expressions? Give a
 small example of an FST that maps input strings to output strings,
 showing the state transitions step by step.
 ```
 
-```
+```plaintext
 What does it mean for a language to be "regular"? Why can finite state
 transducers handle morphological analysis of natural languages, even
 though natural language is not strictly regular? What role do flag
 diacritics play in extending FST power beyond strictly regular languages?
 ```
 
-```
+```plaintext
 Explain the weighted vs unweighted variants of finite state transducers.
 When would you use weights? How does adding weights change the traversal
 algorithm (e.g., need for backtracking or priority queues)?
 ```
 
-```
+```plaintext
 What are flag diacritics in finite state transducers? Explain the five
 operations: P (positive set), C (clear), U (unification), R (require),
 D (disallow). Give an example of how they constrain valid paths, such as
@@ -176,7 +176,7 @@ There are two preset strategies: one optimized for typing errors (the default) a
 
 ### How to learn
 
-```
+```plaintext
 How do spell checkers generate spelling suggestions? Explain the concept
 of edit distance (Levenshtein distance) and how it's used to find
 candidate corrections. What is the typical approach: generate all
@@ -184,7 +184,7 @@ candidates within edit distance 1-2, then filter by dictionary lookup?
 How do you rank multiple candidates?
 ```
 
-```
+```plaintext
 What strategies exist for spelling suggestion beyond simple edit
 distance? Explain keyboard-aware suggestions (using key proximity),
 phonetic similarity, word splitting/joining, and context-aware ranking.
@@ -216,7 +216,7 @@ Only if you're working on the FST engine (`voikko-fst`). For higher-level work, 
 
 ### How to learn
 
-```
+```plaintext
 I'm studying a custom binary format for finite state transducers called
 VFST. It has a 16-byte header (8-byte magic, 1-byte weighted flag,
 7 reserved), followed by a symbol table (2-byte count + null-terminated
@@ -253,14 +253,14 @@ Only if you're modifying the dictionary (adding words, fixing morphological rule
 
 ### How to learn
 
-```
+```plaintext
 What is the LEXC format used in finite-state morphology tools like foma
 and HFST? Explain the structure of a .lexc file: LEXICON declarations,
 continuation classes, multichar symbols. Give a small example that
 defines a few Finnish nouns with nominative and partitive forms.
 ```
 
-```
+```plaintext
 I'm looking at a foma script that compiles a Finnish morphological
 transducer. It uses commands like "define", "regex", "compose",
 "minimize", and "save stack". Explain what each of these foma commands
@@ -290,14 +290,14 @@ Only if you're working on the JS/TS package or adding new public API methods.
 
 ### How to learn
 
-```
+```plaintext
 Explain how wasm-bindgen works in Rust. How does the #[wasm_bindgen]
 attribute transform Rust functions for JavaScript consumption? What
 happens to Rust types like String, Vec<String>, and custom structs when
 they cross the WASM boundary? What are the limitations?
 ```
 
-```
+```plaintext
 What is serde-wasm-bindgen and when would you use it instead of plain
 wasm-bindgen? Compare the two approaches for returning a Vec<MyStruct>
 from Rust to JavaScript. What are the performance implications?
@@ -322,14 +322,14 @@ Only if you're adding a new public API function or working on a language binding
 
 ### How to learn
 
-```
+```plaintext
 Explain Rust's extern "C" FFI. How do you expose a Rust function to C
 callers? What types can cross the FFI boundary safely? How do you handle
 Rust's String type — what's the pattern for returning C strings and who
 is responsible for freeing them?
 ```
 
-```
+```plaintext
 I'm building a Rust shared library that returns complex data to C
 callers (arrays of structs, strings inside structs). Explain the opaque
 handle pattern: how to create handles, pass them to functions, and free

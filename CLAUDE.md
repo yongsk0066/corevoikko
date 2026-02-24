@@ -11,38 +11,19 @@ npm package: `@yongsk0066/voikko` v0.4.0. License: MPL 1.1 / GPL 2+ / LGPL 2.1+ 
 ## Architecture
 
 ```mermaid
-graph TD
-    subgraph "Rust Workspace (libvoikko/rust/crates/)"
-        core[voikko-core<br/>shared types]
-        fst[voikko-fst<br/>FST engine]
-        fi[voikko-fi<br/>Finnish module]
-        wasm[voikko-wasm<br/>WASM bindings]
-        ffi[voikko-ffi<br/>C FFI cdylib]
-        cli[voikko-cli<br/>8 CLI tools]
-    end
-
-    core --> fst
-    core --> fi
+flowchart TD
+    core[voikko-core] --> fst[voikko-fst]
+    core --> fi[voikko-fi]
     fst --> fi
-    fi --> wasm
-    fi --> ffi
-    fi --> cli
-
-    subgraph "Language Bindings"
-        js[JS/TS npm package<br/>libvoikko/js/]
-        py[Python ctypes<br/>libvoikko/python/]
-        java[Java JNA<br/>libvoikko/java/]
-        cs["C# P/Invoke<br/>libvoikko/cs/"]
-        cl[Common Lisp CFFI<br/>libvoikko/cl/]
-    end
-
-    wasm --> js
-    ffi --> py
-    ffi --> java
-    ffi --> cs
-    ffi --> cl
-
-    dict[voikko-fi/<br/>Finnish dictionary VFST] -.-> fi
+    fi --> wasm[voikko-wasm]
+    fi --> ffi[voikko-ffi]
+    fi --> cli[voikko-cli]
+    wasm --> js[JS/TS npm]
+    ffi --> py[Python]
+    ffi --> java[Java]
+    ffi --> cs[C#]
+    ffi --> cl[Common Lisp]
+    dict[voikko-fi dict] -.-> fi
     dict -.-> js
 ```
 
@@ -66,6 +47,7 @@ corevoikko/
 │   ├── legacy/                # Original C++ source (preserved)
 │   ├── doc/                   # API documentation
 │   └── data/                  # Grammar help XML (gchelp.xml)
+├── docs/                      # GitHub Pages site (Carbon Design System SPA)
 ├── voikko-fi/                 # Finnish dictionary data (VFST format)
 ├── data/                      # Linguistic data (affix rules, word lists)
 ├── plan/                      # Porting design documents

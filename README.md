@@ -82,20 +82,15 @@ make vvfst-install DESTDIR=~/.voikko
 ## How It Fits Together
 
 ```mermaid
-graph LR
-    dict[(voikko-fi<br/>dictionary)] --> core
-
-    subgraph libvoikko/rust
-        core[voikko-core + voikko-fst + voikko-fi]
-        core --> wasm[voikko-wasm<br/>189KB]
-        core --> ffi[voikko-ffi<br/>420KB]
-        core --> cli[voikko-cli<br/>8 tools]
-    end
-
-    wasm --> js["JS/TS (npm)<br/>@yongsk0066/voikko"]
+flowchart LR
+    dict[voikko-fi dict] --> core[voikko-core + fst + fi]
+    core --> wasm[voikko-wasm]
+    core --> ffi[voikko-ffi]
+    core --> cli[voikko-cli]
+    wasm --> js[JS/TS npm]
     ffi --> py[Python]
     ffi --> java[Java]
-    ffi --> cs["C#"]
+    ffi --> cs[C#]
     ffi --> cl[Common Lisp]
 ```
 
@@ -134,5 +129,6 @@ Rust rewrite and npm package by Yongseok Jang.
 
 ## Links
 
+- [Live Demo](https://yongsk0066.github.io/corevoikko/) — try all features in the browser, no install needed
 - [npm package](https://www.npmjs.com/package/@yongsk0066/voikko)
 - [Original Voikko project](https://voikko.puimula.org/)

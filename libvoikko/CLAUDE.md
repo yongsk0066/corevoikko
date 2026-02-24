@@ -9,29 +9,17 @@ Guidance for AI assistants working inside the `libvoikko/` directory.
 ## How the Subdirectories Relate
 
 ```mermaid
-graph TD
-    subgraph "Rust Workspace (rust/crates/)"
-        core[voikko-core<br/>shared types, 68 tests]
-        fst[voikko-fst<br/>FST engine, 71 tests]
-        fi[voikko-fi<br/>Finnish NLP, 494 tests]
-        wasm[voikko-wasm<br/>WASM bindings, 189KB]
-        ffi[voikko-ffi<br/>C FFI cdylib, 420KB]
-        cli[voikko-cli<br/>8 CLI tools]
-    end
-
-    core --> fst --> fi
-    fi --> wasm
-    fi --> ffi
-    fi --> cli
-
-    wasm -->|wasm-bindgen| js[js/<br/>npm @yongsk0066/voikko]
-    ffi -->|ctypes| py[python/]
-    ffi -->|JNA| java[java/]
-    ffi -->|P/Invoke| cs["cs/"]
-    ffi -->|CFFI| cl[cl/]
-
-    doc[doc/] -.-> ffi
-    data[data/<br/>gchelp.xml] -.-> fi
+flowchart TD
+    core[voikko-core] --> fst[voikko-fst]
+    fst --> fi[voikko-fi]
+    fi --> wasm[voikko-wasm]
+    fi --> ffi[voikko-ffi]
+    fi --> cli[voikko-cli]
+    wasm --> js[js]
+    ffi --> py[python]
+    ffi --> java[java]
+    ffi --> cs[cs]
+    ffi --> cl[cl]
 ```
 
 ### rust/

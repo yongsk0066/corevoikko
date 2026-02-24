@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Voikko — Finnish NLP</title>
+
+  <!-- Carbon: fonts + theme tokens + grid -->
+  <link rel="stylesheet" href="https://1.www.s81c.com/common/carbon/plex/sans.css">
+  <link rel="stylesheet" href="https://1.www.s81c.com/common/carbon/plex/mono.css">
+  <link rel="stylesheet" href="https://1.www.s81c.com/common/carbon/web-components/tag/latest/themes.css">
+  <link rel="stylesheet" href="https://1.www.s81c.com/common/carbon-for-ibm-dotcom/version/v2.16.0/grid.css">
+
+  <!-- Carbon web components -->
+  <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/tag/latest/ui-shell.min.js"></script>
+  <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/tag/latest/button.min.js"></script>
+  <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/tag/latest/text-input.min.js"></script>
+  <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/tag/latest/textarea.min.js"></script>
+  <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/tag/latest/code-snippet.min.js"></script>
+  <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/tag/latest/tag.min.js"></script>
+  <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/tag/latest/notification.min.js"></script>
+  <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/tag/latest/skeleton-text.min.js"></script>
+  <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/tag/latest/tile.min.js"></script>
+  <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/tag/latest/inline-loading.min.js"></script>
+  <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/tag/latest/link.min.js"></script>
+  <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/tag/latest/stack.min.js"></script>
+  <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/tag/latest/data-table.min.js"></script>
+  <script type="module" src="https://1.www.s81c.com/common/carbon/web-components/tag/latest/breadcrumb.min.js"></script>
+
+  <!-- Carbon type utility classes (compiled from @carbon/styles Sass) -->
+  <link rel="stylesheet" href="carbon-type.css">
+
+  <!-- Markdown rendering -->
+  <script src="https://cdn.jsdelivr.net/npm/marked@15/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/highlight.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+
+  <style>
+    *, *::before, *::after { margin: 0; box-sizing: border-box; }
+
+    /* Carbon motion tokens (not in themes.css, manually defined per spec) */
+    :root {
+      --cds-duration-moderate-02: 240ms;
+      --cds-ease-entrance: cubic-bezier(0, 0, 0.38, 0.9);
+      --cds-ease-standard: cubic-bezier(0.2, 0, 0.38, 0.9);
+    }
+
+    body {
+      font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
+      background: var(--cds-background);
+      color: var(--cds-text-primary);
+    }
+
+    /* ── Layout ─────────────────────────────────── */
+    .shell { margin-top: var(--cds-spacing-09); }
+
+    cds-side-nav {
+      position: fixed;
+      top: var(--cds-spacing-09);
+      left: 0;
+      bottom: 0;
+      width: 16rem;
+      overflow-y: auto;
+      z-index: 100;
+    }
+
+    main {
+      margin-left: 16rem;
+      padding: var(--cds-spacing-07) 0 var(--cds-spacing-10);
+    }
+
+    @media (max-width: 65.99rem) {
+      cds-side-nav { display: none; }
+      cds-side-nav[expanded] { display: block; width: 16rem; }
+      main { margin-left: 0; }
+    }
+
+    /* ── Content fade-in ────────────────────────── */
+    .content-enter {
+      animation: contentIn var(--cds-duration-moderate-02) var(--cds-ease-entrance) forwards;
+    }
+    @keyframes contentIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Skeleton ────────────────────────────────── */
+    .skeleton-block { padding: var(--cds-spacing-07) 0; }
+    .skeleton-block cds-skeleton-text { margin-bottom: var(--cds-spacing-05); }
+
+    /* ── Markdown (type via .cds--type-* from carbon-type.css) ── */
+    .markdown h1 {
+      margin-bottom: var(--cds-spacing-05);
+      padding-bottom: var(--cds-spacing-04);
+      border-bottom: 1px solid var(--cds-border-subtle);
+    }
+    .markdown h2 { margin: var(--cds-spacing-07) 0 var(--cds-spacing-04); }
+    .markdown h3 { margin: var(--cds-spacing-06) 0 var(--cds-spacing-03); }
+    .markdown p {
+      color: var(--cds-text-secondary);
+      margin-bottom: var(--cds-spacing-04);
+    }
+    .markdown ul, .markdown ol {
+      margin: var(--cds-spacing-03) 0 var(--cds-spacing-05) var(--cds-spacing-05);
+      color: var(--cds-text-secondary);
+    }
+    .markdown li { margin-bottom: var(--cds-spacing-02); }
+    .markdown li > ul, .markdown li > ol { margin-top: var(--cds-spacing-02); margin-bottom: 0; }
+    .markdown a { color: var(--cds-link-primary); text-decoration: none; }
+    .markdown a:hover { text-decoration: underline; }
+    .markdown strong { color: var(--cds-text-primary); }
+    .markdown code {
+      font-family: var(--cds-code-02-font-family);
+      font-size: var(--cds-code-02-font-size);
+      letter-spacing: var(--cds-code-02-letter-spacing);
+      background: var(--cds-layer-01);
+      padding: var(--cds-spacing-01) var(--cds-spacing-03);
+    }
+    .markdown cds-code-snippet {
+      margin: var(--cds-spacing-04) 0 var(--cds-spacing-05);
+    }
+    .markdown cds-table { margin: var(--cds-spacing-04) 0 var(--cds-spacing-05); }
+    .markdown cds-callout { margin: var(--cds-spacing-04) 0; }
+    .markdown hr {
+      border: none;
+      border-top: 1px solid var(--cds-border-subtle);
+      margin: var(--cds-spacing-06) 0;
+    }
+    .markdown .mermaid { margin: var(--cds-spacing-05) 0; text-align: center; }
+    .markdown img { max-width: 100%; }
+
+    /* ── Demo ────────────────────────────────────── */
+    .demo-header { margin-bottom: var(--cds-spacing-06); }
+    .demo-header h1 { margin-bottom: var(--cds-spacing-02); }
+    .demo-header p { color: var(--cds-text-secondary); }
+
+
+    #status-area { margin-bottom: var(--cds-spacing-06); }
+    .tile-header {
+      padding: var(--cds-spacing-04) var(--cds-spacing-05);
+      border-bottom: 1px solid var(--cds-border-subtle);
+      display: flex; align-items: center; gap: var(--cds-spacing-04);
+    }
+    .tile-body { padding: var(--cds-spacing-05); }
+    .tile-body cds-code-snippet { margin-bottom: var(--cds-spacing-04); }
+    .tile-body cds-textarea { margin-bottom: var(--cds-spacing-04); }
+    .input-row { display: flex; gap: var(--cds-spacing-05); align-items: flex-end; }
+    .input-row cds-text-input { flex: 1; }
+    .input-row cds-button { flex-shrink: 0; }
+    .result {
+      margin-top: var(--cds-spacing-04);
+      padding: var(--cds-spacing-04);
+      background: var(--cds-layer-01);
+      border: 1px solid var(--cds-border-subtle);
+      font-family: var(--cds-code-02-font-family);
+      font-size: var(--cds-code-02-font-size);
+      line-height: var(--cds-code-02-line-height);
+      white-space: pre-wrap;
+      word-break: break-word;
+      min-height: var(--cds-spacing-06);
+      color: var(--cds-text-secondary);
+    }
+    .result:empty::before {
+      content: 'Press the button to see results';
+      color: var(--cds-text-placeholder);
+      font-style: italic;
+    }
+    .result .ok { color: var(--cds-support-success); font-weight: 600; }
+    .result .err { color: var(--cds-support-error); font-weight: 600; }
+
+    /* ── Shared ──────────────────────────────────── */
+    .hidden { display: none; }
+    footer {
+      margin-top: var(--cds-spacing-09);
+      padding-top: var(--cds-spacing-05);
+      border-top: 1px solid var(--cds-border-subtle);
+      font-size: var(--cds-code-01-font-size);
+      color: var(--cds-text-helper);
+    }
+    footer cds-link { color: var(--cds-text-secondary); }
+  </style>
+</head>
+<body class="cds-theme-zone-g10">
+
+  <!-- Header -->
+  <cds-header aria-label="Voikko">
+    <cds-header-menu-button button-label-active="Close menu" button-label-inactive="Open menu"></cds-header-menu-button>
+    <cds-header-name href="#/demo" prefix="">Voikko</cds-header-name>
+    <cds-header-nav>
+      <cds-header-nav-item href="https://www.npmjs.com/package/@yongsk0066/voikko" target="_blank">npm</cds-header-nav-item>
+      <cds-header-nav-item href="https://github.com/yongsk0066/corevoikko" target="_blank">GitHub</cds-header-nav-item>
+    </cds-header-nav>
+  </cds-header>
+
+  <!-- Side nav -->
+  <cds-side-nav expanded>
+    <cds-side-nav-items>
+      <cds-side-nav-link href="#/demo">Interactive Demo</cds-side-nav-link>
+      <cds-side-nav-divider></cds-side-nav-divider>
+      <cds-side-nav-link href="#/doc/README.md">README</cds-side-nav-link>
+      <cds-side-nav-link href="#/doc/LEARNING.md">Learning Guide</cds-side-nav-link>
+      <cds-side-nav-link href="#/doc/SECURITY.md">Security</cds-side-nav-link>
+      <cds-side-nav-divider></cds-side-nav-divider>
+      <cds-side-nav-menu title="Rust">
+        <cds-side-nav-menu-item href="#/doc/libvoikko/rust/ARCHITECTURE.md">Architecture</cds-side-nav-menu-item>
+        <cds-side-nav-menu-item href="#/doc/libvoikko/rust/CLAUDE.md">Workspace</cds-side-nav-menu-item>
+        <cds-side-nav-menu-item href="#/doc/libvoikko/rust/crates/voikko-core/CLAUDE.md">voikko-core</cds-side-nav-menu-item>
+        <cds-side-nav-menu-item href="#/doc/libvoikko/rust/crates/voikko-fst/CLAUDE.md">voikko-fst</cds-side-nav-menu-item>
+        <cds-side-nav-menu-item href="#/doc/libvoikko/rust/crates/voikko-fi/CLAUDE.md">voikko-fi</cds-side-nav-menu-item>
+        <cds-side-nav-menu-item href="#/doc/libvoikko/rust/crates/voikko-wasm/CLAUDE.md">voikko-wasm</cds-side-nav-menu-item>
+        <cds-side-nav-menu-item href="#/doc/libvoikko/rust/crates/voikko-ffi/CLAUDE.md">voikko-ffi</cds-side-nav-menu-item>
+        <cds-side-nav-menu-item href="#/doc/libvoikko/rust/crates/voikko-cli/CLAUDE.md">voikko-cli</cds-side-nav-menu-item>
+      </cds-side-nav-menu>
+      <cds-side-nav-menu title="JS / WASM">
+        <cds-side-nav-menu-item href="#/doc/libvoikko/js/CLAUDE.md">Package</cds-side-nav-menu-item>
+        <cds-side-nav-menu-item href="#/doc/libvoikko/js/README.md">npm README</cds-side-nav-menu-item>
+      </cds-side-nav-menu>
+      <cds-side-nav-menu title="Language Bindings">
+        <cds-side-nav-menu-item href="#/doc/libvoikko/python/CLAUDE.md">Python</cds-side-nav-menu-item>
+        <cds-side-nav-menu-item href="#/doc/libvoikko/java/CLAUDE.md">Java</cds-side-nav-menu-item>
+        <cds-side-nav-menu-item href="#/doc/libvoikko/cs/CLAUDE.md">C#</cds-side-nav-menu-item>
+        <cds-side-nav-menu-item href="#/doc/libvoikko/cl/CLAUDE.md">Common Lisp</cds-side-nav-menu-item>
+      </cds-side-nav-menu>
+      <cds-side-nav-divider></cds-side-nav-divider>
+      <cds-side-nav-menu title="Other">
+        <cds-side-nav-menu-item href="#/doc/libvoikko/CLAUDE.md">libvoikko Overview</cds-side-nav-menu-item>
+        <cds-side-nav-menu-item href="#/doc/libvoikko/legacy/CLAUDE.md">Legacy C++</cds-side-nav-menu-item>
+        <cds-side-nav-menu-item href="#/doc/voikko-fi/CLAUDE.md">Dictionary</cds-side-nav-menu-item>
+        <cds-side-nav-menu-item href="#/doc/tools/CLAUDE.md">Tools</cds-side-nav-menu-item>
+        <cds-side-nav-menu-item href="#/doc/tests/CLAUDE.md">Tests</cds-side-nav-menu-item>
+        <cds-side-nav-menu-item href="#/doc/docker/CLAUDE.md">Docker</cds-side-nav-menu-item>
+        <cds-side-nav-menu-item href="#/doc/docs/CLAUDE.md">Docs Site</cds-side-nav-menu-item>
+      </cds-side-nav-menu>
+      <cds-side-nav-menu title="Rust Porting Log">
+        <cds-side-nav-menu-item href="#/doc/plan/README.md">Overview</cds-side-nav-menu-item>
+        <cds-side-nav-menu-item href="#/doc/plan/phase2-rust/00-master-plan.md">Master Plan</cds-side-nav-menu-item>
+        <cds-side-nav-menu-item href="#/doc/plan/phase2-rust/01-dependency-graph.md">Dependency Graph</cds-side-nav-menu-item>
+        <cds-side-nav-menu-item href="#/doc/plan/phase2-rust/02-fst-engine.md">FST Engine</cds-side-nav-menu-item>
+        <cds-side-nav-menu-item href="#/doc/plan/phase2-rust/03-modules-analysis.md">Modules Analysis</cds-side-nav-menu-item>
+        <cds-side-nav-menu-item href="#/doc/plan/phase2-rust/04-rust-ecosystem.md">Rust Ecosystem</cds-side-nav-menu-item>
+        <cds-side-nav-menu-item href="#/doc/plan/phase2-rust/05-dev-guidelines.md">Dev Guidelines</cds-side-nav-menu-item>
+        <cds-side-nav-menu-item href="#/doc/plan/phase2-rust/06-suggest-rich-priority.md">Suggest Priority</cds-side-nav-menu-item>
+      </cds-side-nav-menu>
+    </cds-side-nav-items>
+  </cds-side-nav>
+
+  <div class="shell">
+    <main>
+      <div class="cds--grid">
+        <div class="cds--row">
+          <div class="cds--col-lg-12 cds--col-md-8 cds--col-sm-4">
+
+            <!-- Demo View -->
+            <div id="demo-view" class="hidden">
+              <div class="demo-header">
+                <h1 class="cds--type-heading-05">Interactive Demo</h1>
+                <p class="cds--type-body-compact-01">Try Voikko in the browser. WASM and dictionary loaded from CDN — no server required.</p>
+              </div>
+
+              <div id="status-area">
+                <cds-inline-loading status="active" id="loading-indicator">Loading WASM + Finnish dictionary...</cds-inline-loading>
+              </div>
+
+              <cds-stack gap="5">
+
+              <cds-tile data-action="spell" data-input="spellInput">
+                <div class="tile-header"><h2 class="cds--type-heading-compact-01">Spell Check</h2><cds-tag type="green">spell()</cds-tag></div>
+                <div class="tile-body">
+                  <cds-code-snippet type="single">voikko.spell('koira')  // true</cds-code-snippet>
+                  <div class="input-row">
+                    <cds-text-input id="spellInput" value="koira" label="Word" placeholder="Finnish word"></cds-text-input>
+                    <cds-button disabled size="md">Check</cds-button>
+                  </div>
+                  <div class="result"></div>
+                </div>
+              </cds-tile>
+
+              <cds-tile data-action="suggest" data-input="suggestInput">
+                <div class="tile-header"><h2 class="cds--type-heading-compact-01">Spelling Suggestions</h2><cds-tag type="blue">suggest()</cds-tag></div>
+                <div class="tile-body">
+                  <cds-code-snippet type="single">voikko.suggest('koirra')  // ['koira', ...]</cds-code-snippet>
+                  <div class="input-row">
+                    <cds-text-input id="suggestInput" value="koirra" label="Misspelled word"></cds-text-input>
+                    <cds-button disabled size="md">Suggest</cds-button>
+                  </div>
+                  <div class="result"></div>
+                </div>
+              </cds-tile>
+
+              <cds-tile data-action="analyze" data-input="analyzeInput">
+                <div class="tile-header"><h2 class="cds--type-heading-compact-01">Morphological Analysis</h2><cds-tag type="purple">analyze()</cds-tag></div>
+                <div class="tile-body">
+                  <cds-code-snippet type="single">voikko.analyze('kissalla')  // [{ BASEFORM: 'kissa', ... }]</cds-code-snippet>
+                  <div class="input-row">
+                    <cds-text-input id="analyzeInput" value="kissalla" label="Word"></cds-text-input>
+                    <cds-button disabled size="md">Analyze</cds-button>
+                  </div>
+                  <div class="result"></div>
+                </div>
+              </cds-tile>
+
+              <cds-tile data-action="hyphenate" data-input="hyphenInput">
+                <div class="tile-header"><h2 class="cds--type-heading-compact-01">Hyphenation</h2><cds-tag type="teal">hyphenate()</cds-tag></div>
+                <div class="tile-body">
+                  <cds-code-snippet type="single">voikko.hyphenate('kissanpentu')  // 'kis-san-pen-tu'</cds-code-snippet>
+                  <div class="input-row">
+                    <cds-text-input id="hyphenInput" value="kissanpentu" label="Word"></cds-text-input>
+                    <cds-button disabled size="md">Hyphenate</cds-button>
+                  </div>
+                  <div class="result"></div>
+                </div>
+              </cds-tile>
+
+              <cds-tile data-action="tokens" data-input="tokenInput">
+                <div class="tile-header"><h2 class="cds--type-heading-compact-01">Tokenizer</h2><cds-tag type="magenta">tokens()</cds-tag></div>
+                <div class="tile-body">
+                  <cds-code-snippet type="single">voikko.tokens('Koira juoksi.')</cds-code-snippet>
+                  <div class="input-row">
+                    <cds-text-input id="tokenInput" value="Koira juoksi nopeasti." label="Text"></cds-text-input>
+                    <cds-button disabled size="md">Tokenize</cds-button>
+                  </div>
+                  <div class="result"></div>
+                </div>
+              </cds-tile>
+
+              <cds-tile data-action="grammar" data-input="grammarInput">
+                <div class="tile-header"><h2 class="cds--type-heading-compact-01">Grammar Check</h2><cds-tag type="red">grammarErrors()</cds-tag></div>
+                <div class="tile-body">
+                  <cds-code-snippet type="single">voikko.grammarErrors('Minä  olen koirra.')</cds-code-snippet>
+                  <cds-textarea id="grammarInput" value="Minä  olen koirra." label="Text"></cds-textarea>
+                  <cds-button disabled size="md">Check Grammar</cds-button>
+                  <div class="result"></div>
+                </div>
+              </cds-tile>
+
+              <cds-tile data-action="sentences" data-input="sentenceInput">
+                <div class="tile-header"><h2 class="cds--type-heading-compact-01">Sentence Detection</h2><cds-tag type="cyan">sentences()</cds-tag></div>
+                <div class="tile-body">
+                  <cds-code-snippet type="single">voikko.sentences('Hei! Miten menee?')</cds-code-snippet>
+                  <div class="input-row">
+                    <cds-text-input id="sentenceInput" value="Koira juoksi. Kissa nukkui. Entä lintu?" label="Text"></cds-text-input>
+                    <cds-button disabled size="md">Detect</cds-button>
+                  </div>
+                  <div class="result"></div>
+                </div>
+              </cds-tile>
+
+              </cds-stack>
+
+              <footer>
+                Powered by <cds-link href="https://github.com/yongsk0066/corevoikko">Corevoikko</cds-link> — Rust compiled to WebAssembly (189KB).
+                UI: <cds-link href="https://carbondesignsystem.com/">Carbon Design System</cds-link>.
+              </footer>
+            </div>
+
+            <!-- Document View -->
+            <div id="doc-view" class="hidden">
+              <div id="doc-skeleton" class="skeleton-block">
+                <cds-skeleton-text heading width="45%"></cds-skeleton-text>
+                <cds-skeleton-text paragraph line-count="4" width="90%"></cds-skeleton-text>
+                <cds-skeleton-text heading width="30%"></cds-skeleton-text>
+                <cds-skeleton-text paragraph line-count="6" width="85%"></cds-skeleton-text>
+                <cds-skeleton-text heading width="35%"></cds-skeleton-text>
+                <cds-skeleton-text paragraph line-count="3" width="80%"></cds-skeleton-text>
+              </div>
+              <div id="doc-content" class="markdown hidden"></div>
+              <footer>
+                <span id="doc-source"></span>
+                <cds-link href="https://github.com/yongsk0066/corevoikko" target="_blank">View on GitHub</cds-link>
+              </footer>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script type="module">
+    // ── Config ────────────────────────────────────
+    const REPO = 'yongsk0066/corevoikko';
+    const BRANCH = 'master';
+    const RAW_BASE = `https://raw.githubusercontent.com/${REPO}/${BRANCH}`;
+
+    mermaid.initialize({ startOnLoad: false, theme: 'neutral', fontFamily: 'IBM Plex Sans' });
+
+    // ── DOM refs ──────────────────────────────────
+    const $ = (s) => document.querySelector(s);
+    const $$ = (s) => document.querySelectorAll(s);
+
+    const demoView = $('#demo-view');
+    const docView = $('#doc-view');
+    const docSkeleton = $('#doc-skeleton');
+    const docContent = $('#doc-content');
+    const docSource = $('#doc-source');
+    const sideNav = $('cds-side-nav');
+    const docCache = new Map();
+
+    function show(el) { el.classList.remove('hidden'); }
+    function hide(el) { el.classList.add('hidden'); }
+
+    function escHtml(s) {
+      const d = document.createElement('div');
+      d.textContent = s;
+      return d.innerHTML;
+    }
+
+    // ── Router ────────────────────────────────────
+    async function route() {
+      const hash = location.hash || '#/demo';
+
+      $$('cds-side-nav-link, cds-side-nav-menu-item').forEach(el => {
+        if (el.getAttribute('href') === hash) el.setAttribute('active', '');
+        else el.removeAttribute('active');
+      });
+
+      if (window.innerWidth < 1056) sideNav.removeAttribute('expanded');
+
+      if (hash === '#/demo') {
+        show(demoView); hide(docView);
+        demoView.classList.remove('content-enter');
+        void demoView.offsetWidth;
+        demoView.classList.add('content-enter');
+        return;
+      }
+
+      if (hash.startsWith('#/doc/')) {
+        hide(demoView); show(docView);
+        await loadDoc(hash.slice(6));
+        return;
+      }
+
+      location.hash = '#/demo';
+    }
+
+    async function loadDoc(path) {
+      show(docSkeleton);
+      hide(docContent);
+      docContent.classList.remove('content-enter');
+
+      try {
+        let md = docCache.get(path);
+        if (!md) {
+          const res = await fetch(`${RAW_BASE}/${path}`);
+          if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+          md = await res.text();
+          docCache.set(path, md);
+        }
+
+        let html = marked.parse(md);
+
+        // Rewrite relative .md links to SPA routes
+        const base = path.substring(0, path.lastIndexOf('/') + 1);
+        html = html.replace(/href="(?!https?:\/\/|#|mailto:)([^"]*\.md)"/g, (_, p) => {
+          try { return `href="#/doc/${new URL(p, 'file:///' + base).pathname.slice(1)}"`; }
+          catch { return `href="#/doc/${base}${p}"`; }
+        });
+
+        docContent.innerHTML = html;
+
+        // 0) Apply Carbon type classes to rendered markdown elements
+        const typeMap = {
+          H1: 'cds--type-heading-05',
+          H2: 'cds--type-heading-03',
+          H3: 'cds--type-heading-02',
+          P: 'cds--type-body-01',
+          UL: 'cds--type-body-01',
+          OL: 'cds--type-body-01',
+        };
+        for (const [tag, cls] of Object.entries(typeMap)) {
+          docContent.querySelectorAll(`:scope > ${tag}`).forEach(el => el.classList.add(cls));
+        }
+
+        // 1) Replace blockquotes with cds-callout
+        docContent.querySelectorAll('blockquote').forEach(bq => {
+          const callout = document.createElement('cds-callout');
+          callout.setAttribute('kind', 'info');
+          callout.innerHTML = bq.innerHTML;
+          bq.replaceWith(callout);
+        });
+
+        // 2) Extract mermaid blocks before hljs
+        docContent.querySelectorAll('code.language-mermaid').forEach(el => {
+          const pre = el.parentElement;
+          const div = document.createElement('div');
+          div.className = 'mermaid';
+          div.textContent = el.textContent;
+          pre.replaceWith(div);
+        });
+
+        // 3) Replace tables with cds-table
+        docContent.querySelectorAll('table').forEach(table => {
+          const cdsTable = document.createElement('cds-table');
+          cdsTable.setAttribute('size', 'sm');
+          const thead = table.querySelector('thead');
+          const tbody = table.querySelector('tbody');
+          let html = '';
+          if (thead) {
+            html += '<cds-table-head><cds-table-header-row>';
+            thead.querySelectorAll('th').forEach(th => {
+              html += `<cds-table-header-cell>${th.innerHTML}</cds-table-header-cell>`;
+            });
+            html += '</cds-table-header-row></cds-table-head>';
+          }
+          if (tbody) {
+            html += '<cds-table-body>';
+            tbody.querySelectorAll('tr').forEach(tr => {
+              html += '<cds-table-row>';
+              tr.querySelectorAll('td').forEach(td => {
+                html += `<cds-table-cell>${td.innerHTML}</cds-table-cell>`;
+              });
+              html += '</cds-table-row>';
+            });
+            html += '</cds-table-body>';
+          }
+          cdsTable.innerHTML = html;
+          table.replaceWith(cdsTable);
+        });
+
+        // 4) Replace code blocks with cds-code-snippet
+        docContent.querySelectorAll('pre code').forEach(block => {
+          const raw = block.textContent;
+          const snippet = document.createElement('cds-code-snippet');
+          snippet.setAttribute('type', 'multi');
+          snippet.setAttribute('copy-text', raw);
+
+          // Detect language from class (e.g., "language-bash")
+          const langClass = [...block.classList].find(c => c.startsWith('language-'));
+          const lang = langClass?.slice(9);
+
+          if (lang && lang !== 'plaintext' && hljs.getLanguage(lang)) {
+            snippet.innerHTML = hljs.highlight(raw, { language: lang }).value;
+          } else if (!lang || lang === 'plaintext') {
+            snippet.textContent = raw;
+          } else {
+            snippet.innerHTML = hljs.highlightAuto(raw).value;
+          }
+
+          block.parentElement.replaceWith(snippet);
+        });
+
+        // Source breadcrumb
+        const segments = path.split('/');
+        let crumbs = '';
+        for (let i = 0; i < segments.length; i++) {
+          const isLast = i === segments.length - 1;
+          const partial = segments.slice(0, i + 1).join('/');
+          if (isLast) {
+            crumbs += `<cds-breadcrumb-item><cds-breadcrumb-link href="https://github.com/${REPO}/blob/${BRANCH}/${partial}" target="_blank" aria-current="page">${escHtml(segments[i])}</cds-breadcrumb-link></cds-breadcrumb-item>`;
+          } else {
+            crumbs += `<cds-breadcrumb-item><cds-breadcrumb-link href="https://github.com/${REPO}/tree/${BRANCH}/${partial}" target="_blank">${escHtml(segments[i])}</cds-breadcrumb-link></cds-breadcrumb-item>`;
+          }
+        }
+        docSource.innerHTML = `<cds-breadcrumb>${crumbs}</cds-breadcrumb>`;
+
+        // Show content before mermaid (mermaid needs visible container to measure)
+        hide(docSkeleton);
+        show(docContent);
+        docContent.classList.add('content-enter');
+
+        // 5) Render mermaid diagrams
+        const nodes = docContent.querySelectorAll('.mermaid');
+        if (nodes.length) {
+          try { await mermaid.run({ nodes }); }
+          catch (e) { console.warn('mermaid:', e); }
+        }
+
+        window.scrollTo(0, 0);
+      } catch (e) {
+        hide(docSkeleton);
+        show(docContent);
+        docContent.innerHTML = `<p style="color:var(--cds-support-error)">Failed to load <code>${escHtml(path)}</code>: ${escHtml(e.message)}</p>`;
+      }
+    }
+
+    // Hamburger toggle
+    document.addEventListener('cds-header-menu-button-toggled', (e) => {
+      if (e.detail?.active) sideNav.setAttribute('expanded', '');
+      else sideNav.removeAttribute('expanded');
+    });
+
+    // Start router immediately (don't wait for Voikko)
+    window.addEventListener('hashchange', route);
+    route();
+
+    // ── Demo: Voikko (loaded in background) ──────
+    let voikko = null;
+
+    const actions = {
+      spell(w) {
+        const ok = voikko.spell(w);
+        return ok
+          ? `<span class="ok">✓</span> "${escHtml(w)}" is correctly spelled`
+          : `<span class="err">✗</span> "${escHtml(w)}" is misspelled`;
+      },
+      suggest(w) { return escHtml(voikko.suggest(w).join(', ') || '(no suggestions)'); },
+      analyze(w) {
+        const a = voikko.analyze(w);
+        return escHtml(a.length ? JSON.stringify(a, null, 2) : '(no analysis)');
+      },
+      hyphenate(w) { return escHtml(voikko.hyphenate(w)); },
+      tokens(t) { return escHtml(voikko.tokens(t).map(tk => `${tk.type.padEnd(12)} "${tk.text}"`).join('\n')); },
+      grammar(t) {
+        const errs = voikko.grammarErrors(t);
+        return escHtml(errs.length
+          ? errs.map(e => `[pos ${e.startPos}, len ${e.errorLen}] ${e.shortDescription}` +
+              (e.suggestions.length ? `\n  → ${e.suggestions.join(', ')}` : '')).join('\n\n')
+          : '(no grammar errors)');
+      },
+      sentences(t) {
+        return escHtml(voikko.sentences(t).map((s, i) =>
+          `${i + 1}. "${s.text.trim()}"  [next: ${s.nextStartType}]`).join('\n'));
+      },
+    };
+
+    // Delegate button clicks via data attributes
+    demoView.addEventListener('click', (e) => {
+      const btn = e.target.closest('cds-button');
+      if (!btn || btn.hasAttribute('disabled')) return;
+      const tile = btn.closest('cds-tile');
+      if (!tile) return;
+      const action = tile.dataset.action;
+      const inputEl = document.getElementById(tile.dataset.input);
+      const val = (inputEl?.value ?? '').trim();
+      if (!val || !actions[action]) return;
+      const result = tile.querySelector('.result');
+      result.innerHTML = actions[action](val);
+    });
+
+    // Enter key triggers button
+    demoView.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter') return;
+      const btn = e.target.closest('.tile-body')?.querySelector('cds-button');
+      if (btn && !btn.hasAttribute('disabled')) btn.click();
+    });
+
+    // Init Voikko
+    const loadingEl = $('#loading-indicator');
+    try {
+      const { Voikko } = await import('https://unpkg.com/@yongsk0066/voikko@0.4.0/dist/index.mjs');
+      const t0 = performance.now();
+      voikko = await Voikko.init();
+      const ms = Math.round(performance.now() - t0);
+      loadingEl?.setAttribute('status', 'finished');
+      setTimeout(() => {
+        $('#status-area').innerHTML =
+          `<cds-inline-notification kind="success" title="Ready" subtitle="Loaded in ${ms}ms" hide-close-button low-contrast></cds-inline-notification>`;
+      }, 600);
+      demoView.querySelectorAll('cds-button[disabled]').forEach(b => b.removeAttribute('disabled'));
+    } catch (e) {
+      loadingEl?.setAttribute('status', 'error');
+      setTimeout(() => {
+        $('#status-area').innerHTML =
+          `<cds-inline-notification kind="error" title="Failed" subtitle="${escHtml(e.message)}" hide-close-button low-contrast></cds-inline-notification>`;
+      }, 600);
+    }
+  </script>
+
+</body>
+</html>
