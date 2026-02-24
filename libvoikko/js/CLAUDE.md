@@ -1,77 +1,102 @@
-# CLAUDE.md — libvoikko JS/WASM 패키지
+# CLAUDE.md -- JS/WASM Package
 
-## 개요
+npm: `@yongsk0066/voikko` v0.4.0. Thin ESM TypeScript wrapper around the Rust `voikko-wasm` crate (wasm-bindgen).
 
-Rust voikko-wasm (wasm-bindgen)을 ESM TypeScript 패키지로 래핑.
-npm: `@yongsk0066/voikko` (v0.4.0)
+## Stack
 
-## 스택
+- **pnpm** package manager
+- **tsdown** bundler (rolldown-based, generates `.d.ts`, injects `__PKG_VERSION__` define)
+- **vitest** test framework (37 tests)
+- **ESM only** -- no CJS support
 
-- **pnpm** — 패키지 매니저
-- **tsdown** — 라이브러리 번들러 (rolldown 기반, .d.ts 생성, `__PKG_VERSION__` define 주입)
-- **vitest** — 테스트 프레임워크
-- **ESM only** — CJS 미지원
-
-## 디렉토리 구조
+## Directory Layout
 
 ```
-libvoikko/js/
+js/
 ├── src/
-│   ├── index.ts          # Voikko 클래스 (thin wrapper, ~270줄)
-│   ├── types.ts          # 타입 정의 (Analysis, Token, GrammarError 등)
-│   └── wasm-loader.ts    # loadWasm, loadDict + 에러 클래스 + 캐싱
+│   ├── index.ts          # Voikko class (~270 lines, pure delegation + type mapping)
+│   ├── types.ts           # TS types (Analysis, Token, Sentence, GrammarError, VoikkoInitOptions)
+│   └── wasm-loader.ts     # loadWasm, loadDict, error classes, caching logic
 ├── test/
-│   ├── voikko.test.ts    # vitest 테스트 (37개)
-│   └── setup-dict.ts     # globalSetup: 모노레포 사전 자동 감지
-├── dict/                 # 번들 사전 (mor.vfst 3.8MB, autocorr.vfst, index.txt)
-├── wasm/                 # wasm-bindgen 출력 (voikko_wasm_bg.wasm, 189KB)
-├── dist/                 # tsdown 빌드 출력 (index.mjs 14KB)
-├── test.html             # 브라우저 테스트 페이지
+│   ├── voikko.test.ts     # 37 vitest tests
+│   └── setup-dict.ts      # globalSetup: monorepo dictionary auto-detection
+├── dict/                  # Bundled dictionary (mor.vfst 3.8MB, autocorr.vfst, index.txt)
+├── wasm/                  # wasm-bindgen output (voikko_wasm_bg.wasm 189KB + .js + .d.ts)
+├── dist/                  # tsdown build output (index.mjs 14KB + index.d.mts)
+├── test.html              # Browser manual test page
+├── tsdown.config.ts       # Build config with __PKG_VERSION__ define
 └── package.json
 ```
 
-## 빌드 명령어
+## Build
 
 ```bash
 cd libvoikko/js
 pnpm install
-pnpm build          # → dist/index.mjs + dist/index.d.mts
-pnpm test           # 37 vitest
+pnpm build     # dist/index.mjs + dist/index.d.mts
+pnpm test      # 37 vitest
 ```
 
-## 아키텍처
+## Architecture
 
-### 초기화 파이프라인
+### Initialization Pipeline
 
+```mermaid
+graph LR
+    opts[options] --> lw[loadWasm cached]
+    opts --> ld[loadDict cached]
+    lw --> init["new WasmVoikko(mor, autocorr)"]
+    ld --> init
+    init --> v[Voikko instance]
 ```
-options ──┬── loadWasm() (캐시) ──┐
-          │                       ├── new WasmVoikko(morData, autocorrData) ── Voikko
-          └── loadDict() (캐시) ──┘
-```
 
-- `loadWasm`: WASM 모듈 캐싱 (에러 시 캐시 초기화)
-- `loadDict`: 사전 캐싱 (키: URL/path/bundled/cdn)
-- Node.js: 번들 사전 자동 발견 (zero-config)
-- Browser: unpkg CDN fallback (zero-config)
+`loadWasm` and `loadDict` run in parallel via `Promise.all`. Both are cached with error-invalidation: if loading fails, the cache entry is cleared so the next call retries.
 
-### 에러 클래스
+### Source Files
 
-- `VoikkoError` — 베이스 에러
-- `WasmLoadError extends VoikkoError` — WASM 로드 실패
-- `DictionaryLoadError extends VoikkoError` — 사전 로드 실패 (`.fileName` 포함)
+**index.ts** -- The `Voikko` class. Private constructor; public static `init()` factory. Every method delegates to `WasmVoikko` (the wasm-bindgen handle) after an `ensureActive()` guard. Type mapping converts WASM return values (PascalCase enums like `Word`, `Probable`) to the public TS types (SCREAMING_CASE like `WORD`, `PROBABLE`).
 
-### Voikko 클래스
+**wasm-loader.ts** -- Two loaders:
+- `loadWasm(options)` -- loads and initializes the WASM module. Node.js reads the `.wasm` file from disk; browser fetches from `wasmUrl` or CDN.
+- `loadDict(options)` -- loads dictionary files. Resolution order: explicit `dictionaryUrl`/`dictionaryPath` > Node.js bundled dict > browser CDN.
 
-- `#handle: WasmVoikko | null` + `#terminated` flag
-- `ensureActive()` — terminate 후 메서드 호출 시 명확한 에러
-- 비즈니스 로직은 전부 Rust(voikko-fi)에 있음. TS 레이어는 순수 위임 + 타입 매핑.
+Dictionary files are split into required (`index.txt`, `mor.vfst`) and optional (`autocorr.vfst`). Required files throw `DictionaryLoadError` on failure; optional files log warnings.
 
-### 사전 경로 해석
-- **Node.js** (기본): 번들 `dict/` 자동 발견
-- **Node.js** (`dictionaryPath`): flat 또는 V5 구조 자동 감지
-- **Browser** (기본): unpkg CDN flat fetch
-- **Browser** (`dictionaryUrl`): `{url}/5/mor-standard/{file}` fetch
+Node.js filesystem loading auto-detects flat layout (`dict/mor.vfst`) and V5 structure (`dict/5/mor-standard/mor.vfst`).
 
-### CDN 버전 동기화
-- `__PKG_VERSION__` → tsdown/vitest `define`으로 `package.json` version 자동 주입
-- CDN URL: `https://unpkg.com/@yongsk0066/voikko@{version}/...`
+**types.ts** -- Pure type definitions. `Analysis` uses an index signature `[key: string]: string | undefined` for extensibility beyond the known morphological attributes.
+
+### Error Classes (wasm-loader.ts)
+
+- `VoikkoError` -- base error
+- `WasmLoadError extends VoikkoError` -- WASM load/init failure (includes `cause`)
+- `DictionaryLoadError extends VoikkoError` -- dictionary load failure (includes `fileName` and `cause`)
+
+### Voikko Class (index.ts)
+
+- `#handle: WasmVoikko | null` + `#terminated: boolean`
+- `ensureActive()` throws a clear error after `terminate()`
+- `terminate()` is idempotent (no-op on second call)
+- All business logic lives in Rust (voikko-fi crate). The TS layer is pure delegation + type mapping.
+- `attributeValues(name)` returns possible values for a morphological attribute, or `null`.
+
+### CDN Version Sync
+
+`__PKG_VERSION__` is injected at build time by tsdown (and vitest) from `package.json` version. CDN URLs use this version: `https://unpkg.com/@yongsk0066/voikko@{version}/...`
+
+### Dictionary Path Resolution
+
+- **Node.js default**: bundled `dict/` directory (zero-config)
+- **Node.js `dictionaryPath`**: auto-detects flat or V5 structure
+- **Browser default**: unpkg CDN with flat layout
+- **Browser `dictionaryUrl`**: V5 structure (`{url}/5/mor-standard/{file}`)
+
+### Package Exports
+
+Single ESM entrypoint: `dist/index.mjs`. Published files: `dist/`, `wasm/`, `dict/`.
+
+### Key Types Exported
+
+Classes: `Voikko`, `VoikkoError`, `WasmLoadError`, `DictionaryLoadError`
+
+Type aliases: `Token`, `Sentence`, `GrammarError`, `Analysis`, `TokenType`, `SentenceStartType`, `SuggestionStrategy`, `VoikkoInitOptions`

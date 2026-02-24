@@ -1,6 +1,6 @@
 # @yongsk0066/voikko
 
-Finnish NLP library for JavaScript — spell checking, morphological analysis, hyphenation, grammar checking, and tokenization. Powered by Rust compiled to WebAssembly.
+Finnish NLP library for JavaScript -- spell checking, morphological analysis, hyphenation, grammar checking, and tokenization. Powered by Rust compiled to WebAssembly.
 
 ## Install
 
@@ -8,11 +8,11 @@ Finnish NLP library for JavaScript — spell checking, morphological analysis, h
 npm install @yongsk0066/voikko
 ```
 
-## Usage
+## Quick Start
 
 ### Node.js (zero-config)
 
-Finnish dictionary is bundled in the package. No setup required.
+The Finnish dictionary is bundled in the package. No setup required.
 
 ```typescript
 import { Voikko } from '@yongsk0066/voikko';
@@ -39,7 +39,7 @@ voikko.terminate(); // release resources
 
 ### Browser (zero-config)
 
-WASM and dictionary files are automatically fetched from CDN. No setup needed.
+WASM and dictionary files are automatically fetched from CDN.
 
 ```typescript
 import { Voikko } from '@yongsk0066/voikko';
@@ -50,7 +50,7 @@ voikko.spell('koira'); // true
 
 ### Browser (self-hosted)
 
-For production, serve files yourself to avoid CDN dependency:
+Serve files yourself to avoid CDN dependency:
 
 ```typescript
 const voikko = await Voikko.init('fi', {
@@ -61,69 +61,86 @@ const voikko = await Voikko.init('fi', {
 
 Copy dictionary files from `node_modules/@yongsk0066/voikko/dict/` and the WASM binary from `node_modules/@yongsk0066/voikko/wasm/voikko_wasm_bg.wasm` to your public directory.
 
-## API
+## Initialization
+
+```mermaid
+graph LR
+    A["Voikko.init(lang, opts)"] --> B["loadWasm()"]
+    A --> C["loadDict()"]
+    B --> D["new WasmVoikko(mor, autocorr)"]
+    C --> D
+    D --> E["Voikko instance"]
+```
+
+Both WASM and dictionary loading run in parallel. Results are cached after the first call -- subsequent `Voikko.init()` calls reuse the loaded modules instantly.
 
 ### `Voikko.init(language?, options?)`
 
-Creates a new Voikko instance. Returns `Promise<Voikko>`.
+Returns `Promise<Voikko>`.
 
-- `language` — BCP 47 tag (default: `'fi'`)
-- `options.dictionaryUrl` — URL base for dictionary files (browser)
-- `options.dictionaryPath` — Local filesystem path (Node.js)
-- `options.wasmUrl` — URL to WASM binary (browser)
+- `language` -- BCP 47 tag (default: `'fi'`)
+- `options.dictionaryUrl` -- URL base for dictionary files (browser, expects V5 layout)
+- `options.dictionaryPath` -- filesystem path to dictionary (Node.js, flat or V5 layout)
+- `options.wasmUrl` -- URL to WASM binary (browser)
 
 All options are optional. Defaults to bundled dictionary (Node.js) or CDN (browser).
 
-### Spell checking
+## API
 
-- `voikko.spell(word)` — `boolean`
-- `voikko.suggest(word)` — `string[]`
+### Spell Checking
 
-### Morphological analysis
+- `voikko.spell(word)` -- returns `boolean`
+- `voikko.suggest(word)` -- returns `string[]`
 
-- `voikko.analyze(word)` — `Analysis[]`
+### Morphological Analysis
 
-Returns analysis objects with fields: `BASEFORM`, `CLASS`, `STRUCTURE`, `SIJAMUOTO`, `NUMBER`, `PERSON`, `MOOD`, `TENSE`, `PARTICIPLE`, `POSSESSIVE`, `COMPARISON`, `NEGATIVE`, `FOCUS`, `WORDBASES`, `WORDIDS`, `FSTOUTPUT`.
+- `voikko.analyze(word)` -- returns `Analysis[]`
+
+Each `Analysis` object contains morphological attributes as key-value pairs: `BASEFORM`, `CLASS`, `STRUCTURE`, `SIJAMUOTO`, `NUMBER`, `PERSON`, `MOOD`, `TENSE`, `PARTICIPLE`, `POSSESSIVE`, `COMPARISON`, `NEGATIVE`, `FOCUS`, `WORDBASES`, `WORDIDS`, `FSTOUTPUT`.
+
+- `voikko.attributeValues(name)` -- returns `string[] | null`. Lists possible values for a given morphological attribute.
 
 ### Hyphenation
 
-- `voikko.hyphenate(word, separator?, allowContextChanges?)` — `string`
-- `voikko.getHyphenationPattern(word)` — `string`
+- `voikko.hyphenate(word, separator?, allowContextChanges?)` -- returns `string` with separator inserted at break points
+- `voikko.getHyphenationPattern(word)` -- returns a pattern string where `' '` = no break, `'-'` = hyphenation point (preserved), `'='` = hyphenation point (replaced)
 
-### Grammar checking
+### Grammar Checking
 
-- `voikko.grammarErrors(text)` — `GrammarError[]`
+- `voikko.grammarErrors(text)` -- returns `GrammarError[]`. Accepts multiple paragraphs separated by newlines.
 
 ### Tokenization
 
-- `voikko.tokens(text)` — `Token[]` with types: `WORD`, `PUNCTUATION`, `WHITESPACE`, `UNKNOWN`
-- `voikko.sentences(text)` — `Sentence[]`
+- `voikko.tokens(text)` -- returns `Token[]` with types: `WORD`, `PUNCTUATION`, `WHITESPACE`, `UNKNOWN`
+- `voikko.sentences(text)` -- returns `Sentence[]`
 
 ### Options
 
-- `voikko.setIgnoreDot(boolean)`
-- `voikko.setIgnoreNumbers(boolean)`
-- `voikko.setIgnoreUppercase(boolean)`
-- `voikko.setAcceptFirstUppercase(boolean)`
-- `voikko.setAcceptAllUppercase(boolean)`
-- `voikko.setIgnoreNonwords(boolean)`
-- `voikko.setAcceptExtraHyphens(boolean)`
-- `voikko.setAcceptMissingHyphens(boolean)`
-- `voikko.setAcceptTitlesInGc(boolean)`
-- `voikko.setAcceptUnfinishedParagraphsInGc(boolean)`
-- `voikko.setAcceptBulletedListsInGc(boolean)`
-- `voikko.setNoUglyHyphenation(boolean)`
-- `voikko.setHyphenateUnknownWords(boolean)`
-- `voikko.setMinHyphenatedWordLength(number)`
-- `voikko.setSuggestionStrategy('TYPO' | 'OCR')`
+```typescript
+voikko.setIgnoreDot(boolean)
+voikko.setIgnoreNumbers(boolean)
+voikko.setIgnoreUppercase(boolean)
+voikko.setAcceptFirstUppercase(boolean)
+voikko.setAcceptAllUppercase(boolean)
+voikko.setIgnoreNonwords(boolean)
+voikko.setAcceptExtraHyphens(boolean)
+voikko.setAcceptMissingHyphens(boolean)
+voikko.setAcceptTitlesInGc(boolean)
+voikko.setAcceptUnfinishedParagraphsInGc(boolean)
+voikko.setAcceptBulletedListsInGc(boolean)
+voikko.setNoUglyHyphenation(boolean)
+voikko.setHyphenateUnknownWords(boolean)
+voikko.setMinHyphenatedWordLength(number)
+voikko.setSuggestionStrategy('TYPO' | 'OCR')
+```
 
 ### Cleanup
 
-- `voikko.terminate()` — Release all resources. Instance must not be used after this call.
+- `voikko.terminate()` -- releases all resources. Safe to call multiple times. The instance must not be used after the first call.
 
 ## Error Handling
 
-The library provides typed errors for programmatic handling:
+Three typed error classes for programmatic handling:
 
 ```typescript
 import { Voikko, WasmLoadError, DictionaryLoadError } from '@yongsk0066/voikko';
@@ -139,7 +156,7 @@ try {
 }
 ```
 
-Calling methods on a terminated instance throws an error:
+Calling methods on a terminated instance throws immediately:
 
 ```typescript
 voikko.terminate();
@@ -148,14 +165,13 @@ voikko.spell('koira'); // Error: Cannot use Voikko instance after terminate()
 
 ## Bundle Size
 
-| Component | Size | Notes |
-|-----------|------|-------|
-| JS wrapper | 14 KB | `dist/index.mjs` |
-| WASM binary | 189 KB | Rust compiled, wasm-opt applied |
-| Dictionary | 3.8 MB | Finnish morphology (`mor.vfst`) |
+| Component | Size |
+|-----------|------|
+| JS wrapper | 14 KB |
+| WASM binary | 189 KB |
+| Dictionary | 3.8 MB |
 
-Node.js: All files are bundled in the package.
-Browser: WASM and dictionary are fetched from CDN by default (~4 MB total on first load, cached by browser).
+In Node.js, all files are bundled in the package. In the browser, WASM and dictionary are fetched on first load (~4 MB total, then cached by the browser).
 
 ## Next.js / SSR
 
@@ -192,7 +208,6 @@ app.get('/spell/:word', (req, res) => {
   res.json({ correct: voikko.spell(req.params.word) });
 });
 
-// Call terminate() only on shutdown
 process.on('SIGTERM', () => voikko.terminate());
 ```
 

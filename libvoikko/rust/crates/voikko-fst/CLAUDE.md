@@ -1,43 +1,56 @@
 # voikko-fst
 
-언어 무관한 VFST (Voikko Finite State Transducer) 엔진.
+Language-agnostic VFST (Voikko Finite State Transducer) engine. Reads `.vfst` binary files and traverses the graph to produce output strings from input words.
 
-## 모듈 구조
+## Purpose
 
-| 모듈 | C++ 원본 | 역할 | 난이도 |
-|------|----------|------|--------|
-| `format` | `Transducer.cpp:163-178` | 16B 헤더, 바이너리 파싱 | 낮음 |
-| `transition` | `Transition.hpp`, `WeightedTransition.hpp` | `#[repr(C)]` + bytemuck zero-copy | 낮음 |
-| `symbols` | `UnweightedTransducer.cpp:125-189` | 심볼 테이블 (HashMap<char, u16>) | 낮음 |
-| `flags` | `Transducer.cpp:62-123` | Flag diacritics (P,C,U,R,D) | 낮음 |
-| `config` | `Configuration.hpp/cpp` | 순회 상태 스택 | 낮음 |
-| `unweighted` | `UnweightedTransducer.cpp:228-370` | Unweighted FST 순회 | 중간 |
-| `weighted` | `WeightedTransducer.cpp:230-428` | Weighted FST 순회 (backtrack) | 중간 |
+This crate loads and traverses FST graphs stored in the `.vfst` binary format. It knows nothing about Finnish -- it just follows graph edges and returns symbol sequences. The `voikko-fi` crate uses it to perform morphological analysis, spell checking, and other NLP tasks.
 
-## 핵심 설계 결정
+## Key types and traits
 
-- **Byte-swap 제거**: WASM은 항상 LE, 사전도 LE로 작성됨
-- **mmap 제거**: WASM은 `Vec<u8>`, native는 나중에 `memmap2` 추가
-- **Trait 기반**: `Transducer` trait로 unweighted/weighted 통합
-- **Zero-copy**: 트랜지션 테이블은 `bytemuck::cast_slice`로 직접 매핑
-- **C++ goto 패턴 → labeled loop**: `continue 'outer` 사용
+- `Transducer` trait -- the core abstraction with `prepare(&[char]) -> bool` and `next(&mut String) -> bool` methods. Uses a coroutine-style pattern: call `prepare` once, then `next` repeatedly until it returns `false`.
+- `UnweightedTransducer` -- loads and traverses unweighted `.vfst` files (8-byte transitions)
+- `WeightedTransducer` -- loads and traverses weighted `.vfst` files (16-byte transitions with weight)
+- `VfstError` -- typed error enum for parsing failures (InvalidMagic, TooShort, TypeMismatch, InvalidSymbolTable, InvalidFlagDiacritic, AlignmentError)
+- `Configuration` / `WeightedConfiguration` -- explicit DFS stack for traversal state
 
-## VFST 바이너리 포맷 요약
+## Module structure
 
-- 16B 헤더: magic(8B) + weighted_flag(1B) + reserved(7B)
-- 심볼 테이블: count(2B) + null-terminated UTF-8 strings
-- 패딩: unweighted=8B, weighted=16B 경계
-- 트랜지션: unweighted=8B(symIn,symOut,transInfo), weighted=16B(+weight)
-
-## 성능 핫 패스
-
-`Transducer::next()` — 단어당 ~10,000회 호출. 순회 중 힙 할당 0이 목표.
-
-## 빌드 & 테스트
-
-```bash
-cargo test -p voikko-fst
-cargo clippy -p voikko-fst -- -D warnings
+```
+src/
+  lib.rs         # Transducer trait, VfstError, MAX_LOOP_COUNT
+  format.rs      # 16-byte header parsing and validation
+  transition.rs  # #[repr(C)] transition structs + bytemuck zero-copy
+  symbols.rs     # symbol table (HashMap<char, u16> + Vec<String>)
+  flags.rs       # flag diacritic operations (P, C, U, R, D)
+  config.rs      # traversal configuration (explicit DFS stack)
+  unweighted.rs  # UnweightedTransducer loading + traversal
+  weighted.rs    # WeightedTransducer loading + traversal (with backtracking)
 ```
 
-상세 스펙: `plan/phase2-rust/02-fst-engine.md`
+## VFST binary format
+
+The `.vfst` file layout:
+
+1. **16-byte header**: 8-byte magic + 1-byte weighted flag + 7 reserved bytes
+2. **Symbol table**: 2-byte count + null-terminated UTF-8 strings
+3. **Padding**: aligned to 8 bytes (unweighted) or 16 bytes (weighted)
+4. **Transition table**: array of fixed-size entries -- 8 bytes each for unweighted (symIn, symOut, transInfo), 16 bytes for weighted (+weight field)
+
+## Design decisions
+
+- **No byte-swap**: WASM is always little-endian, and dictionaries are written in LE. Byte-swap logic from C++ is removed.
+- **No mmap**: data is loaded as `Vec<u8>`. Native mmap support can be added later via `memmap2`.
+- **Zero-copy transitions**: transition tables are cast directly from bytes using `bytemuck::cast_slice`, avoiding per-transition allocation.
+- **Explicit DFS stack**: traversal uses `continue 'outer` labeled loops instead of the C++ goto pattern. No recursion, keeping memory usage predictable.
+
+## Performance
+
+`Transducer::next()` is the hottest function in the codebase -- it is called roughly 10,000 times per word during morphological analysis. The zero-allocation goal in the traversal inner loop is critical for performance.
+
+## Build and test
+
+```bash
+cargo test -p voikko-fst              # 71 tests
+cargo clippy -p voikko-fst -- -D warnings
+```

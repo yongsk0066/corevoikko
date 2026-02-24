@@ -1,12 +1,12 @@
 General information
 ===================
 
-Libvoikko is a library for free natural language processing.
-The core library is written in Rust. The VFST backend provides
+Libvoikko is a library for Finnish natural language processing. The core
+is written in Rust (edition 2024, MSRV 1.86). The VFST backend provides
 morphology-based analysis for Finnish.
 
-Libvoikko provides spell checking, hyphenation, grammar checking and
-morphological analysis for Finnish language.
+Libvoikko provides spell checking, hyphenation, grammar checking,
+morphological analysis, tokenization, and sentence splitting.
 
 
 License
@@ -28,18 +28,42 @@ Features
  - Grammar checking and context-sensitive spell checking using paragraph
    based API.
  - String tokenizer and sentence splitter.
- - Morphological analyzer.
+ - Morphological analyzer with full inflection details.
  - Available through JS/TS (WASM), Python, Java, C#, Common Lisp, and C APIs.
 
-Documentation for the C API can be found in the header file rust/crates/voikko-ffi/include/voikko.h.
+Documentation for the C API is in rust/crates/voikko-ffi/include/voikko.h.
+
+
+Directory structure
+===================
+
+ rust/          Rust workspace (6 crates, 637 tests)
+   crates/
+     voikko-core/   Shared types and enums (68 tests)
+     voikko-fst/    VFST finite state transducer engine (71 tests)
+     voikko-fi/     Finnish language module (494 tests, 10 ignored)
+     voikko-wasm/   WebAssembly bindings via wasm-bindgen (189KB, 4 tests)
+     voikko-ffi/    C FFI shared library (420KB, 30+ functions)
+     voikko-cli/    8 command-line tools
+
+ js/            npm package @yongsk0066/voikko (37 vitest)
+ python/        Python ctypes bindings
+ java/          Java JNA bindings
+ cs/            C# P/Invoke bindings
+ cl/            Common Lisp CFFI bindings
+ legacy/        Original C++ source (preserved for reference)
+ doc/           API documentation
+ data/          Grammar help XML (gchelp.xml)
 
 
 Build (Rust)
 ============
 
   cd rust
+  cargo fmt --all --check
   cargo test --all-features      # 637 tests
   cargo clippy --all-features -- -D warnings
+  cargo audit
 
 WASM build:
 
@@ -47,12 +71,20 @@ WASM build:
   cargo build --target wasm32-unknown-unknown --release -p voikko-wasm
   wasm-bindgen target/wasm32-unknown-unknown/release/voikko_wasm.wasm \
     --out-dir ../js/wasm --target web --typescript
+  wasm-opt ../js/wasm/voikko_wasm_bg.wasm -Oz --enable-bulk-memory \
+    -o ../js/wasm/voikko_wasm_bg.wasm
 
 FFI shared library:
 
   cd rust
   cargo build --release -p voikko-ffi
-  # → target/release/libvoikko_ffi.{dylib,so,dll}
+  # produces target/release/libvoikko_ffi.{dylib,so,dll}
+
+JS/TS package:
+
+  cd js
+  pnpm install && pnpm build     # dist/index.mjs (14KB)
+  pnpm test                      # 37 vitest
 
 
 Dictionary files

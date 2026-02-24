@@ -1,6 +1,6 @@
 # Corevoikko
 
-Finnish natural language processing library — spell checking, morphological analysis, hyphenation, grammar checking, and tokenization.
+Finnish natural language processing library -- spell checking, morphological analysis, hyphenation, grammar checking, and tokenization.
 
 This is a Rust rewrite of the original [Voikko](https://voikko.puimula.org/) C++ library, compiled to native code and WebAssembly. The original C++ source is preserved in `libvoikko/legacy/` for reference.
 
@@ -13,32 +13,6 @@ This is a Rust rewrite of the original [Voikko](https://voikko.puimula.org/) C++
 - **Grammar checking** with context-sensitive paragraph analysis
 - **Tokenization** and sentence splitting
 
-## Repository Structure
-
-```
-corevoikko/
-├── libvoikko/
-│   ├── rust/                  # Rust implementation (6 crates, 637 tests)
-│   │   └── crates/
-│   │       ├── voikko-core/   # Shared types and enums
-│   │       ├── voikko-fst/    # VFST finite state transducer engine
-│   │       ├── voikko-fi/     # Finnish language module
-│   │       ├── voikko-wasm/   # WebAssembly build (wasm-bindgen)
-│   │       ├── voikko-ffi/    # C FFI shared library
-│   │       └── voikko-cli/    # CLI tools (8 binaries)
-│   ├── js/                    # npm package (@yongsk0066/voikko)
-│   ├── python/                # Python bindings (ctypes → voikko-ffi)
-│   ├── java/                  # Java bindings (JNA → voikko-ffi)
-│   ├── cs/                    # C# bindings (P/Invoke → voikko-ffi)
-│   ├── cl/                    # Common Lisp bindings (CFFI → voikko-ffi)
-│   └── legacy/                # Original C++ source (preserved)
-├── voikko-fi/                 # Finnish dictionary data (VFST format)
-├── plan/                      # Porting design documents
-├── data/                      # Grammar help XML
-├── tests/                     # Integration test data
-└── tools/                     # Developer utilities
-```
-
 ## Quick Start
 
 ### npm (Browser / Node.js)
@@ -50,20 +24,23 @@ npm install @yongsk0066/voikko
 ```typescript
 import { Voikko } from '@yongsk0066/voikko';
 
-// Node.js — dictionary is bundled, zero config
+// Node.js -- dictionary is bundled, zero config
 const voikko = await Voikko.init();
 
-// Browser — serve dictionary files via HTTP
-const voikko = await Voikko.init('fi', { dictionaryUrl: '/dict/' });
+// Browser -- WASM and dictionary fetched from CDN automatically
+const voikko = await Voikko.init();
+
+// Browser (self-hosted) -- serve files from your own server
+const voikko = await Voikko.init('fi', { dictionaryUrl: '/dict/', wasmUrl: '/voikko.wasm' });
 
 voikko.spell('koira');        // true
 voikko.suggest('koirra');     // ['koira', ...]
-voikko.analyze('koirien');    // [{ STRUCTURE: '=pppppp=p', ... }]
+voikko.analyze('koirien');    // [{ BASEFORM: 'koira', CLASS: 'nimisana', ... }]
 voikko.hyphenate('kissa');    // 'kis-sa'
 voikko.terminate();
 ```
 
-Finnish dictionary files are **bundled** in the npm package. Node.js users need no additional setup. For browser usage, copy the dictionary files from `node_modules/@yongsk0066/voikko/dict/` to your public directory and pass `dictionaryUrl`.
+Finnish dictionary files are bundled in the npm package. Node.js users need no additional setup. Browser users can rely on automatic CDN loading, or copy dictionary files from `node_modules/@yongsk0066/voikko/dict/` to a public directory and pass `dictionaryUrl`.
 
 ### Rust
 
@@ -75,61 +52,80 @@ cargo clippy --all-features -- -D warnings
 
 ### CLI Tools
 
+Eight command-line tools for interactive use:
+
 ```bash
 cd libvoikko/rust
 VOIKKO_DICT_PATH=/path/to/dict cargo run -p voikko-cli --bin voikko-spell
 ```
 
-Available: `voikko-spell`, `voikko-suggest`, `voikko-analyze`, `voikko-hyphenate`, `voikko-tokenize`, `voikko-gc-pretty`, `voikko-baseform`, `voikko-readability`
+Available: `voikko-spell`, `voikko-suggest`, `voikko-analyze`, `voikko-hyphenate`, `voikko-tokenize`, `voikko-gc-pretty`, `voikko-baseform`, `voikko-readability`.
 
 ### Native Library (FFI)
 
 ```bash
 cd libvoikko/rust
 cargo build --release -p voikko-ffi
-# → target/release/libvoikko_ffi.{dylib,so,dll}
+# produces target/release/libvoikko_ffi.{dylib,so,dll}
 ```
 
-Bindings available for Python (ctypes), Java (JNA), C# (P/Invoke), and Common Lisp (CFFI). See `libvoikko/python/`, `libvoikko/java/`, `libvoikko/cs/`, `libvoikko/cl/`.
-
-### WASM Build
-
-```bash
-cd libvoikko/rust
-cargo build --target wasm32-unknown-unknown --release -p voikko-wasm
-wasm-bindgen target/wasm32-unknown-unknown/release/voikko_wasm.wasm \
-  --out-dir ../js/wasm --target web --typescript
-wasm-opt ../js/wasm/voikko_wasm_bg.wasm -Oz --enable-bulk-memory \
-  -o ../js/wasm/voikko_wasm_bg.wasm
-```
+Bindings for Python (ctypes), Java (JNA), C# (P/Invoke), and Common Lisp (CFFI) are in `libvoikko/python/`, `libvoikko/java/`, `libvoikko/cs/`, `libvoikko/cl/`.
 
 ### Finnish Dictionary
 
 ```bash
 cd voikko-fi
-make vvfst                    # Requires foma, Python 3, GNU make
+make vvfst                    # requires foma, Python 3, GNU make
 make vvfst-install DESTDIR=~/.voikko
 ```
+
+## How It Fits Together
+
+```mermaid
+graph LR
+    dict[(voikko-fi<br/>dictionary)] --> core
+
+    subgraph libvoikko/rust
+        core[voikko-core + voikko-fst + voikko-fi]
+        core --> wasm[voikko-wasm<br/>189KB]
+        core --> ffi[voikko-ffi<br/>420KB]
+        core --> cli[voikko-cli<br/>8 tools]
+    end
+
+    wasm --> js["JS/TS (npm)<br/>@yongsk0066/voikko"]
+    ffi --> py[Python]
+    ffi --> java[Java]
+    ffi --> cs["C#"]
+    ffi --> cl[Common Lisp]
+```
+
+The Rust workspace in `libvoikko/rust/` contains six crates. The Finnish language module (`voikko-fi`) implements all NLP logic on top of shared types (`voikko-core`) and the FST engine (`voikko-fst`). Two output crates expose this to other languages: `voikko-wasm` for JavaScript via WebAssembly, and `voikko-ffi` for native bindings through a C API. The `voikko-cli` crate provides standalone command-line tools.
 
 ## Language Bindings
 
 | Language | Location | Mechanism | Status |
 |----------|----------|-----------|--------|
 | JS/TS | `libvoikko/js/` | voikko-wasm (wasm-bindgen) | 37 vitest |
-| Python | `libvoikko/python/` | ctypes → voikko-ffi | Verified |
-| Java | `libvoikko/java/` | JNA → voikko-ffi | Scaffold |
-| C# | `libvoikko/cs/` | P/Invoke → voikko-ffi | Scaffold |
-| Common Lisp | `libvoikko/cl/` | CFFI → voikko-ffi | Scaffold |
+| Python | `libvoikko/python/` | ctypes via voikko-ffi | Verified |
+| Java | `libvoikko/java/` | JNA via voikko-ffi | Scaffold |
+| C# | `libvoikko/cs/` | P/Invoke via voikko-ffi | Scaffold |
+| Common Lisp | `libvoikko/cl/` | CFFI via voikko-ffi | Scaffold |
 
 ## License
 
-Tri-licensed under [MPL 1.1](libvoikko/LICENSE.CORE) / [GPL 2+](libvoikko/COPYING) / [LGPL 2.1+](libvoikko/LICENSE.CORE).
+The repository uses layered licensing:
 
-See [LICENSE](LICENSE) for full details.
+- **Repository overall**: GPL 3+
+- **libvoikko**: additionally available under MPL 1.1 / GPL 2+ / LGPL 2.1+ (tri-license)
+- **data, voikko-fi**: additionally available under GPL 2+
+
+See [LICENSE](LICENSE) and [libvoikko/LICENSE.CORE](libvoikko/LICENSE.CORE) for full details.
 
 ## Credits
 
-This project is a Rust rewrite of [Voikko](https://voikko.puimula.org/), originally created by Harri Pitkanen and contributors. The original C++ implementation and the linguistic data in `voikko-fi/` are the work of the Voikko project contributors.
+This project is a Rust rewrite of [Voikko](https://voikko.puimula.org/), originally created by Harri Pitkanen and contributors. The linguistic data in `voikko-fi/` is the work of the Voikko project contributors.
+
+Rust rewrite and npm package by Yongseok Jang.
 
 ## Links
 
