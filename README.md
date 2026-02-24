@@ -127,6 +127,11 @@ This project is a Rust rewrite of [Voikko](https://voikko.puimula.org/), origina
 
 Rust rewrite and npm package by Yongseok Jang.
 
+## Documentation
+
+- [LEARNING.md](LEARNING.md) — domain knowledge guide for newcomers (FST, Finnish morphology, spell checking concepts, with AI study prompts)
+- [ARCHITECTURE.md](libvoikko/rust/ARCHITECTURE.md) — Rust codebase architecture and design decisions
+
 ## Links
 
 - [npm package](https://www.npmjs.com/package/@yongsk0066/voikko)
