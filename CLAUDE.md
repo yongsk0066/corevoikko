@@ -8,6 +8,8 @@ Corevoikko는 핀란드어 자연어 처리 오픈소스 라이브러리로, 맞
 
 핵심 구현은 **Rust**로 재작성 완료 (Phase 0~5). C++ 원본은 `libvoikko/legacy/`에 보존.
 
+npm 패키지: `@yongsk0066/voikko` (v0.4.0)
+
 라이선스: MPL 1.1 / GPL 2+ / LGPL 2.1+ (tri-license)
 
 ## 디렉토리 구조
@@ -23,23 +25,21 @@ corevoikko/
 │   │       ├── voikko-wasm/   # wasm-bindgen WASM (4 tests, 189KB)
 │   │       ├── voikko-ffi/    # C FFI cdylib (420KB, 30+ 함수)
 │   │       └── voikko-cli/    # Rust CLI 도구 (8개 바이너리)
-│   ├── js/                    # ESM TypeScript 래퍼 (37 vitest)
+│   ├── js/                    # npm 패키지 @yongsk0066/voikko (37 vitest)
+│   │   ├── src/               # Voikko 클래스 + wasm-loader + types
+│   │   └── dict/              # 번들 사전 (mor.vfst 3.8MB)
 │   ├── python/libvoikko.py    # Python ctypes → voikko-ffi
 │   ├── java/.../VoikkoRust.java  # Java JNA → voikko-ffi
 │   ├── cs/VoikkoRust.cs       # C# P/Invoke → voikko-ffi
 │   ├── cl/voikko-rust.lisp    # Common Lisp CFFI → voikko-ffi
 │   ├── legacy/                # C++ 원본 (보존용, legacy/cpp-backup 브랜치)
-│   │   ├── cpp-src/           # C++ 소스
-│   │   ├── cpp-test/          # C++ 테스트
-│   │   ├── cs-cpp/            # 구 C# 바인딩
-│   │   ├── autotools/         # configure.ac, autogen.sh, m4/
-│   │   └── emscripten/        # 구 WASM 빌드 (libvoikko_api.js)
 │   ├── doc/                   # 문서
 │   └── data/                  # 문법 도움말 XML
 ├── voikko-fi/                 # 핀란드어 사전 데이터 (VFST)
+├── plan/                      # 포팅 설계 문서 (15개 .md)
 ├── tools/                     # CLI 유틸리티 (Python 스크립트)
 ├── tests/                     # 통합 테스트 데이터
-└── plan/phase2-rust/          # Rust 포팅 설계 문서
+└── .github/workflows/         # CI + Release + CodeQL
 ```
 
 ## 빌드 명령어
@@ -48,8 +48,10 @@ corevoikko/
 
 ```bash
 cd libvoikko/rust
-cargo test --all-features      # 637 tests (core 68 + fst 71 + fi 494 + wasm 4, 10 ignored)
+cargo fmt --all --check           # 포맷 검사
+cargo test --all-features         # 637 tests
 cargo clippy --all-features -- -D warnings
+cargo audit                       # 의존성 취약점 스캔
 cargo bench -p voikko-fi --features handle  # 7개 벤치마크
 ```
 
@@ -86,7 +88,7 @@ VOIKKO_DICT_PATH=/path/to/dict cargo run -p voikko-cli --bin voikko-spell
 
 ```bash
 cd libvoikko/js
-pnpm install && pnpm build    # TS 래퍼 빌드
+pnpm install && pnpm build    # TS 래퍼 빌드 (dist/index.mjs 14KB)
 pnpm test                     # 37 vitest (Tier 1: 구조, Tier 2: WASM 통합)
 ```
 
@@ -98,6 +100,36 @@ make vvfst                    # foma, python3, GNU make 필요
 make vvfst-install DESTDIR=~/.voikko
 ```
 
+## CI/CD 파이프라인
+
+| 워크플로우 | 트리거 | 내용 |
+|-----------|--------|------|
+| CI | push/PR to master | Rust (fmt+test+clippy+audit) + JS/WASM (build+test) |
+| Release | tag v* | test → npm publish + GitHub Release |
+| CodeQL | push/PR to master | JavaScript 보안 분석 |
+
+## npm 패키지 (@yongsk0066/voikko)
+
+### 사용법
+
+```typescript
+// Node.js — zero-config (사전 번들)
+const voikko = await Voikko.init();
+
+// Browser — zero-config (CDN에서 자동 fetch)
+const voikko = await Voikko.init();
+
+// Browser self-host
+const voikko = await Voikko.init('fi', { dictionaryUrl: '/dict/', wasmUrl: '/voikko.wasm' });
+```
+
+### 주요 기능
+- typed error classes: `VoikkoError`, `WasmLoadError`, `DictionaryLoadError`
+- WASM + 사전 캐싱 (에러 시 자동 초기화)
+- terminate guard (use-after-terminate 방지)
+- CDN fallback (unpkg, 버전 자동 동기화)
+- 빌드타임 버전 주입 (`__PKG_VERSION__` define)
+
 ## Rust 아키텍처
 
 ### Cargo Workspace (6 crates)
@@ -107,44 +139,23 @@ make vvfst-install DESTDIR=~/.voikko
 - **voikko-fi** — 핀란드어 모듈 (morphology, speller, hyphenator, tokenizer, suggestion, grammar)
 - **voikko-wasm** — wasm-bindgen WASM 래퍼 (189KB, 15개 메서드 + 14개 옵션 setter)
 - **voikko-ffi** — C FFI cdylib (420KB, C 헤더 `include/voikko.h`, 30+ extern "C" 함수)
-- **voikko-cli** — Rust CLI 도구 (8개 바이너리: spell, suggest, analyze, hyphenate, tokenize, gc-pretty, baseform, readability)
-
-### 언어 바인딩 (5개)
-
-| 언어 | 파일 | 메커니즘 |
-|------|------|----------|
-| JS/TS | `js/src/index.ts` | voikko-wasm (wasm-bindgen) |
-| Python | `python/libvoikko.py` + `voikko-ffi/python/` | voikko-ffi (ctypes) |
-| Java | `java/.../VoikkoRust.java` | voikko-ffi (JNA) |
-| C# | `cs/VoikkoRust.cs` | voikko-ffi (P/Invoke) |
-| Common Lisp | `cl/voikko-rust.lisp` | voikko-ffi (CFFI) |
+- **voikko-cli** — Rust CLI 도구 (8개 바이너리)
 
 ### 사전 파일
 
 - `voikko-fi/vvfst/mor.vfst` (3.8MB) — 형태소 분석 트랜스듀서
 - `voikko-fi/vvfst/autocorr.vfst` (11KB) — 자동교정 트랜스듀서
 - `voikko-fi/vvfst/index.txt` — 사전 메타데이터
-
-### Legacy (C++ 원본)
-
-C++ 소스는 `libvoikko/legacy/`에 격리. 전체 히스토리는 `legacy/cpp-backup` 브랜치에 보존.
-- `legacy/cpp-src/` — C++ 소스 (voikko.h, 모듈별 .cpp/.hpp)
-- `legacy/cpp-test/` — Python unittest 기반 C++ 테스트
-- `legacy/autotools/` — configure.ac, autogen.sh, Makefile.am, m4/
-- `legacy/emscripten/` — Emscripten WASM 빌드 (libvoikko_api.js, build.sh)
+- npm 패키지에도 `js/dict/`로 번들 포함
 
 ## 검증 방법
 
 ```bash
-# Rust 전체 테스트 + clippy
-cd libvoikko/rust && cargo test --all-features && cargo clippy --all-features -- -D warnings
+# Rust 전체 검사
+cd libvoikko/rust && cargo fmt --all --check && cargo test --all-features && cargo clippy --all-features -- -D warnings && cargo audit
 
 # JS/TS 테스트
 cd libvoikko/js && pnpm test
-
-# Python FFI 검증
-VOIKKO_FFI_LIB=libvoikko/rust/target/release/libvoikko_ffi.dylib \
-  python3 -c "from voikko import Voikko; v = Voikko('voikko-fi/vvfst'); print(v.spell('koira'))"
 
 # 벤치마크
 VOIKKO_DICT_PATH=voikko-fi/vvfst cargo bench -p voikko-fi --features handle
